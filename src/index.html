@@ -9,7 +9,8 @@
 </head>
 <body>
   <header>
-    Menu
+    <p>Menu</p>
+    <button>Create New Tab</button>
   </header>
   <main id="draw-area">
   </main>
@@ -18,11 +19,13 @@
     let tabs = [{ active: true },  { active: false }];
 
     // (() => {
-      console.log('hello world');
+      // private
       const main = document.getElementById('draw-area');
+      const button = document.querySelector('button');
+      button.addEventListener('click', (e) => assignNewTab(tabs));
 
       document.addEventListener('DOMContentLoaded', () => {
-        createTabs(tabs);
+        assignTabs(tabs);
         renderTabs(tabs);
       })
 
@@ -35,21 +38,38 @@
         tabs = tabs.map(tab => ({...tab, active: false}));
         tabs[newActiveTab] = {...tabs[newActiveTab], active: true};
         renderTabs(tabs);
-
       })
 
-      function createTabs(tabs) {
-        tabs.forEach((tab, i) => {
-          const aside = document.createElement('aside');
-          const canvas = document.createElement('canvas');
-          aside.id = `tools-menu-${i}`;
-          canvas.id = `draw-${i}`;
-          tabs[i] = Object.assign(tab, { elements: {aside, canvas}});
+      function assignTabs(tabs) {
+        tabs.forEach((status, i) => {
+          tabs[i] = Object.assign(status, { elements: createTab(i)});
         });
       }
 
+      // private
+      function createTab(index) {
+        const aside = document.createElement('aside');
+        const canvas = document.createElement('canvas');
+        aside.id = `tools-menu-${index}`;
+        aside.innerText = index;
+        canvas.id = `draw-${index}`;
+        return { aside, canvas };
+      }
+
+      function assignNewTab(tabs) {
+        button.removeEventListener('click', (e) => assignNewTab(tabs));
+        tabs = tabs.map(tab => ({...tab, active: false}));
+        tabs[tabs.length] = {
+          active: true,
+          elements: createTab(tabs.length)
+        }
+        console.log("created with index", tabs.length);
+        renderTabs(tabs);
+        button.addEventListener('click', (e) => assignNewTab(tabs));
+      }
+
       function renderTabs(tabs) {
-        main.innerHTML='';
+        main.innerHTML = '';
         tabs.forEach((tab, i) => {
           if (tab.active) {
             main.appendChild(tab.elements.aside);

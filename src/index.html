@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Paint</title>
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+  <header>
+    Menu
+  </header>
+  <main id="draw-area">
+  </main>
+  <script>
+    //state
+    let tabs = [{ active: true },  { active: false }];
+
+    // (() => {
+      console.log('hello world');
+      const main = document.getElementById('draw-area');
+
+      document.addEventListener('DOMContentLoaded', () => {
+        createTabs(tabs);
+        renderTabs(tabs);
+      })
+
+      document.addEventListener('dblclick', () => {
+        const newActiveTab = Number(prompt('Which tab you want to activate?'));
+        if (isNaN(newActiveTab) || newActiveTab > tabs.length - 1) {
+          alert("INVALID INDEX MOTHERFUCKER!");
+          return;
+        }
+        tabs = tabs.map(tab => ({...tab, active: false}));
+        tabs[newActiveTab] = {...tabs[newActiveTab], active: true};
+        renderTabs(tabs);
+
+      })
+
+      function createTabs(tabs) {
+        tabs.forEach((tab, i) => {
+          const aside = document.createElement('aside');
+          const canvas = document.createElement('canvas');
+          aside.id = `tools-menu-${i}`;
+          canvas.id = `draw-${i}`;
+          tabs[i] = Object.assign(tab, { elements: {aside, canvas}});
+        });
+      }
+
+      function renderTabs(tabs) {
+        main.innerHTML='';
+        tabs.forEach((tab, i) => {
+          if (tab.active) {
+            main.appendChild(tab.elements.aside);
+            main.appendChild(tab.elements.canvas);
+          }
+        })
+      }
+    // })()
+  </script>
+</body>
+</html>

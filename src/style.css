@@ -1,0 +1,32 @@
+/* body {
+  width: 100%;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+} */
+main {
+  display: grid;
+  grid-template-columns: 1fr 12% 80% 1fr;
+  grid-gap: 2%;
+}
+
+aside {
+  grid-column: 2;
+  background-color: aqua;
+}
+
+canvas {
+  width: 100%;
+  grid-column: 3;
+  background-color: blueviolet;
+}
+
+#tools-menu-1 {
+  background-color: rgb(255, 127, 249);
+}
+
+#draw-1 {
+  background-color: red;
+}
+

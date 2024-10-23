@@ -6,78 +6,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Paint</title>
   <link href="style.css" rel="stylesheet">
+  <script type="module" src="script.js"></script>
 </head>
 <body>
   <header>
     <p>Menu</p>
-    <button>Create New Tab</button>
+    
   </header>
   <main id="draw-area">
+    <aside id="tools">
+
+    </aside>
+
+    <div id="canvas-wrapper">
+      <div id="tab-buttons-wrapper">
+        <button id="add-tab">+</button>
+      </div>
+    </div>
+
+    <aside id="options">
+      
+    </aside>
   </main>
-  <script>
-    //state
-    let tabs = [{ active: true },  { active: false }];
-
-    // (() => {
-      // private
-      const main = document.getElementById('draw-area');
-      const button = document.querySelector('button');
-      button.addEventListener('click', (e) => assignNewTab(tabs));
-
-      document.addEventListener('DOMContentLoaded', () => {
-        assignTabs(tabs);
-        renderTabs(tabs);
-      })
-
-      document.addEventListener('dblclick', () => {
-        const newActiveTab = Number(prompt('Which tab you want to activate?'));
-        if (isNaN(newActiveTab) || newActiveTab > tabs.length - 1) {
-          alert("INVALID INDEX MOTHERFUCKER!");
-          return;
-        }
-        tabs = tabs.map(tab => ({...tab, active: false}));
-        tabs[newActiveTab] = {...tabs[newActiveTab], active: true};
-        renderTabs(tabs);
-      })
-
-      function assignTabs(tabs) {
-        tabs.forEach((status, i) => {
-          tabs[i] = Object.assign(status, { elements: createTab(i)});
-        });
-      }
-
-      // private
-      function createTab(index) {
-        const aside = document.createElement('aside');
-        const canvas = document.createElement('canvas');
-        aside.id = `tools-menu-${index}`;
-        aside.innerText = index;
-        canvas.id = `draw-${index}`;
-        return { aside, canvas };
-      }
-
-      function assignNewTab(tabs) {
-        button.removeEventListener('click', (e) => assignNewTab(tabs));
-        tabs = tabs.map(tab => ({...tab, active: false}));
-        tabs[tabs.length] = {
-          active: true,
-          elements: createTab(tabs.length)
-        }
-        console.log("created with index", tabs.length);
-        renderTabs(tabs);
-        button.addEventListener('click', (e) => assignNewTab(tabs));
-      }
-
-      function renderTabs(tabs) {
-        main.innerHTML = '';
-        tabs.forEach((tab, i) => {
-          if (tab.active) {
-            main.appendChild(tab.elements.aside);
-            main.appendChild(tab.elements.canvas);
-          }
-        })
-      }
-    // })()
-  </script>
 </body>
 </html>

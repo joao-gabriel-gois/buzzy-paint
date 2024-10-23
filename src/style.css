@@ -1,32 +1,108 @@
-/* body {
-  width: 100%;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-} */
+body {
+  background-color: rgba(71, 61, 139, 0.559);
+}
 main {
   display: grid;
-  grid-template-columns: 1fr 12% 80% 1fr;
-  grid-gap: 2%;
+  grid-template-columns: 1fr 12% 74% 12% 1fr;
+  grid-gap: 0.5%;
+  margin: 2em 0;
+  height: 80vh;
 }
 
 aside {
+  border-radius: 5px;
+  background-color: antiquewhite;
+}
+
+#tab-buttons-wrapper {
+  display: flex;
+  gap: 0.5em;
+  overflow-x: scroll;
+  margin-top: -2.33em;
+}
+/* width */
+::-webkit-scrollbar {
+  height: 0.33em;
+  width: 100%;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: rgba(71, 61, 139, 0.119);
+  margin: 0.5em 0.25em;
+  border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgba(71, 61, 139, 0.764);
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 61, 139, 0.394);
+}
+
+button {
+  border: 2px rgba(71, 61, 139, 0.8) solid;
+  background-color: #DDD;
+  color: rgb(71, 61, 139);
+  font-size: 12pt;
+  font-weight: 600;
+  padding: 0.25em 0.5em;
+  text-align: center;
+  transition: 333ms ease-out all;
+  margin-bottom: 0.15em;
+}
+
+button.tab {
+  display: flex;
+  min-width: 5em;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  opacity: 0.55;
+  
+}
+button.tab.active {
+  opacity: 0.85;
+  font-weight: 900;
+}
+
+button.tab:hover {
+ opacity: 1;
+}
+button#add-tab {
+  border-radius: 50%;
+  opacity: 0.55;
+  justify-self: end;
+}
+button#add-tab:hover {
+  opacity: 1;
+}
+aside#tools {
   grid-column: 2;
-  background-color: aqua;
+}
+
+aside#options {
+  grid-column: 4;
 }
 
 canvas {
   width: 100%;
   grid-column: 3;
-  background-color: blueviolet;
+  background-color: #FFF;
+  height: 100%;
+  border-radius: 5px;
+  margin-top: 0.1em;
 }
 
-#tools-menu-1 {
+/* #tools-menu-1 {
   background-color: rgb(255, 127, 249);
 }
 
 #draw-1 {
   background-color: red;
-}
+} */
 

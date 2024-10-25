@@ -1,4 +1,5 @@
 import { DummyCanvasEventListener } from "./dummy-canvas-list.js";
+// import { CanvasEventListener } from "./CanvasEventListener.js";
 
 export class TabsManager {
   constructor(canvasWrapperReference, tabWrapperReference, addTabButtonReference) {
@@ -31,7 +32,7 @@ export class TabsManager {
         canvasListener: new DummyCanvasEventListener(`draw-${i}`) //dependency injection to be refatored
       };
       if (tab.active) {
-        this.tabs[i].canvasListener.init();
+        this.tabs[i].canvasListener.start();
         this.tabButtonsWrapper.insertBefore(
           this.tabs[i].elements.canvasTabButton,
           this.newTabBtn
@@ -55,7 +56,7 @@ export class TabsManager {
     this.tabs = this.tabs.map(tab => ({...tab, active: false}));
     this.tabs[tabIndex] = {...this.tabs[tabIndex], active: true};
     
-    document.dispatchEvent(new Event('canvas-destroy-call'));
+    document.dispatchEvent(new Event('canvas-stop-call'));
     console.log("(TO) current active tab now is:", this.getActiveIndex());
     console.log("\tEVENT CHAIN END\n\n\n");
   }
@@ -68,6 +69,38 @@ export class TabsManager {
     canvasTabButton.classList.add('tab');
     canvasTabButton.innerText = `Tab ${index + 1}`;
     canvasTabButton.addEventListener('click', this.alternateTab);
+    canvasTabButton.addEventListener('dblclick', changeTabName);
+    
+    function changeTabName(event) {
+      const getPxValue = (pxString) => Number(pxString.slice(0, pxString.length - 2));
+      const { target: currentTabEl } = event;
+
+      const oldText = currentTabEl.innerText;
+      const inputParentWidth = getPxValue(getComputedStyle(currentTabEl).width);
+      const inputParentPaddingR = getPxValue(getComputedStyle(currentTabEl).paddingRight);
+
+      currentTabEl.innerHTML = `<input id="tab-text-changing" placeholder="${oldText}"></input>`;
+      currentTabEl.firstChild.style.minWidth = `${
+        inputParentWidth - inputParentPaddingR * 2.4
+      }px`;
+      currentTabEl.firstChild.focus();
+      
+      let isEscPressed = false;
+      currentTabEl.firstChild.addEventListener('keydown', cancelTabNameChange);
+      
+      currentTabEl.firstChild.addEventListener('change', (sndEvent) => {
+        if (!isEscPressed)
+          currentTabEl.innerText = sndEvent.target.value;
+        currentTabEl.firstChild.removeEventListener('keydown', cancelTabNameChange);
+      });
+
+      function cancelTabNameChange(keyEvent) {
+        if (keyEvent.key === 'Escape') {
+          isEscPressed = true;
+          currentTabEl.innerText = oldText;
+        }
+      }
+    }
 
     return { canvas, canvasTabButton };
   }
@@ -103,7 +136,7 @@ export class TabsManager {
     });
 
     document.dispatchEvent(
-      new Event('canvas-destroy-call')
+      new Event('canvas-stop-call')
     );
     console.log("(TO NEW TAB) current active tab now is:", this.getActiveIndex());
     console.log("\tEVENT CHAIN END\n\n\n");
@@ -136,13 +169,17 @@ export class TabsManager {
         ...this.tabs[this.previousTabIndex],
         active: true
       };
+
+      const tabsBtns = this.tabButtonsWrapper.children;
+      tabsBtns[tabsBtns.length - 2].remove(); // last one is the add button, so we remove the one before it
       console.error(
         "Something went REALLY REALLY WRONG",
         "Either eventQueue doesn't exists or current index is < 0.",
         "\n\tCurrent EventQueue", eventQueue,
         "\n\tCurrent active index", i
       );
-      return;
+
+      throw new Error("Either the canvas you're attempting to activate doesn't have an eventQueue or its index wasn't found");
     }
     // In case it is success, alteranteTab / assignNewTab already updated the
     // current one so we only need to save previous eventQueue state before
@@ -164,7 +201,7 @@ export class TabsManager {
       .remove('active');
 
     this.renderActiveTab();
-    this.tabs[i].canvasListener.init();  
+    this.tabs[i].canvasListener.start();  
   }
 
   init() {
@@ -172,7 +209,7 @@ export class TabsManager {
     this.renderActiveTab();
     this.newTabBtn.addEventListener('click', this.assignNewTab);
     // document.addEventListener('dblclick', this.alternateTab);
-    document.addEventListener('canvas-destroy', this.handleCanvasSwitch);
+    document.addEventListener('canvas-stop', this.handleCanvasSwitch);
   }
 }
 

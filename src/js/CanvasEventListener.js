@@ -31,6 +31,7 @@ export default class CanvasEventListener {
     this.onImportCall = this.onImportCall.bind(this);
     this.onDownloadCall = this.onDownloadCall.bind(this);
     this.paintBackground = this.paintBackground.bind(this);
+    this.onStopCall = this.onStopCall.bind(this);
   }
 
   redrawSequences(event) {
@@ -229,12 +230,12 @@ export default class CanvasEventListener {
     downloadHiddenAnchor.remove();
   }
 
-  onDestroyCall(_) {
-    this.dispatchEvent(new CustomEvent('canvas-destroy', {
-      detail: {
-        eventQueue: this.eventQueue,
-      }
-    }));
+  onStopCall(_) {
+    this.eventQueue.push(this.eventQueueElTest);
+    console.log("received canvas-destroy-call");
+    document.dispatchEvent(
+      new CustomEvent('canvas-stop', { detail: { eventQueue: this.eventQueue } })
+    );
   }
 
   paintBackground() {
@@ -242,7 +243,7 @@ export default class CanvasEventListener {
     this.context.fillRect(0, 0, this.canvasSize.real.width, this.canvasSize.real.height);
   }
 
-  init() {
+  start() {
     this.canvas.addEventListener('draw', this.onDraw);
     this.canvas.addEventListener('line', this.onLine);
     this.canvas.addEventListener('write', this.onWrite);
@@ -250,9 +251,23 @@ export default class CanvasEventListener {
     this.canvas.addEventListener('erase', this.onErase);
     this.canvas.addEventListener('render-call', this.renderCurrentState);
     document.addEventListener('export-call', this.onExportCall);
-    document.addEventListener('canvas-destroy-call', this.onDestroyCall);
     document.addEventListener('import-call', this.onImportCall);
     document.addEventListener('download-call', this.onDownloadCall);
     
+    document.addEventListener('canvas-stop-call', this.onStopCall);
+  }
+
+  stop() {
+    this.canvas.removeEventListener('draw', this.onDraw);
+    this.canvas.removeEventListener('line', this.onLine);
+    this.canvas.removeEventListener('write', this.onWrite);
+    this.canvas.removeEventListener('zoom', this.onZoom);
+    this.canvas.removeEventListener('erase', this.onErase);
+    this.canvas.removeEventListener('render-call', this.renderCurrentState);
+    document.removeEventListener('export-call', this.onExportCall);
+    document.removeEventListener('import-call', this.onImportCall);
+    document.removeEventListener('download-call', this.onDownloadCall);
+    
+    document.removeEventListener('canvas-stop-call', this.onStopCall);
   }
 }

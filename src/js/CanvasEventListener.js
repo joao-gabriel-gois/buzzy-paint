@@ -1,18 +1,15 @@
-export default class CanvasEventListener {
-  constructor(canvasId) {
-    this.canvas = document.getElementById(canvasId);
-    this.context = this.canvas.getContext('2d');
-    this.canvasSize = {
-      real: {
-        width: this.canvas.width,
-        height: this.canvas.height,
-      },
-      style: {
-        width: Number(window.getComputedStyle(this.canvas).width.match(/\d+/g)[0]),
-        height: Number(window.getComputedStyle(this.canvas).height.match(/\d+/g)[0]),
-      },
-    };;
+import { getInstanceName } from './utils/eventUtils.js'
+import { getStyle } from './utils/cssUtils.js';
 
+
+export class CanvasEventListener {
+  static #instancesCount = 0;
+
+  constructor(canvasReference) {
+    CanvasEventListener.#instancesCount++;
+    this.canvas = document.querySelector(canvasReference);
+    this.context = this.canvas.getContext('2d');
+    
     this.eventQueue = [];
     
     this.zoomCurrentRate = 1;
@@ -31,7 +28,11 @@ export default class CanvasEventListener {
     this.onImportCall = this.onImportCall.bind(this);
     this.onDownloadCall = this.onDownloadCall.bind(this);
     this.paintBackground = this.paintBackground.bind(this);
-    this.onStopCall = this.onStopCall.bind(this);
+    // this.onStopCall = this.onStopCall.bind(this);
+  }
+
+  static getNumberOfInstances() {
+    return CanvasEventListener.#instancesCount;
   }
 
   redrawSequences(event) {
@@ -86,7 +87,7 @@ export default class CanvasEventListener {
   applyZoom() {
     const invertedPreviousZoomRate = 1 / this.zoomPreviousRate;
     const zoomfactor = this.zoomCurrentRate;
-    const { width, height } = this.canvasSize.real;
+    const { width, height } = this.canvas;
 
     // I'm using tranform this way in order to get a centered zoom
     // scale does not provide this possibily
@@ -111,25 +112,26 @@ export default class CanvasEventListener {
   }
 
   applyErasing(event) {
-    this.context.fillStyle = getComputedStyle(this.canvas).backgroundColor;
     // console.log('Applying erasing with canvas element color.\nBG Color', this.context.fillStyle);
     const size = event.eraserSize;
     event.sequence.forEach(point => {
       const { position } = point;
-      // console.log(`\tpos:(${position[0]}, ${position[1]})| size: ${size}`);
-      const ratio = this.canvasSize.style.width / this.canvasSize.real.width;
       if (event.isPng)
-        this.context.clearRect(position[0] - size / 2, position[1] - size / 2, size * ratio , size * ratio);
-      else 
-        this.context.fillRect(position[0] - size / 2, position[1] - size / 2, size * ratio , size * ratio);
-
+        this.context.clearRect(position[0] - size / 2, position[1] - size / 2, size, size);
+      else {
+        this.context.fillStyle = getComputedStyle(this.canvas).backgroundColor;
+        this.context.fillRect(position[0] - size / 2, position[1] - size / 2, size, size);
+      }
     })
   }
 
   renderCurrentState(cb) {
-    this.context.clearRect(0, 0, this.canvasSize.real.width, this.canvasSize.real.height);
-    cb && cb();
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     
+    if (!getInstanceName(cb).includes('Event')) { 
+      cb && cb();
+    }
+
     if (this.isZoomActive) {
       this.applyZoom();
     }
@@ -143,7 +145,7 @@ export default class CanvasEventListener {
           this.redrawLines(event);
           break;
         case 'WRITE':
-          this.rewritePoints(event)
+          this.rewritePoints(event);
           break;
         case 'ERASE': 
           event = {
@@ -230,17 +232,17 @@ export default class CanvasEventListener {
     downloadHiddenAnchor.remove();
   }
 
-  onStopCall(_) {
-    this.eventQueue.push(this.eventQueueElTest);
-    console.log("received canvas-destroy-call");
-    document.dispatchEvent(
-      new CustomEvent('canvas-stop', { detail: { eventQueue: this.eventQueue } })
-    );
-  }
+  // onStopCall(_) {
+  //   this.eventQueue.push(this.eventQueueElTest);
+  //   console.log("received canvas-destroy-call");
+  //   document.dispatchEvent(
+  //     new CustomEvent('canvas-stop', { detail: { eventQueue: this.eventQueue } })
+  //   );
+  // }
 
   paintBackground() {
     this.context.fillStyle = getComputedStyle(this.canvas).backgroundColor;
-    this.context.fillRect(0, 0, this.canvasSize.real.width, this.canvasSize.real.height);
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.style.height);
   }
 
   start() {
@@ -253,8 +255,6 @@ export default class CanvasEventListener {
     document.addEventListener('export-call', this.onExportCall);
     document.addEventListener('import-call', this.onImportCall);
     document.addEventListener('download-call', this.onDownloadCall);
-    
-    document.addEventListener('canvas-stop-call', this.onStopCall);
   }
 
   stop() {
@@ -267,7 +267,7 @@ export default class CanvasEventListener {
     document.removeEventListener('export-call', this.onExportCall);
     document.removeEventListener('import-call', this.onImportCall);
     document.removeEventListener('download-call', this.onDownloadCall);
-    
-    document.removeEventListener('canvas-stop-call', this.onStopCall);
   }
 }
+
+

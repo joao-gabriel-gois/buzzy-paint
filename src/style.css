@@ -11,9 +11,18 @@ header {
   background-color: rgba(71, 61, 139, 0.25);
   margin-bottom: 3em;
   padding: 0.2em 0.5em;
+}
+
+header ul {
+  list-style-type: none;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: flex-start;
+  color: rgba(71, 61, 139, 20);
+  font-size: 10pt;
+  font-weight: 600;
+  gap: 4%;
+  font-family: 'Arial';
 }
 
 main {
@@ -219,25 +228,30 @@ aside#options {
   color: #666;
   padding: .2rem;
   border-radius: 3px;
+  border: 3px rgba(71, 61, 139, 0.559) solid;
   transition: all 300ms linear;
-  border: 3px solid #FFF;
 }
 
 #options ul form > div input:hover {
   box-shadow: 0 0 10px 0 rgba(12, 14, 13, .3);
-  border: 3px solid #000;
+  border: 3px solid rgb(71, 61, 139);
 }
 
 #options ul form > div input[type=color] {
+  appearance: 'none';
+  margin: 0;
   padding: 0;
-  height: 500%;
-  border: 2px rgba(41, 38, 75, 0.35) solid;
+  height: 300%;
   transition: box-shadow 300ms linear;
 }
 
-
-#options ul form > div input[type=color]:hover {
-  transition: all 300ms linear;
+input[type="color"]::-webkit-color-swatch-wrapper {
+	padding: 0;
+  width: 100%;
+}
+input[type="color"]::-webkit-color-swatch {
+	width: 100%;
+  border: none;
 }
 
 #options ul .text-area-container {
@@ -259,7 +273,6 @@ aside#options {
 
 #options ul #innerText:hover {
   box-shadow: 0 0 10px 0 rgba(12, 14, 13, .3);
-  border: 3px solid #000;
 }
 
 #options ul .color-input-container {
@@ -271,13 +284,13 @@ aside#options {
   height: 1.5rem;
   transition: all 300ms linear;
   overflow: hidden;
-  border: 3px #DCB37A solid;
+  border: 2px rgba(71, 61, 139, 0.37) solid;
   /* border: 0; */
 }
 
 #options ul .color-input-container:hover {
-  border: 3px #210 solid;
   box-shadow: 0 0 10px 0 rgba(45, 51, 48, 0.6);
+  border: 2px solid rgb(71, 61, 139);
 }
 
 .zoom-number-container {
@@ -300,7 +313,7 @@ aside#options {
   pointer-events: none;
   padding: 0;
   background-color: rgba(255, 255, 255, 0.685);
-  border: #FB3 solid 2px;
+  border: #BBB solid 2px;
 }
 
 #canvas-wrapper {

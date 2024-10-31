@@ -1,7 +1,9 @@
 export const getInstanceName = (event) => (
-  Object.getPrototypeOf(event)
-    .constructor
-    .name
+  event
+    ? Object.getPrototypeOf(event) 
+        .constructor
+        .name
+    : ''
 );
 
 export function getRelativeCursorPos(event, element) {

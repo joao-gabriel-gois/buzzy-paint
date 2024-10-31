@@ -1,7 +1,6 @@
 import { getInstanceName } from './utils/eventUtils.js'
 import { getStyle } from './utils/cssUtils.js';
 
-
 export class CanvasEventListener {
   static #instancesCount = 0;
 
@@ -11,6 +10,9 @@ export class CanvasEventListener {
     this.context = this.canvas.getContext('2d');
     
     this.eventQueue = [];
+    this.undoStack = [];
+
+    this.keysPressed = ['none'];
     
     this.zoomCurrentRate = 1;
     this.zoomPreviousRate = 1;
@@ -28,6 +30,7 @@ export class CanvasEventListener {
     this.onImportCall = this.onImportCall.bind(this);
     this.onDownloadCall = this.onDownloadCall.bind(this);
     this.paintBackground = this.paintBackground.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
     // this.onStopCall = this.onStopCall.bind(this);
   }
 
@@ -60,7 +63,6 @@ export class CanvasEventListener {
     const lineThicknessRate = 1 + style.lineThickness / 8;
     this.context.strokeStyle = style.lineColor;
     this.context.lineWidth = lineThicknessRate;
-    // console.log("lines state\n", line);
     this.context.beginPath();
     this.context.moveTo(...line.start);
     this.context.lineTo(...line.end);
@@ -119,7 +121,7 @@ export class CanvasEventListener {
       if (event.isPng)
         this.context.clearRect(position[0] - size / 2, position[1] - size / 2, size, size);
       else {
-        this.context.fillStyle = getComputedStyle(this.canvas).backgroundColor;
+        this.context.fillStyle = getStyle(this.canvas).backgroundColor;
         this.context.fillRect(position[0] - size / 2, position[1] - size / 2, size, size);
       }
     })
@@ -136,7 +138,7 @@ export class CanvasEventListener {
       this.applyZoom();
     }
     
-    this.eventQueue.forEach(event => {
+    for (let event of this.eventQueue) {
       switch(event.type) {
         case 'DRAW':
           this.redrawSequences(event);
@@ -155,8 +157,44 @@ export class CanvasEventListener {
           this.applyErasing(event);
           break;  
       }
-    });
+    };
   }
+
+  undo() {
+    const removedEvent = this.eventQueue.pop();
+    if (removedEvent) {
+      this.undoStack.push(removedEvent);
+      this.renderCurrentState();
+    }
+  }
+
+  redo() {
+    const reAddedEvent = this.undoStack.pop();
+    if (reAddedEvent) {
+      this.eventQueue.push(reAddedEvent);
+      this.renderCurrentState();
+    }
+  }
+
+  onKeyDown(event) {
+    this.keysPressed.push(event.key);
+    const k = this.keysPressed;
+    const lastKey = k[k.length - 1];
+    const keyBeforeLastKey = k[k.length - 2];
+
+    if (keyBeforeLastKey === "Control" && lastKey === 'z') {
+      this.undo();
+      this.keysPressed = [ keyBeforeLastKey ];
+      return
+    }
+    else if (keyBeforeLastKey === "Control" && lastKey === 'y') {
+      this.redo();
+      this.keysPressed = [ keyBeforeLastKey ];
+      return
+    }
+
+    this.keysPressed = [ lastKey ];
+  } 
 
   onDraw(event) {
     const { sequenceArray, style } = event.detail;
@@ -168,7 +206,6 @@ export class CanvasEventListener {
       style, // if you put style directly it will always change all drawSequences style to latest
     });
   }
-
 
   onLine(event) {
     const { line, style } = event.detail;
@@ -191,10 +228,8 @@ export class CanvasEventListener {
   }
 
   onZoom(event) {
-    const { zoom, state }= event.detail;
-    
+    const { zoom, state } = event.detail;
     this.isZoomActive = state;
-
     this.zoomCurrentRate = zoom;
   }
 
@@ -232,16 +267,8 @@ export class CanvasEventListener {
     downloadHiddenAnchor.remove();
   }
 
-  // onStopCall(_) {
-  //   this.eventQueue.push(this.eventQueueElTest);
-  //   console.log("received canvas-destroy-call");
-  //   document.dispatchEvent(
-  //     new CustomEvent('canvas-stop', { detail: { eventQueue: this.eventQueue } })
-  //   );
-  // }
-
   paintBackground() {
-    this.context.fillStyle = getComputedStyle(this.canvas).backgroundColor;
+    this.context.fillStyle = getStyle(this.canvas).backgroundColor;
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.style.height);
   }
 
@@ -252,6 +279,7 @@ export class CanvasEventListener {
     this.canvas.addEventListener('zoom', this.onZoom);
     this.canvas.addEventListener('erase', this.onErase);
     this.canvas.addEventListener('render-call', this.renderCurrentState);
+    document.addEventListener('keydown', this.onKeyDown);
     document.addEventListener('export-call', this.onExportCall);
     document.addEventListener('import-call', this.onImportCall);
     document.addEventListener('download-call', this.onDownloadCall);
@@ -264,6 +292,7 @@ export class CanvasEventListener {
     this.canvas.removeEventListener('zoom', this.onZoom);
     this.canvas.removeEventListener('erase', this.onErase);
     this.canvas.removeEventListener('render-call', this.renderCurrentState);
+    document.removeEventListener('keydown', this.onKeyDown);
     document.removeEventListener('export-call', this.onExportCall);
     document.removeEventListener('import-call', this.onImportCall);
     document.removeEventListener('download-call', this.onDownloadCall);

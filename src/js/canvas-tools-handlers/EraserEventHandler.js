@@ -24,7 +24,7 @@ export class Eraser extends ToolEventHandler {
 
   handleOnMouseDown(event) {
     super.handleOnMouseDown(event);
-    this.context.fillStyle = getComputedStyle(this.canvas).backgroundColor;
+    this.context.fillStyle = getStyle(this.canvas).backgroundColor;
     const [x, y] = getRelativeCursorPos(event, this.canvas);
     this.currentEraseSequence.push({
       position: [x, y],

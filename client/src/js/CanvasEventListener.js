@@ -161,6 +161,9 @@ export class CanvasEventListener {
   }
 
   undo() {
+    if (this.undoStack.length > 60) 
+      this.undoStack = [];
+    
     const removedEvent = this.eventQueue.pop();
     if (removedEvent) {
       this.undoStack.push(removedEvent);

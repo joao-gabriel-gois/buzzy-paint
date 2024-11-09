@@ -4,16 +4,16 @@ import { getUserService } from './getUserService.ts';
 import { SearchTerm } from "../../@types/index.d.ts";
 import { ApplicationError, BadRequestError } from "../../../../shared/errors/ApplicationError.ts";
 
-export const getUserController = async (req: Request, res: Response, next: NextFunction) => {
+export const getUserController = async (request: Request, response: Response, next: NextFunction) => {
   let searchTerm = {};
   if (
-    req.params.id
-      && req.params.id.length > 0
-      && !validate(req.params.id)
+    request.params.id
+      && request.params.id.length > 0
+      && !validate(request.params.id)
   ) throw new BadRequestError('Not a valid UUID!');
-  else if (req.params.id) searchTerm = { id : req.params.id };
-  else if (req.query) {
-    const { email, username } = req.query;
+  else if (request.params.id) searchTerm = { id : request.params.id };
+  else if (request.query) {
+    const { email, username } = request.query;
     searchTerm = (email ? { email } : username ? { username } : null) as SearchTerm;
     if (searchTerm === null) throw new BadRequestError('No valid search term was found');
   }
@@ -27,8 +27,8 @@ export const getUserController = async (req: Request, res: Response, next: NextF
     if (error instanceof ApplicationError) {
       return next(error);
     }
-    return next(new Error('Get User: Unknown error!'));
+    return next(new ApplicationError('Get User: Unknown error!', 500, error as Error));
   }
   
-  return res.json(user);
+  return response.json(user);
 }

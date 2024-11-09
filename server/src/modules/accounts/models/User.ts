@@ -9,7 +9,7 @@ export class User {
   public lastName;
   public password;
 
-  constructor(userDto: ICreateUserDTO) {
+  constructor(userDTO: ICreateUserDTO) {
     const {
       id,
       email,
@@ -17,8 +17,7 @@ export class User {
       firstName,
       lastName,
       password
-    } = userDto;
-
+    } = userDTO;
 
     this.id = id ? id : uuid();
     this.email = email;

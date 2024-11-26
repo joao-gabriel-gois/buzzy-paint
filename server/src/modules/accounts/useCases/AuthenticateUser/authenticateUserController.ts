@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'npm:@types/express';
-// import { authenticateUserService } from './authenticateUserService.ts';
+import { authenticateUserService } from './authenticateUserService.ts';
 import { ApplicationError, BadRequestError, NotFoundError } from "../../../../shared/errors/ApplicationError.ts";
+import auth from "../../../../config/auth.ts";
+import { expiryDateMapper } from "../../../../utils/expiryDateMapper.ts";
 
 export const authenticateUserController = async (request: Request, response: Response, next: NextFunction) => {
   const {
@@ -14,10 +16,10 @@ export const authenticateUserController = async (request: Request, response: Res
 
   let sessionInfo;
   try {
-    // sessionInfo = await authenticateUserService.execute({
-    //   email,
-    //   password
-    // });
+    sessionInfo = await authenticateUserService.execute({
+      email,
+      password
+    });
   }
   catch(error) {
     if (error instanceof ApplicationError) {
@@ -27,19 +29,34 @@ export const authenticateUserController = async (request: Request, response: Res
   }
    
   if (!sessionInfo) {
-    throw new NotFoundError('Session fot this user was not fount');
+    throw new NotFoundError('Session fot this user was not found.');
   }
   
-  const clientIp = request.ip?.split(':')[request.ip.split(':').length - 1];
-  if (clientIp) {
-    console.log(`\nSession started from user with Email: ${
-      email
-    }, using IP: ${
-      clientIp
-    }\nReq Headers:\n${
-      JSON.stringify(request.headers)
-    }`);
-  };
+  // const clientIp = request.ip?.split(':')[request.ip.split(':').length - 1];
+  // if (clientIp) {
+  //   console.log(`\nSession started from user with Email: ${
+  //     email
+  //   }, using IP: ${
+  //     clientIp
+  //   }\nReq Headers:\n${
+  //     JSON.stringify(request.headers)
+  //   }`);
+  // };
 
-  return response.json(sessionInfo);
+  const { refresh_token, token, user } = sessionInfo;
+  const expireDateDays = auth.refresh_token_expires_in;
+  const maxAge = expiryDateMapper(expireDateDays as string);
+
+  response.cookie('refresh_token', refresh_token, {
+    httpOnly: true,  // revents JS access
+    secure: true,    // only HTTPS
+    sameSite: 'strict', // avoid CSRF
+    maxAge,
+  });
+
+  console.log(user);
+  return response.json({
+    user,
+    token
+  });
 }

@@ -41,6 +41,13 @@ class DatabaseTransactionError extends ApplicationError {
   }
 }
 
+class InvalidParameterError extends ApplicationError {
+  constructor(message = "Unexpected Parameter Format", status = 500, error?: Error) {
+    super(message, status, error);
+    super.name = "Invalid Parameter Error";
+  }
+}
+
 class UnauthorizedError extends ApplicationError {
   constructor(message = 'Unauthorized', status = 401, error?: Error) {
     super(message, status, error);
@@ -60,6 +67,7 @@ export {
   BusinessLogicError,
   BadRequestError,
   DatabaseTransactionError,
+  InvalidParameterError,
   UnauthorizedError,
   NotFoundError
 }

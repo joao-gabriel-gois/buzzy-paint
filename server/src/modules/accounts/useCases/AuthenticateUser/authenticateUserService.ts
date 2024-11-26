@@ -4,6 +4,8 @@ import { sign } from 'npm:jsonwebtoken';
 import { BadRequestError, BusinessLogicError } from "../../../../shared/errors/ApplicationError.ts";
 import { usersRepository } from "../../repositories/postgres/usersRepository.ts";
 import auth from "../../../../config/auth.ts";
+import { usersTokensRepository } from "../../repositories/postgres/usersTokensRepository.ts";
+import { expiryDateMapper } from "../../../../utils/expiryDateMapper.ts";
 // import IUsersTokensRepository from '@modules/accounts/repositories/IUsersTokensRepository';
 
 interface IRequest {
@@ -21,7 +23,7 @@ interface IResponse {
   refresh_token: string;
 }
 
-class AuthenticateUserUseCase {
+class AuthenticateUserService {
   // constructor(
   //   private usersRepository: IUsersRepository,
   //   private usersTokensRepository: IUsersTokensRepository,
@@ -53,19 +55,21 @@ class AuthenticateUserUseCase {
       expiresIn: token_expires_in,
     });
 
-    // const expiration_date = (add number of expiring date as days to be considered the expiration date)
+    const expiration_date = new Date(Date.now() + expiryDateMapper('2d')).toISOString(); // 2 days from now
 
     const refresh_token = sign({ email }, refresh_token_secret, {
       subject: user.id,
       expiresIn: refresh_token_expires_in 
-    }); 
+    });
+
+    // const currentToken = await usersTokensRepository.fin
 
     // usersTokensRepository
-    // await usersTokensRepository.create({
-    //   user_id: user.id!,
-    //   expiration_date,
-    //   refresh_token
-    // });
+    await usersTokensRepository.create({
+      user_id: user.id!,
+      expiration_date,
+      refresh_token
+    });
     
     return {
       user: {
@@ -81,4 +85,4 @@ class AuthenticateUserUseCase {
 
 }
 
-export const authenticateUserUseCase = new AuthenticateUserUseCase();
+export const authenticateUserService = new AuthenticateUserService();

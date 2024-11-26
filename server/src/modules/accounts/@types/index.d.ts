@@ -1,12 +1,14 @@
-import { v4 } from 'npm:@types/uuid';
 import { User } from "../models/User.ts";
 
-export type UUID = typeof v4;
+import { Request } from 'npm:@types/express';
+
+type UUIDBrand = { readonly UUID: unique symbol };
+
+export type UUID = `${string}-${string}-${string}-${string}-${string}` & UUIDBrand;
 
 type ExposableUser = Omit<User,'password'>;
 type ManageableUser = ExposableUser & { password?: string };
 
-type SearchTerm =
-  | { id: UUID }
-  | { email: string }
-  | { username: string };
+interface IRequest extends Request {
+  user?: { id : string }
+}

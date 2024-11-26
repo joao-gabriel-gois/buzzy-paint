@@ -2,8 +2,9 @@ import { DatabaseTransactionError, NotFoundError } from "../../../../shared/erro
 import { checkHash, hash } from "../../../../utils/hash.ts";
 import { ManageableUser, UUID } from "../../@types/index.d.ts";
 import { ICreateUserDTO } from "../../DTOs/CreateUserDTO.ts";
+import { IUpdateUserDTO } from "../../DTOs/UpdateUserDTO.ts";
 import { User } from "../../models/User.ts";
-import { IUsersRepository } from "../IUsersRepositories.ts";
+import { IUsersRepository } from "../IUsersRepository.ts"
 
 let users: User[] = [];
 
@@ -70,8 +71,8 @@ class UsersRepositoryInMemory implements IUsersRepository {
     });
   };
 
-  async updateUser(id: UUID, user: Omit<ICreateUserDTO, "username">): Promise<ManageableUser> {
-    const currentUser = await this.getUserById(id) as User;
+  async updateUser(user: IUpdateUserDTO): Promise<ManageableUser> {
+    const currentUser = await this.getUserById(user.id) as User;
     if (!currentUser) throw new NotFoundError('User not found');
 
     if (user.email && user.email !== currentUser.email) {

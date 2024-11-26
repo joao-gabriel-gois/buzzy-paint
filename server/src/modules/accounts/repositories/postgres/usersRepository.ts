@@ -4,7 +4,7 @@ import { DatabaseTransactionError, NotFoundError } from "../../../../shared/erro
 import { User } from "../../../../modules/accounts/models/User.ts";
 
 import { ManageableUser, UUID } from "../../@types/index.d.ts";
-import { IUsersRepository } from "../../../../modules/accounts/repositories/IUsersRepositories.ts";
+import { IUsersRepository } from "../../../../modules/accounts/repositories/IUsersRepository.ts";
 import { ICreateUserDTO } from "../../../../modules/accounts/DTOs/CreateUserDTO.ts";
 import { IUpdateUserDTO } from "../../DTOs/UpdateUserDTO.ts";
 

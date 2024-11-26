@@ -1,13 +1,14 @@
+import { UUID } from "../@types/index.d.ts";
 import { ICreateUserDTO } from "../DTOs/CreateUserDTO.ts";
 import { v4 as uuid } from 'npm:uuid';
 
 export class User {
-  public id;
-  public email;
-  public username;
-  public firstName;
-  public lastName;
-  public password;
+  public id: UUID;
+  public email: string;
+  public username: string;
+  public firstName: string;
+  public lastName: string;
+  public password: string;
 
   constructor(userDTO: ICreateUserDTO) {
     const {
@@ -19,7 +20,7 @@ export class User {
       password
     } = userDTO;
 
-    this.id = id ? id : uuid();
+    this.id = id ? id : uuid() as UUID;
     this.email = email;
     this.username = username;
     this.firstName = firstName;

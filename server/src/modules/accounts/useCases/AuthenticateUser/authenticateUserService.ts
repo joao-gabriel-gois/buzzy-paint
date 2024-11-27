@@ -6,6 +6,7 @@ import { usersRepository } from "../../repositories/postgres/usersRepository.ts"
 import auth from "../../../../config/auth.ts";
 import { usersTokensRepository } from "../../repositories/postgres/usersTokensRepository.ts";
 import { expiryDateMapper } from "../../../../utils/expiryDateMapper.ts";
+import { IUsersRepository } from "../../repositories/IUsersRepository.ts";
 // import IUsersTokensRepository from '@modules/accounts/repositories/IUsersTokensRepository';
 
 interface IRequest {
@@ -24,13 +25,13 @@ interface IResponse {
 }
 
 class AuthenticateUserService {
-  // constructor(
-  //   private usersRepository: IUsersRepository,
-  //   private usersTokensRepository: IUsersTokensRepository,
-  // ) {};
+  constructor(
+    private usersRepository: IUsersRepository,
+  ) {};
 
   async execute({ email, password }: IRequest): Promise<IResponse> {
-    const user = await usersRepository.getUserByEmail(email);
+    const user = await this.usersRepository.getUserByEmail(email);
+  
     const {
       token_secret,
       token_expires_in,
@@ -62,19 +63,18 @@ class AuthenticateUserService {
       expiresIn: refresh_token_expires_in 
     });
 
-    // const currentToken = await usersTokensRepository.fin
 
-    // usersTokensRepository
+      // usersTokensRepository
     await usersTokensRepository.create({
       user_id: user.id!,
       expiration_date,
-      refresh_token
+      refresh_token,
     });
     
     return {
       user: {
-        firstName: user.firstName,
-        lastName: user.lastName,
+        firstName: user.firstname,
+        lastName: user.lastname,
         email: user.email
       }, 
       token,
@@ -85,4 +85,4 @@ class AuthenticateUserService {
 
 }
 
-export const authenticateUserService = new AuthenticateUserService();
+export const authenticateUserService = new AuthenticateUserService(usersRepository);

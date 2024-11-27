@@ -31,7 +31,8 @@ export default class RefreshTokenService {
 
     const { email, sub: user_id } = verify(refresh_token, refresh_token_secret) as IPayload;
 
-    const userToken = await this.usersTokensRepository.findByRefreshTokenAndUserId(refresh_token, user_id);
+    const userToken = await this.usersTokensRepository
+      .findUniqueByRefreshTokenAndUserId(refresh_token, user_id as UUID);
 
     if (!userToken) {
       throw new NotFoundError('Refresh Token Mismatch! Token informed was not found for this user')

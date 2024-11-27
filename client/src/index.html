@@ -1,140 +1,80 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Paint</title>
-  <link href="style.css" rel="stylesheet">
-  <script type="module" src="script.js"></script>
-</head>
-<body>
-  <header>
-    <nav>
-      <ul>
-        <li>Importar Projeto</li>
-        <li>Exportar Projeto</li>
-        <li>Salvar como Imagem</li>
-      </ul>
-    </nav>
-  </header>
-  
-  <main id="draw-area">
-    <aside id="tools">
-      <ul>
-        <li><img src="assets/pencil.svg" /></li>
-        <li><img src="assets/line.svg" /></li>
-        <li><img src="assets/text.svg" /></li>
-        <li><img src="assets/zoom-in.svg" /></li>
-        <li><img src="assets/eraser.svg" /></li>
-      </ul>
-    </aside>
-
-    <div id="canvas-wrapper">
-      <div id="tab-buttons-wrapper">
-        <button id="add-tab">+</button>
-      </div>
-      <canvas width="1280" height="720"></canvawidths>
+  <script src="index.js" type="module"></script>
+  <body>
+    <div id="top-side">
+      <img src="assets/pencil_case.png" />
+      <h1>Buzzy Paint</h1>
     </div>
+    <div id="bottom-side">
+      <img src="assets/loading.png" />
+      <p>Loading</p>
+    </div>
+  </body>
+  <script>
+    const p = document.querySelector('#bottom-side p');
+    const text = p.innerText;
+    const originalMarginLeft = getComputedStyle(p).marginRight;
+    let margin = 0;
+    setInterval(() => {
+      if (p.innerText.length < 10) {
+        p.innerText += '.';
+        margin += 0.7;
+        p.style.marginRight = `-${margin}rem`
+        return;
+      }
+      p.innerText = text;
+      p.style.marginRight = originalMarginLeft;
+      margin = 0;
+      
+    }, 1200);
+  </script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      display: flex;
+      height: 100vh;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+      color: #500b81;
+      overflow: hidden;
+      background-color: rgba(87, 15, 155, 0.747);
+      background-image: url(assets/bg.svg);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 2em;
+    }
+    img {
+      width: 12rem;
+      opacity: 0.75;
+    }
+    #bottom-side {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-size: 14pt;
+      font-weight: 600;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    #bottom-side p {
+      margin: 1em 0em;
+    }
+    #bottom-side img {
+      width: 6rem;
+      animation: loading linear 1.5s infinite;
+    }
 
-    <aside id="options">
-      <ul>
-        <li>
-          <h3>Lápis</h3>
-          <form id="draw-options">
-            <div>
-              <label for="drawColor" name="DrawColor">
-                Cor:
-              </label>
-              <div class="color-input-container">
-                <input type="color" id="drawColor" />
-              </div>
-            </div>
-            <div>
-              <label for="drawThickness" name="DrawThickness">
-                Grossura do Traço:
-              </label>
-              <input type="number" class="number" id="drawThickness" />
-            </div>
-          </form>
-        </li>
+    @keyframes loading {
+      from {
+        rotate: 0deg;
+      }
+      to {
+        rotate: 360deg;
+      }
+    }
 
-        <li>
-          <h3>Linha</h3>
-          <form id="line-options">
-            <div>
-              <label for="lineColor" name="LineColor">
-                Cor:
-              </label>
-              <div class="color-input-container">
-                <input type="color" id="lineColor" />
-              </div>
-            </div>
-            <div>
-              <label for="lineThickness" name="DrawThickness">
-                Grossura do Traço:
-              </label>
-              <input type="number" class="number" id="lineThickness" />
-            </div>
-          </form>
-        </li>
-
-        <li>
-          <h3>Texto</h3>
-          <form id="text-options">
-            <div>
-              <label for="fontSize" name="FontSize">
-                Tamanho da Fonte:
-              </label>
-              <input type=number class="number" id="fontSize" />pt
-            </div>
-            <div>
-              <label for="textColor" name="TextColor">
-                Cor do Texto:
-              </label>
-              <div class="color-input-container">
-                <input type="color" id="textColor" />
-              </div>
-            </div>
-            <div>
-              <label for="fontFamily" name="FontFamily">
-                Tipo da Fonte:
-              </label>
-              <input type="text" id="fontFamily" />
-            </div>
-            <div class="text-area-container">
-              <label for="innerText" name="InnerText">Conteúdo do texto:</label>
-              <textarea id="innerText"></textarea>
-            </div>
-          </form>
-        </li>
-
-        <li>
-          <h3>Zoom</h3>
-          <form id="zoom-options">
-            <div class="zoom-number-container">
-              <label for="zoom" name="Zoom">Zoom:</label>
-              <input type="number" id="zoom" class="number" />%
-            </div>
-          </form>
-        </li>
-
-        <li>
-          <h3>Borracha</h3>
-          <form id="eraser-options">
-            <div>
-              <label for="eraserSize" name="eraserSize">
-                Tamanho
-              </label>
-              <div class="eraser-input-container">
-                <input type="number" id="eraserSize" />
-              </div>
-            </div>
-          </form>
-        </li>
-
-      </ul>
-    </aside>
-  </main>
-</body>
+  </style>
 </html>

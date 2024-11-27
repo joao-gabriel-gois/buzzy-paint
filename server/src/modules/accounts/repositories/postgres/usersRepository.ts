@@ -15,8 +15,8 @@ class UserRepository implements IUsersRepository {
       username,
       email,
       password,
-      firstName,
-      lastName
+      firstname: lastName,
+      lastname: firstName
     } = new User(userDTO);
     
     password = await hash(password);

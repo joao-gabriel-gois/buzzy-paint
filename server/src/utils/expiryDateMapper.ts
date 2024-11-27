@@ -1,6 +1,7 @@
 const periods = {
   'd': 24 * 60 * 60 * 1000,  // days
-  'm': 60 * 60 * 1000,       // minutes
+  'h': 60 * 60 * 1000,       // hours
+  'm': 60 * 1000,            // minutes
   's': 1000                  // seconds
 } as const;
 

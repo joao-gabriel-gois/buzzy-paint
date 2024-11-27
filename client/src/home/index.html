@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Paint</title>
+  <link href="style.css" rel="stylesheet">
+  <script type="module" src="home.js"></script>
+</head>
+<body>
+  <header>
+    <nav>
+      <ul>
+        <li>Importar Projeto</li>
+        <li>Exportar Projeto</li>
+        <li>Salvar como Imagem</li>
+      </ul>
+    </nav>
+  </header>
+  
+  <main id="draw-area">
+    <aside id="tools">
+      <ul>
+        <li><img src="../assets/pencil.svg" /></li>
+        <li><img src="../assets/line.svg" /></li>
+        <li><img src="../assets/text.svg" /></li>
+        <li><img src="../assets/zoom-in.svg" /></li>
+        <li><img src="../assets/eraser.svg" /></li>
+      </ul>
+    </aside>
+
+    <div id="canvas-wrapper">
+      <div id="tab-buttons-wrapper">
+        <button id="add-tab">+</button>
+      </div>
+      <canvas width="1280" height="720"></canvawidths>
+    </div>
+
+    <aside id="options">
+      <ul>
+        <li>
+          <h3>Lápis</h3>
+          <form id="draw-options">
+            <div>
+              <label for="drawColor" name="DrawColor">
+                Cor:
+              </label>
+              <div class="color-input-container">
+                <input type="color" id="drawColor" />
+              </div>
+            </div>
+            <div>
+              <label for="drawThickness" name="DrawThickness">
+                Grossura do Traço:
+              </label>
+              <input type="number" class="number" id="drawThickness" />
+            </div>
+          </form>
+        </li>
+
+        <li>
+          <h3>Linha</h3>
+          <form id="line-options">
+            <div>
+              <label for="lineColor" name="LineColor">
+                Cor:
+              </label>
+              <div class="color-input-container">
+                <input type="color" id="lineColor" />
+              </div>
+            </div>
+            <div>
+              <label for="lineThickness" name="DrawThickness">
+                Grossura do Traço:
+              </label>
+              <input type="number" class="number" id="lineThickness" />
+            </div>
+          </form>
+        </li>
+
+        <li>
+          <h3>Texto</h3>
+          <form id="text-options">
+            <div>
+              <label for="fontSize" name="FontSize">
+                Tamanho da Fonte:
+              </label>
+              <input type=number class="number" id="fontSize" />pt
+            </div>
+            <div>
+              <label for="textColor" name="TextColor">
+                Cor do Texto:
+              </label>
+              <div class="color-input-container">
+                <input type="color" id="textColor" />
+              </div>
+            </div>
+            <div>
+              <label for="fontFamily" name="FontFamily">
+                Tipo da Fonte:
+              </label>
+              <input type="text" id="fontFamily" />
+            </div>
+            <div class="text-area-container">
+              <label for="innerText" name="InnerText">Conteúdo do texto:</label>
+              <textarea id="innerText"></textarea>
+            </div>
+          </form>
+        </li>
+
+        <li>
+          <h3>Zoom</h3>
+          <form id="zoom-options">
+            <div class="zoom-number-container">
+              <label for="zoom" name="Zoom">Zoom:</label>
+              <input type="number" id="zoom" class="number" />%
+            </div>
+          </form>
+        </li>
+
+        <li>
+          <h3>Borracha</h3>
+          <form id="eraser-options">
+            <div>
+              <label for="eraserSize" name="eraserSize">
+                Tamanho
+              </label>
+              <div class="eraser-input-container">
+                <input type="number" id="eraserSize" />
+              </div>
+            </div>
+          </form>
+        </li>
+
+      </ul>
+    </aside>
+  </main>
+</body>
+</html>

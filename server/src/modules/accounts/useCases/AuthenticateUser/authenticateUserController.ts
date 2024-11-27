@@ -7,18 +7,18 @@ import { expiryDateMapper } from "../../../../utils/expiryDateMapper.ts";
 export const authenticateUserController = async (request: Request, response: Response, next: NextFunction) => {
   const {
     email,
-    password
+    password,
   } = request.body;
-
-  if (!(email && password)) {
-    return next(new BadRequestError('Request body is missing information to create new user!'));
+  console.log('\n\nEMAIL:', email, '\n\nPASSWORD:', password);
+  if (!(email || password)) {
+    return next(new BadRequestError('Request body is missing information to authenticate this user!'));
   }
 
   let sessionInfo;
   try {
     sessionInfo = await authenticateUserService.execute({
       email,
-      password
+      password,
     });
   }
   catch(error) {
@@ -48,13 +48,12 @@ export const authenticateUserController = async (request: Request, response: Res
   const maxAge = expiryDateMapper(expireDateDays as string);
 
   response.cookie('refresh_token', refresh_token, {
-    httpOnly: true,  // revents JS access
+    httpOnly: true,  // prevents JS access
     secure: true,    // only HTTPS
     sameSite: 'strict', // avoid CSRF
     maxAge,
   });
 
-  console.log(user);
   return response.json({
     user,
     token

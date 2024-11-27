@@ -34,13 +34,12 @@ export const refreshUserTokenController = async (request: Request, response: Res
   const maxAge = expiryDateMapper(expireDateDays as string);
 
   response.cookie('refresh_token', newRefreshToken, {
-    httpOnly: true,  // revents JS access
+    httpOnly: true,  // prevents JS access
     secure: true,    // only HTTPS
     sameSite: 'strict', // avoid CSRF
     maxAge,
   });
 
-  console.log(token);
   return response.json({
     token
   });

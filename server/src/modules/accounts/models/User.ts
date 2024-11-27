@@ -6,8 +6,8 @@ export class User {
   public id: UUID;
   public email: string;
   public username: string;
-  public firstName: string;
-  public lastName: string;
+  public firstname: string;
+  public lastname: string;
   public password: string;
 
   constructor(userDTO: ICreateUserDTO) {
@@ -23,8 +23,8 @@ export class User {
     this.id = id ? id : uuid() as UUID;
     this.email = email;
     this.username = username;
-    this.firstName = firstName;
-    this.lastName = lastName;
+    this.firstname = firstName;
+    this.lastname = lastName;
     this.password = password;
   }
 }

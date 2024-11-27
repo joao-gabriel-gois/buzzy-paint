@@ -1,5 +1,5 @@
-import { getInstanceName } from './utils/eventUtils.js'
-import { getStyle } from './utils/cssUtils.js';
+import { getInstanceName } from '../modules/utils/eventUtils.js'
+import { getStyle } from '../modules/utils/cssUtils.js';
 
 export class CanvasEventListener {
   static #instancesCount = 0;

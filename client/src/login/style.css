@@ -1,0 +1,87 @@
+body {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  width: 100%;
+  height: 100vh;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  color: #500b81;
+  overflow: hidden;
+}
+#left-side {
+  grid-column: 1;
+  background-color: rgba(87, 15, 155, 0.747);
+  background-image: url(../assets/bg.svg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 2.5em;
+}
+#left-side img {
+  width: 14em;
+  margin-top: -2em;
+  opacity: 0.6;
+}
+#right-side {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  background-color: #FAEDF089;
+  border-left: 4px groove rgb(182, 130, 238);
+}
+h1 {
+  margin-top: -0.5rem;
+  font-size: 32pt;
+}
+form {
+  margin-top: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.8em;
+}
+label {
+  align-self: flex-start;
+  margin-left: 0.75em;
+  margin-bottom: -0.75em;
+  font-weight: 600;
+}
+input {
+  padding: 0.75em 2.5em;
+  border: 3px blueviolet solid;
+  transition: 300ms ease-out all;
+  border-radius: 3rem;
+  background-color: rgba(210, 177, 241, 0.126);
+}
+
+input:hover {
+  background-color: rgba(156, 74, 234, 0.307);
+}
+
+input:focus {
+  background-color: rgba(156, 74, 234, 0.154);
+  border: 3px rgb(199, 64, 197) solid;
+  outline: none;
+}
+
+input[type="submit"] {
+  margin-top: 1.25em;
+  background-color: blueviolet;
+  border-color: blueviolet;
+  color: #FFF;
+  font-size: 12pt;
+  font-weight: bolder;
+  font-family: Ubuntu, Verdana, Geneva, Tahoma, sans-serif;
+  width: 100%;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover {
+  opacity: 0.8;
+}

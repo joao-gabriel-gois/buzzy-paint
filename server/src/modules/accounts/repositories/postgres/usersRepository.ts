@@ -1,12 +1,10 @@
-import { pool } from '../../../../shared/infra/postgres/config.ts';
-import { hash, checkHash } from "../../../../utils/hash.ts";
-import { DatabaseTransactionError, NotFoundError } from "../../../../shared/errors/ApplicationError.ts";
-import { User } from "../../../../modules/accounts/models/User.ts";
-
-import { ManageableUser, UUID } from "../../@types/index.d.ts";
-import { IUsersRepository } from "../../../../modules/accounts/repositories/IUsersRepository.ts";
-import { ICreateUserDTO } from "../../../../modules/accounts/DTOs/CreateUserDTO.ts";
-import { IUpdateUserDTO } from "../../DTOs/UpdateUserDTO.ts";
+import { pool } from '@shared/infra/postgres/config.ts';
+import { hash, checkHash } from "@utils/hash.ts";
+import { DatabaseTransactionError, NotFoundError } from "@shared/errors/ApplicationError.ts";
+import { User } from "@modules/accounts/models/User.ts";
+import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts";
+import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
+import { IUpdateUserDTO } from "@modules/accounts/DTOs/UpdateUserDTO.ts";
 
 class UserRepository implements IUsersRepository {
   async createUser(userDTO: ICreateUserDTO) {

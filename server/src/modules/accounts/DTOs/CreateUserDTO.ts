@@ -1,5 +1,3 @@
-import { UUID } from "../@types/index.d.ts";
-
 export interface ICreateUserDTO {
   id?: UUID;
   email: string;

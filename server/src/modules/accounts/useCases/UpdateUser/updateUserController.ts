@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'npm:@types/express';
-import { updateUserService } from './updateUserService.ts';
-import { ApplicationError, BadRequestError } from "../../../../shared/errors/ApplicationError.ts";
+import { updateUserService } from "@modules/accounts/useCases/UpdateUser/updateUserService.ts";
+import { ApplicationError, BadRequestError } from "@shared/errors/ApplicationError.ts";
 
 export const updateUserController = async (request: Request, response: Response, next: NextFunction) => {
   const {

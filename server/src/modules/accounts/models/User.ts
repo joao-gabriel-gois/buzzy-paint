@@ -1,4 +1,3 @@
-import { UUID } from "../@types/index.d.ts";
 import { ICreateUserDTO } from "../DTOs/CreateUserDTO.ts";
 import { v4 as uuid } from 'npm:uuid';
 

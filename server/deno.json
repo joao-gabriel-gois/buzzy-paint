@@ -6,9 +6,17 @@
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
+    "cookie-parser": "npm:cookie-parser@^1.4.7",
     "cors": "npm:cors@^2.8.5",
     "express": "npm:express@^4.21.1",
-    "@types/express": "npm:@types/express@^4.17.21"
+    "@types/express": "npm:@types/express@^4.17.21",
+    "@modules/": "./src/modules/",
+    "@config/": "./src/config/",
+    "@shared/": "./src/shared/",
+    "@utils/": "./src/utils/",
+    "@types/": "./src/@types/",
+    "mongodb": "npm:mongodb@^6.11.0"
   },
+  "compilerOptions": { "types": [ "./src/@types/global.d.ts" ] },
   "nodeModulesDir": "auto"
 }

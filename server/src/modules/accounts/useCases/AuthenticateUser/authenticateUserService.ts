@@ -1,13 +1,12 @@
-import { checkHash } from "../../../../utils/hash.ts";
+import { checkHash } from "@utils/hash.ts";
 import { sign } from 'npm:jsonwebtoken';
-// import { IUsersRepository } from "../../repositories/IUsersRepositories.ts";
-import { BadRequestError, BusinessLogicError } from "../../../../shared/errors/ApplicationError.ts";
-import { usersRepository } from "../../repositories/postgres/usersRepository.ts";
-import auth from "../../../../config/auth.ts";
-import { usersTokensRepository } from "../../repositories/postgres/usersTokensRepository.ts";
-import { expiryDateMapper } from "../../../../utils/expiryDateMapper.ts";
-import { IUsersRepository } from "../../repositories/IUsersRepository.ts";
-// import IUsersTokensRepository from '@modules/accounts/repositories/IUsersTokensRepository';
+import { InvalidParameterError, BadRequestError, BusinessLogicError } from "@shared/errors/ApplicationError.ts";
+import { usersRepository } from "@modules/accounts/repositories/postgres/usersRepository.ts";
+import auth from "@config/auth.ts";
+import { usersTokensRepository } from "@modules/accounts/repositories/postgres/usersTokensRepository.ts";
+import { expiryDateMapper, pgsqlDateAdapter } from "@utils/expiryDateMapper.ts";
+import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts";
+import IUsersTokensRepository from "@modules/accounts/repositories/IUsersTokensRepository.ts";
 
 interface IRequest {
   email: string;
@@ -26,21 +25,26 @@ interface IResponse {
 
 class AuthenticateUserService {
   constructor(
+    private usersTokensRepository: IUsersTokensRepository,
     private usersRepository: IUsersRepository,
   ) {};
 
   async execute({ email, password }: IRequest): Promise<IResponse> {
     const user = await this.usersRepository.getUserByEmail(email);
-  
-    const {
+
+    if (!user || !user!.id) {
+      throw new BadRequestError('Incorrect Email or password!');
+    }
+
+    const  {
       token_secret,
       token_expires_in,
       refresh_token_secret,
       refresh_token_expires_in
     } = auth;
 
-    if (!user || !user!.id) {
-      throw new BadRequestError('Incorrect Email or password!');
+    if (!(token_secret || token_expires_in || refresh_token_secret || refresh_token_expires_in)) {
+      throw new InvalidParameterError('Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!');
     }
 
     const passwordMatch = await checkHash(password, user.password!); // Password is manageable to get deleteable, but it will be surely returned
@@ -49,26 +53,26 @@ class AuthenticateUserService {
       throw new BusinessLogicError('Incorrect Email or password!');
     }
 
-    // only for example, generated with md5, with this input: pudãoignitenode_ultrasecure_hash
-    // it should be used with better input and saved in an .env variable
     const token = sign({}, token_secret , {
       subject: user.id,
       expiresIn: token_expires_in,
     });
 
-    const expiration_date = new Date(Date.now() + expiryDateMapper('2d')).toISOString(); // 2 days from now
+    const expiration_date = pgsqlDateAdapter(
+      new Date(Date.now() + expiryDateMapper(token_expires_in!))
+    );
+    console.log('SERVICE expiration_date', expiration_date);
 
     const refresh_token = sign({ email }, refresh_token_secret, {
       subject: user.id,
       expiresIn: refresh_token_expires_in 
     });
 
-
-      // usersTokensRepository
-    await usersTokensRepository.create({
+    // usersTokensRepository
+    await this.usersTokensRepository.create({
       user_id: user.id!,
       expiration_date,
-      refresh_token,
+      refresh_token
     });
     
     return {
@@ -78,11 +82,11 @@ class AuthenticateUserService {
         email: user.email
       }, 
       token,
-      refresh_token
+      refresh_token,
     };
 
   }
 
 }
 
-export const authenticateUserService = new AuthenticateUserService(usersRepository);
+export const authenticateUserService = new AuthenticateUserService(usersTokensRepository, usersRepository);

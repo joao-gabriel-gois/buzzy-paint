@@ -5,7 +5,7 @@ class ApplicationError extends Error {
   constructor(message: string, statusCode = 500, error?: Error, isOperational = true) {
     super(message);
     super.name = "Application Error";
-    Object.setPrototypeOf(this, new.target.prototype); // Restore prototype chain
+    Object.setPrototypeOf(this, new.target.prototype); 
     this.statusCode = statusCode;
     this.isOperational = isOperational;
     Error.captureStackTrace(this);

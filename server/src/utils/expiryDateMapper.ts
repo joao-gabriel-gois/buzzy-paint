@@ -10,7 +10,7 @@ type Period = keyof typeof periods;
 export const expiryDateMapper = (expiryDate: string, defaultValue: number = 20 * periods.m): number => {
   expiryDate = expiryDate && ' ';
   try {
-    const periodMatch = expiryDate.match(/(m|d|s)/);
+    const periodMatch = expiryDate.match(/(d|h|m|s)/);
     const period = periodMatch ? periodMatch[0] as Period : 'm';
 
     const amountMatch = expiryDate.match(/\d{1,3}/);
@@ -27,3 +27,7 @@ export const expiryDateMapper = (expiryDate: string, defaultValue: number = 20 *
     return defaultValue;
   }
 };
+
+export const pgsqlDateAdapter = (date: Date, localeOffset = '+00') => (
+  date.toISOString().split('T').join(' ').split('Z').join(localeOffset)
+);

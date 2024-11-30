@@ -1,10 +1,9 @@
-import { DatabaseTransactionError, NotFoundError } from "../../../../shared/errors/ApplicationError.ts";
-import { checkHash, hash } from "../../../../utils/hash.ts";
-import { ManageableUser, UUID } from "../../@types/index.d.ts";
-import { ICreateUserDTO } from "../../DTOs/CreateUserDTO.ts";
-import { IUpdateUserDTO } from "../../DTOs/UpdateUserDTO.ts";
-import { User } from "../../models/User.ts";
-import { IUsersRepository } from "../IUsersRepository.ts"
+import { DatabaseTransactionError, NotFoundError } from "@shared/errors/ApplicationError.ts";
+import { checkHash, hash } from "@utils/hash.ts";
+import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
+import { IUpdateUserDTO } from "@modules/accounts/DTOs/UpdateUserDTO.ts";
+import { User } from "@modules/accounts/models/User.ts";
+import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts"
 
 let users: User[] = [];
 
@@ -20,8 +19,8 @@ class UsersRepositoryInMemory implements IUsersRepository {
     return await new Promise((resolve, reject) => {
       const user = new User(userDTO);
       if (!(
-        user.email && user.firstName
-          && user.lastName && user.password
+        user.email && user.firstname
+          && user.lastname && user.password
       )) reject(
         new DatabaseTransactionError(
           'Query for creating user has failed!'
@@ -78,11 +77,11 @@ class UsersRepositoryInMemory implements IUsersRepository {
     if (user.email && user.email !== currentUser.email) {
       user.email = currentUser.email;
     }
-    if (user.firstName && user.firstName !== currentUser.firstName) {
-      user.firstName = currentUser.firstName;
+    if (user.firstName && user.firstName !== currentUser.firstname) {
+      user.firstName = currentUser.firstname;
     }
-    if (user.lastName && user.lastName !== currentUser.lastName) {
-      user.lastName = currentUser.lastName;
+    if (user.lastName && user.lastName !== currentUser.lastname) {
+      user.lastName = currentUser.lastname;
     }
     if (user.password && !checkHash(currentUser.password, user.password)) {
       user.password = await hash(user.password);

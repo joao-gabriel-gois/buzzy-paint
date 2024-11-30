@@ -5,16 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Buzzy Paint</title>
-    <script src="index.js" type="module"></script>
   </head>
   <body>
-    <div id="top-side">
-      <img src="assets/pencil_case.png" />
-      <h1>Buzzy Paint</h1>
-    </div>
-    <div id="bottom-side">
-      <img src="assets/loading.png" />
-      <p>Loading</p>
+    <div>
+      <h1>😔</h1>
+      <h1>Page not found</h1>
+      <img src="../assets/404.png" />
     </div>
   </body>
   <style>
@@ -25,20 +21,19 @@
       display: flex;
       height: 100vh;
       font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-      color: #500b81;
+      color: #a54be5;
       overflow: hidden;
       background-color: rgba(87, 15, 155, 0.747);
-      background-image: url(assets/bg.svg);
+      background-image: url(../assets/bg.svg);
       align-items: center;
       justify-content: center;
       flex-direction: column;
       gap: 2em;
     }
     img {
-      width: 12rem;
-      opacity: 0.75;
+      width: 16rem;
     }
-    #bottom-side {
+    div {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -46,35 +41,17 @@
       font-size: 14pt;
       font-weight: 600;
       font-family: 'Courier New', Courier, monospace;
-    }
-    div {
-      animation: show 333ms ease-out;
-    }
-    #bottom-side p {
-      margin: 1em 0em;
-    }
-    #bottom-side img {
-      width: 6rem;
-      animation: loading linear 1.5s infinite;
+      background-color: rgba(41, 15, 67, 0.558);
+      padding: 2em;
+      border-radius: 9px;
     }
 
-    @keyframes loading {
+    @keyframes anim404 {
       from {
-        rotate: 0deg;
+        transform: scale(0.8)
       }
       to {
-        rotate: 360deg;
-      }
-    }
-
-    @keyframes show {
-      from {
-        transform: translateX(-1.5rem);
-        opacity: 0.2;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
+        rotate: scale(1.2);
       }
     }
 

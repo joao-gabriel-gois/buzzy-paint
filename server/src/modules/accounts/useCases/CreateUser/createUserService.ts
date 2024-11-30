@@ -1,9 +1,6 @@
-import { BusinessLogicError } from "../../../../shared/errors/ApplicationError.ts";
-// import { usersRepository } from "../../repositories/in-memory/usersRepository.ts";
-import { usersRepository } from "../../repositories/postgres/usersRepository.ts";
-
-import { ExposableUser } from "../../@types/index.d.ts";
-import { ICreateUserDTO } from "../../DTOs/CreateUserDTO.ts";
+import { BusinessLogicError } from "@shared/errors/ApplicationError.ts";
+import { usersRepository } from "@modules/accounts/repositories/postgres/usersRepository.ts";
+import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
 
 class CreateUserService {
   async execute({email, username, firstName, lastName, password }: ICreateUserDTO): Promise<ExposableUser> {

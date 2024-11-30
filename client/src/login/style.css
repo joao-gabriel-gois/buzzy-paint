@@ -9,6 +9,10 @@ body {
   color: #500b81;
   overflow: hidden;
 }
+h1 {
+  margin-top: -0.5rem;
+  font-size: 32pt;
+}
 #left-side {
   grid-column: 1;
   background-color: rgba(87, 15, 155, 0.747);
@@ -23,6 +27,7 @@ body {
   width: 14em;
   margin-top: -2em;
   opacity: 0.6;
+  animation: show-grow-img 566ms ease-out;
 }
 #right-side {
   grid-column: 2;
@@ -34,9 +39,8 @@ body {
   background-color: #FAEDF089;
   border-left: 4px groove rgb(182, 130, 238);
 }
-h1 {
-  margin-top: -0.5rem;
-  font-size: 32pt;
+#right-side form, #right-side h1 {
+  animation: show-grow 566ms ease-out;
 }
 form {
   margin-top: 2.25rem;
@@ -84,4 +88,26 @@ input[type="submit"] {
 
 input[type="submit"]:hover {
   opacity: 0.8;
+}
+
+@keyframes show-grow {
+  from {
+    transform: scale(0.8);
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes show-grow-img {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+
 }

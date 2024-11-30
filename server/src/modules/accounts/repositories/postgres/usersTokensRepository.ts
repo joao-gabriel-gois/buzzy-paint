@@ -1,12 +1,12 @@
-import { DatabaseTransactionError } from "../../../../shared/errors/ApplicationError.ts";
-import { pool } from "../../../../shared/infra/postgres/config.ts";
-import { UUID } from "../../@types/index.d.ts";
-import { ICreateUserTokensDTO } from "../../DTOs/CreateUserTokensDTO.ts";
-import { UserTokens } from "../../models/UserTokens.ts";
-import IUsersTokensRepository from "../IUsersTokensRepository.ts";
+import { DatabaseTransactionError } from "@shared/errors/ApplicationError.ts";
+import { pool } from "@shared/infra/postgres/config.ts";
+import { ICreateUserTokensDTO } from "@modules/accounts/DTOs/CreateUserTokensDTO.ts";
+import { UserTokens } from "@modules/accounts/models/UserTokens.ts";
+import IUsersTokensRepository from "@modules/accounts/repositories/IUsersTokensRepository.ts";
 
 
 class UsersTokensRepository implements IUsersTokensRepository {
+
   async create(createUserDTO: ICreateUserTokensDTO): Promise<UserTokens> {
     const {
       id,
@@ -93,6 +93,23 @@ class UsersTokensRepository implements IUsersTokensRepository {
     }
     catch(error) {
       const dbError = new DatabaseTransactionError('Database Transaction for deleting token for this user has failed');
+      console.error(
+        `[${new Date().toISOString()}]:`,
+        `(${dbError}) Query has failed ⮷\n`,
+        dbError.message + ':\n\t',
+        error
+      );
+      throw dbError;
+    }
+  }
+
+  async deleteExpiredRefreshTokens(): Promise<void> {
+    const query = "DELETE FROM user_tokens WHERE expiration_date < NOW() - INTERVAL '30 days'";
+    try {
+      await pool.query(query);
+    }
+    catch(error) {
+      const dbError = new DatabaseTransactionError('Database Transaction for deleting all expired refresh tokens has failed');
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError}) Query has failed ⮷\n`,

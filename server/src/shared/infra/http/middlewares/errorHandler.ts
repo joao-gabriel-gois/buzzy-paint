@@ -1,4 +1,4 @@
-import { ApplicationError } from "../../../errors/ApplicationError.ts";
+import { ApplicationError } from "@shared/errors/ApplicationError.ts";
 import { Request, Response, NextFunction} from 'npm:@types/express';
 
 export const errorHandler = (error: Error, _: Request, response: Response, _next: NextFunction) => {

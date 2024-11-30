@@ -1,8 +1,7 @@
 import { Response, NextFunction } from 'npm:@types/express';
-import { UnauthorizedError } from "../../../errors/ApplicationError.ts";
+import { UnauthorizedError } from "@shared/errors/ApplicationError.ts";
 import { verify } from "npm:jsonwebtoken";
-import auth from "../../../../config/auth.ts";
-import { IRequest } from "../../../../modules/accounts/@types/index.d.ts";
+import auth from "@config/auth.ts";
 
 interface IPayload {
   sub: string;

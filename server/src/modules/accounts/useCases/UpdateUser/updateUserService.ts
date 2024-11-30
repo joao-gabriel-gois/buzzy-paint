@@ -1,8 +1,6 @@
-import { IUpdateUserDTO } from "../../DTOs/UpdateUserDTO.ts";
-// import { usersRepository } from "../../repositories/in-memory/usersRepository.ts";
-import { usersRepository } from "../../repositories/postgres/usersRepository.ts";
-import { ExposableUser } from "../../@types/index.d.ts";
-import { BusinessLogicError } from "../../../../shared/errors/ApplicationError.ts";
+import { IUpdateUserDTO } from "@modules/accounts/DTOs/UpdateUserDTO.ts";
+import { usersRepository } from "@modules/accounts/repositories/postgres/usersRepository.ts";
+import { BusinessLogicError } from "@shared/errors/ApplicationError.ts";
 
 class UpdateUserService {
   async execute(updateUserDTO: IUpdateUserDTO): Promise<ExposableUser> {

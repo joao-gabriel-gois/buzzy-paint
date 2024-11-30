@@ -1,3 +1,4 @@
+import "../js/router.js";
 import { TabsManager  } from "../js/modules/TabsManager.js";
 import { ToolbarClickListener } from '../js/modules/ToolbarClickListener.js';
 
@@ -6,9 +7,7 @@ import { Liner } from '../js/modules/canvas-tools-handlers/LinerEventHandler.js'
 import { Writter } from '../js/modules/canvas-tools-handlers/WritterEventHandler.js';
 import { Zoomer } from '../js/modules/canvas-tools-handlers/ZoomerEventHandler.js';
 import { Eraser } from '../js/modules/canvas-tools-handlers/EraserEventHandler.js';
-import { router } from "../js/router.js";
 
-router('/home');
 
 (() => {
   document.addEventListener('DOMContentLoaded', () => {

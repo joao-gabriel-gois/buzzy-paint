@@ -15,7 +15,21 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - './src/shared/infra/postgres/initdb:/docker-entrypoint-initdb.d'
 
-  deno_app:
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    ports:
+      - "27017:${MONGOPORT}"
+    volumes:
+      - mongo_data:/var/lib/mongo/data
+      - './src/shared/infra/mongo/initdb:/docker-entrypoint-initdb.d/mongo'
+
+
+  buzzy_paint_app:
     build:
       context: .
       args:
@@ -24,6 +38,8 @@ services:
         PGHOST: ${PGHOST}
         PGPORT: ${PGPORT}
         PGDATABASE: ${PGDATABASE}
+        MONGO_ROOT_USER: ${MONGO_ROOT_USER}
+        MONGO_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
         PORT: ${PORT}
     container_name: deno_app
     restart: unless-stopped

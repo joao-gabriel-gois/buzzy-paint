@@ -5,6 +5,7 @@ body {
   margin: 0;
   box-sizing: border-box;
   user-select: none;
+  animation: show ease-out 0.666s;
 }
 
 header {
@@ -370,4 +371,15 @@ li.active {
 
 li.tabnav-active {
   display: block !important;
+}
+
+@keyframes show {
+  from {
+    transform: translateX(-2.2rem);
+    opacity: 0.2;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }

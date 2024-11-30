@@ -1,9 +1,8 @@
 import { v4 as uuid } from 'npm:uuid';
-import { UUID } from "../@types/index.d.ts";
-import { ICreateUserTokensDTO } from "../DTOs/CreateUserTokensDTO.ts";
+import { ICreateUserTokensDTO } from "@modules/accounts/DTOs/CreateUserTokensDTO.ts";
+
 
 export class UserTokens {
-  
   public id: UUID;
   public refresh_token: string;
   public user_id: UUID;

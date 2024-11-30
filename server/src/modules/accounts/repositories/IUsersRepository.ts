@@ -1,6 +1,5 @@
-import { ManageableUser, UUID } from "../@types/index.d.ts";
-import { ICreateUserDTO } from "../DTOs/CreateUserDTO.ts";
-import { IUpdateUserDTO } from "../DTOs/UpdateUserDTO.ts";
+import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
+import { IUpdateUserDTO } from "@modules/accounts/DTOs/UpdateUserDTO.ts";
 
 export interface IUsersRepository {
   createUser: (userDTO: ICreateUserDTO) => Promise<ManageableUser>;

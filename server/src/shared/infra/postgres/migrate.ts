@@ -1,5 +1,5 @@
 import { dirname, fromFileUrl, join, resolve } from "https://deno.land/std@0.224.0/path/mod.ts";
-import { pool } from '../../../shared/infra/postgres/config.ts';
+import { pool } from "@shared/infra/postgres/config.ts";
 const __dirname = dirname(fromFileUrl(import.meta.url))
 
 const logger = console; // we can create a different logger utils later, let's use console for now
@@ -11,7 +11,7 @@ async function executeSqlFile(filePath: string) {
     const query = Deno.readTextFileSync(filePath);
     await pool.query(query);
     // await pool.query('COMMIT');
-    // logger.info('Migration', res); // for debugging put 'await pool.query();' inside a const called res
+    // logger.info('Migration', res); // for debugging put 'await pool.query();' calls inside a variable
     logger.info('(migrate.ts script): All migrations has been executed successfully');
   } catch (err) {
     await pool.query('ROLLBACK');

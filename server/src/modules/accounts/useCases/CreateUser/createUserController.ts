@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'npm:@types/express';
-import { createUserService } from './createUserService.ts';
-import { ApplicationError, BadRequestError } from "../../../../shared/errors/ApplicationError.ts";
+import { createUserService } from "@modules/accounts/useCases/CreateUser/createUserService.ts";
+import { ApplicationError, BadRequestError } from "@shared/errors/ApplicationError.ts";
 
 export const createUserController = async (request: Request, response: Response, next: NextFunction) => {
   const {

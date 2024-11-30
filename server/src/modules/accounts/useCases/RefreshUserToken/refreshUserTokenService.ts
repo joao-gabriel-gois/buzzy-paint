@@ -1,10 +1,9 @@
 import { sign, verify } from 'npm:jsonwebtoken';
-import auth from '../../../../config/auth.ts'
-import { NotFoundError } from "../../../../shared/errors/ApplicationError.ts";
-import { UUID } from "../../@types/index.d.ts";
-import IUsersTokensRepository from "../../repositories/IUsersTokensRepository.ts";
-import { usersTokensRepository } from "../../repositories/postgres/usersTokensRepository.ts";
-import { expiryDateMapper } from "../../../../utils/expiryDateMapper.ts";
+import auth from "@config/auth.ts"
+import { InvalidParameterError, NotFoundError } from "@shared/errors/ApplicationError.ts";
+import IUsersTokensRepository from "@modules/accounts/repositories/IUsersTokensRepository.ts";
+import { usersTokensRepository } from "@modules/accounts/repositories/postgres/usersTokensRepository.ts";
+import { expiryDateMapper } from "@utils/expiryDateMapper.ts";
 
 interface IPayload {
   sub: string;
@@ -29,6 +28,9 @@ export default class RefreshTokenService {
       token_expires_in 
     } = auth;
 
+    if (!(token_secret || token_expires_in || refresh_token_secret || refresh_token_expires_in)) {
+      throw new InvalidParameterError('Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!');
+    }
     const { email, sub: user_id } = verify(refresh_token, refresh_token_secret) as IPayload;
 
     const userToken = await this.usersTokensRepository
@@ -46,7 +48,6 @@ export default class RefreshTokenService {
     });
 
     const expiration_date = new Date(Date.now() + expiryDateMapper('2d')).toISOString(); // 2 days from now
-
 
     await this.usersTokensRepository.create({
       user_id: user_id as UUID,

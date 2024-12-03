@@ -1,7 +1,7 @@
 {
   "tasks": {
-    "dev": "deno run --watch --allow-read --allow-net --allow-ffi --allow-env --env-file='.env' --allow-scripts=npm:bcrypt src/shared/infra/http/server.ts",
-    "prod": "deno run --allow-read --allow-net --allow-ffi --allow-env --allow-scripts=npm:bcrypt src/shared/infra/http/server.ts",
+    "dev": "deno run --watch --allow-read --allow-net --allow-sys --allow-ffi --allow-env --env-file='.env' --allow-scripts=npm:bcrypt src/shared/infra/http/server.ts",
+    "prod": "deno run --allow-read --allow-net --allow-sys --allow-ffi --allow-env --allow-scripts=npm:bcrypt src/shared/infra/http/server.ts",
     "migrate": "deno run --allow-read --allow-net --allow-env src/shared/infra/postgres/migrate.ts"
   },
   "imports": {

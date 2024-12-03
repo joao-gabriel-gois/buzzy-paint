@@ -7,7 +7,7 @@ interface IPayload {
   sub: string;
 }
 
-export const ensureAuthentication = (request: IRequest, _: Response, next: NextFunction) => {
+export const ensureAuthentication = (request: AuthRequest, _: Response, next: NextFunction) => {
   const bearer = request.headers.authorization;
   if (!bearer) next(new UnauthorizedError('Authorization Header not Found!'))
   else {
@@ -20,7 +20,7 @@ export const ensureAuthentication = (request: IRequest, _: Response, next: NextF
       ) as IPayload;
   
       request.user = {
-        id: user_id
+        id: user_id as UUID
       };
   
       next();

@@ -5,4 +5,5 @@ export interface ICreateUserDTO {
   firstName: string;
   lastName: string;
   password: string;
+  draws_mongo_id?: string;
 }

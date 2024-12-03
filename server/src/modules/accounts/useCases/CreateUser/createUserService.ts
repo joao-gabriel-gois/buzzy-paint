@@ -5,12 +5,12 @@ import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
 class CreateUserService {
   async execute({email, username, firstName, lastName, password }: ICreateUserDTO): Promise<ExposableUser> {
     // check if either user with same email or username already exists (business rule)
-    let existentUser = await usersRepository.getUserByEmail(email);
+    let existentUser = await usersRepository.findByEmail(email);
     if (existentUser) throw new BusinessLogicError('User with this email already exists');
-    existentUser = await usersRepository.getUserByUsername(username);
+    existentUser = await usersRepository.findByUsername(username);
     if (existentUser) throw new BusinessLogicError('User with this username already exists');
 
-    const createdUser = await usersRepository.createUser({
+    const createdUser = await usersRepository.create({
       email,
       username,
       firstName,

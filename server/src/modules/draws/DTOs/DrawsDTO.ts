@@ -48,12 +48,12 @@ type Command = IDrawCommand | IWriteCommand  | ILineCommand | IEraseCommand;
 type EventQueue = Command[];
 type UndoStack = EventQueue;
 
-interface IDrawDTO {
+export interface IDrawsDTO {
   eventQueue: EventQueue;
   undoStack: UndoStack; // turn it in a tree later (/TODO on client side)
 }
 
-export interface IDrawsDTO {
-  id: MongoId;
-  draws: IDrawDTO[];
+export interface IDrawsMongoDocumentDTO {
+  id: string;
+  draws: IDrawsDTO[];
 }

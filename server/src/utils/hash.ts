@@ -15,6 +15,10 @@ export const hash = async (password: string) => {
   return hashedPassword;
 }
 
-export const checkHash = async (plainPassword: string, hash: string) => (
-  await bcrypt.compare(plainPassword, hash)
-);
+export const checkHash = async (plainPassword: string, hash: string): Promise<boolean> => {
+  try {
+    return await bcrypt.compare(plainPassword, hash);
+  } catch(e) {
+    throw new Error('Not able to check the hash, error:', e as Error);
+  }
+};

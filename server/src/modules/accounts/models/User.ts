@@ -8,6 +8,7 @@ export class User {
   public firstname: string;
   public lastname: string;
   public password: string;
+  public draws_mongo_id: string | null;
 
   constructor(userDTO: ICreateUserDTO) {
     const {
@@ -16,7 +17,8 @@ export class User {
       username,
       firstName,
       lastName,
-      password
+      password,
+      draws_mongo_id
     } = userDTO;
 
     this.id = id ? id : uuid() as UUID;
@@ -25,5 +27,6 @@ export class User {
     this.firstname = firstName;
     this.lastname = lastName;
     this.password = password;
+    this.draws_mongo_id = draws_mongo_id || null;
   }
 }

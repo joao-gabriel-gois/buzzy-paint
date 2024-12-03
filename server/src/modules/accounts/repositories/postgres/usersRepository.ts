@@ -7,14 +7,14 @@ import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
 import { IUpdateUserDTO } from "@modules/accounts/DTOs/UpdateUserDTO.ts";
 
 class UserRepository implements IUsersRepository {
-  async createUser(userDTO: ICreateUserDTO) {
+  async create(userDTO: ICreateUserDTO) {
     let {
       id,
       username,
       email,
       password,
       firstname: lastName,
-      lastname: firstName
+      lastname: firstName,
     } = new User(userDTO);
     
     password = await hash(password);
@@ -39,7 +39,7 @@ class UserRepository implements IUsersRepository {
     return rows[0] as ManageableUser;
   }
 
-  async getUserById(id: UUID) {
+  async findById(id: UUID) {
     const query = 'SELECT * FROM users WHERE id = $1';
     const values = [id];
     let result;
@@ -60,7 +60,7 @@ class UserRepository implements IUsersRepository {
     return rows[0] as ManageableUser | undefined;
   }
 
-  async getUserByEmail(email: string) {
+  async findByEmail(email: string) {
     const query = 'SELECT * FROM users WHERE email = $1';
     const values = [email];
     let result;
@@ -81,7 +81,7 @@ class UserRepository implements IUsersRepository {
     return rows[0] as ManageableUser | undefined;
   }
 
-  async getUserByUsername(username: string) {
+  async findByUsername(username: string) {
     const query = 'SELECT * FROM users WHERE username = $1';
     const values = [username];
     let result;
@@ -102,8 +102,8 @@ class UserRepository implements IUsersRepository {
     return rows[0] as ManageableUser | undefined;
   }
 
-  async updateUser(user: IUpdateUserDTO) {
-    const currentUser = await this.getUserById(user.id);
+  async update(user: IUpdateUserDTO) {
+    const currentUser = await this.findById(user.id);
     if (!currentUser) throw new NotFoundError('User not found');
   
     const updates: string[] = [];
@@ -115,12 +115,12 @@ class UserRepository implements IUsersRepository {
       values.push(user.email);
       index++;
     }
-    if (user.firstName && user.firstName !== currentUser.firstName) {
+    if (user.firstName && user.firstName !== currentUser.firstname) {
       updates.push(`firstName = $${index}`);
       values.push(user.firstName);
       index++;
     }
-    if (user.lastName && user.lastName !== currentUser.lastName) {
+    if (user.lastName && user.lastName !== currentUser.lastname) {
       updates.push(`lastName = $${index}`);
       values.push(user.lastName);
       index++;
@@ -133,6 +133,11 @@ class UserRepository implements IUsersRepository {
         values.push(hashedPassword);
         index++;
       }
+    }
+    if (user.draws_mongo_id) {
+      updates.push(`draws_mongo_id = $${index}`);
+      values.push(user.draws_mongo_id);
+      index++;
     }
     if (updates.length === 0) {
       return currentUser; // No changes
@@ -160,7 +165,7 @@ class UserRepository implements IUsersRepository {
     return rows[0] as ManageableUser;
   }
   
-  async deleteUser(id: UUID) {
+  async delete(id: UUID) {
     const query = 'DELETE FROM users WHERE id = $1 RETURNING *';
     const values = [id];
     let result;

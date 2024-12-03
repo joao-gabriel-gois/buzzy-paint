@@ -30,7 +30,7 @@ class AuthenticateUserService {
   ) {};
 
   async execute({ email, password }: IRequest): Promise<IResponse> {
-    const user = await this.usersRepository.getUserByEmail(email);
+    const user = await this.usersRepository.findByEmail(email);
 
     if (!user || !user!.id) {
       throw new BadRequestError('Incorrect Email or password!');
@@ -61,7 +61,6 @@ class AuthenticateUserService {
     const expiration_date = pgsqlDateAdapter(
       new Date(Date.now() + expiryDateMapper(token_expires_in!))
     );
-    console.log('SERVICE expiration_date', expiration_date);
 
     const refresh_token = sign({ email }, refresh_token_secret, {
       subject: user.id,

@@ -1,12 +1,10 @@
 
-import { IDrawsDTO } from "@modules/draws/DTOs/DrawsDTO.ts";
-import { MongoId } from "@modules/draws/types.d.ts";
-
-// NoSQL object, no schema, everything is a DTO and there is no processing
-// at least for now, for this info as a Model. The application is a proxy to mongo, basically.
-type Draws = IDrawsDTO;
+import { IDrawsDTO, IDrawsMongoDocumentDTO } from "@modules/draws/DTOs/DrawsDTO.ts";
+import { WithId, Document, UpdateResult, DeleteResult } from "npm:mongodb@6.11.0";
 
 export interface IDrawsRepository {
-  createDraw: (drawsDTO: IDrawsDTO) => Promise<UUID>;
-  findDraw: (draws_id: MongoId) => Promise<Draws>;
+  findById: (draws_id: string) => Promise<WithId<Document> | null>;
+  create: (drawsDTO: IDrawsDTO[]) => Promise<string | null>;
+  update: (drawMongoDocDTO: IDrawsMongoDocumentDTO) => Promise<UpdateResult<Document> | null>;
+  delete: (draws_id: string) => Promise<DeleteResult>;
 }

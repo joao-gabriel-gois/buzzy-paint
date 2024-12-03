@@ -5,12 +5,7 @@ import { ensureAuthentication } from "@shared/infra/http/middlewares/ensureAuthe
 
 const userRoutes = Router();
 
-
-// create authed getUserDraws
 userRoutes.put('/users', ensureAuthentication, updateUserController);
 userRoutes.post('/users', createUserController);
-// TODO
-// userRoutes.delete('/users/:id', deleteUserControler);
-
 
 export { userRoutes };

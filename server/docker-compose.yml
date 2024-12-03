@@ -23,7 +23,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
     ports:
-      - "27017:${MONGOPORT}"
+      - "27017:27017"
     volumes:
       - mongo_data:/var/lib/mongo/data
       - './src/shared/infra/mongo/initdb:/docker-entrypoint-initdb.d/mongo'
@@ -53,9 +53,13 @@ services:
       PGHOST: ${PGHOST}
       PGPORT: ${PGPORT}
       PGDATABASE: ${PGDATABASE}
+      MONGO_ROOT_USER: ${MONGO_ROOT_USER}
+      MONGO_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
       PORT: ${PORT}
     depends_on:
       - postgres
+      - mongo
 
 volumes:
   postgres_data:
+  mongo_data:

@@ -7,15 +7,13 @@ const periods = {
 
 type Period = keyof typeof periods;
 
-export const expiryDateMapper = (expiryDate: string, defaultValue: number = 20 * periods.m): number => {
-  expiryDate = expiryDate && ' ';
+export const expiryDateMapper = (expiryDate = ' ', defaultValue = 20 * periods.m): number => {
   try {
     const periodMatch = expiryDate.match(/(d|h|m|s)/);
     const period = periodMatch ? periodMatch[0] as Period : 'm';
 
     const amountMatch = expiryDate.match(/\d{1,3}/);
     const amount = amountMatch ? Number(amountMatch[0]) : 15;
-
     if (!periods[period]) {
       console.warn(`Invalid period: ${period}. Using default.`);
       return defaultValue;

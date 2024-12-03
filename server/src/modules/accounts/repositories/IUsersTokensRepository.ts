@@ -1,4 +1,3 @@
-import { UUID } from "../../../@types/index.js";
 import { ICreateUserTokensDTO } from "@modules/accounts/DTOs/CreateUserTokensDTO.ts";
 import { UserTokens } from "@modules/accounts/models/UserTokens.ts";
 

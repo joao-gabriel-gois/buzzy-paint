@@ -10,7 +10,7 @@ declare global {
   type ExposableUser = Omit<User,'password'>;
   type ManageableUser = ExposableUser & { password?: string };
 
-  interface IRequest extends Request {
-    user?: { id : string }
+  interface AuthRequest extends Request {
+    user?: { id : UUID }
   }
 }

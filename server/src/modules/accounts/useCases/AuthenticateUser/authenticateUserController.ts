@@ -26,19 +26,17 @@ export const authenticateUserController = async (request: Request, response: Res
   }
   catch(error) {
     if (error instanceof ApplicationError) {
-      throw error;
+      return next(error);
     }
-    throw new ApplicationError('Authenticate User: Unknown error!', 500, error as Error);
+    return next(new ApplicationError('Authenticate User: Unknown error!', 500, error as Error));
   }
   
   if (!sessionInfo) {
-    next(new NotFoundError('Session for this user was not found.'));
+    return next(new NotFoundError('Session for this user was not found.'));
   }
   
   const { refresh_token, token, user } = sessionInfo;
   const maxAge = expiryDateMapper(refresh_token_expires_in!) / 1000;
-  console.log('AuthUser-> MaxAge:', maxAge)
-
   response.cookie('refresh_token', refresh_token, {
     httpOnly: true,  // prevents JS access
     // disabling bellow options for testing

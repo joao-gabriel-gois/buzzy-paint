@@ -5,7 +5,7 @@ import { BusinessLogicError } from "@shared/errors/ApplicationError.ts";
 class UpdateUserService {
   async execute(updateUserDTO: IUpdateUserDTO): Promise<ExposableUser> {
     if (updateUserDTO.email) {;
-      const hasUser = await usersRepository.getUserByEmail(updateUserDTO.email);
+      const hasUser = await usersRepository.findByEmail(updateUserDTO.email);
       if (hasUser) throw new BusinessLogicError('You can\'t update to an already registered email!');
     }
     

@@ -8,10 +8,13 @@ import { sillyLogger } from "@shared/infra/http/middlewares/sillyLogger.ts";
 const app = express();
 
 app.use(express.json())
-app.use(cors({
-  origin: 'http://localhost:8080', 
-  credentials: true
-}));
+app.use(cors()
+  // cors({
+  //   origin: 'http://localhost:8080', 
+  //   credentials: true
+  // })
+);
+
 app.use(cookieParser());
 
 app.use(sillyLogger); // We can create a better one later, with critical levels in order to store important ones

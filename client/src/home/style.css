@@ -11,7 +11,15 @@ body {
 header {
   background-color: rgba(71, 61, 139, 0.25);
   margin-bottom: 3em;
-  padding: 0.2em 0.5em;
+  width: 100%;
+}
+
+header nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.2em 0.75em;
+  width: 100%;
 }
 
 header ul {
@@ -35,6 +43,20 @@ header ul li {
 header ul li:hover {
   opacity: 0.85;
   color: rgb(87, 76, 157);
+}
+
+header nav button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  margin-right: 2em;
+  opacity: 0.77;
+}
+
+header nav button:hover {
+  opacity: 1;
+  transform: scale(1.12);
 }
 
 main {

@@ -1,6 +1,6 @@
 import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts";
 import { IDrawsRepository } from "@modules/draws/repositories/IDrawsRepository.ts";
-import { IDrawsDTO } from "@modules/draws/DTOs/DrawsDTO.ts";
+import { ITabsDTO } from "@modules/draws/DTOs/DrawsDTO.ts";
 import { BusinessLogicError, NotFoundError } from "@shared/errors/ApplicationError.ts";
 import { drawsRepository } from "@modules/draws/repositories/mongo/drawsRepository.ts";
 import { usersRepository } from "@modules/accounts/repositories/postgres/usersRepository.ts";
@@ -15,7 +15,7 @@ class CreateDrawsService {
     this.usersRepository = usersRepository;
   }
 
-  async execute(user_id: UUID, drawsDTO: IDrawsDTO[]) {
+  async execute(user_id: UUID, tabsDTO: ITabsDTO) {
     const user = await this.usersRepository.findById(user_id);
     if (!user) {
       throw new NotFoundError("(CreateDrawService): There is no User with this ID.");
@@ -23,7 +23,7 @@ class CreateDrawsService {
     if (user.draws_mongo_id) {
       throw new BusinessLogicError('(CreateDrawService): This user already has an assigned Draw.');
     }
-    const draws_mongo_id = await this.drawsRepository.create(drawsDTO);
+    const draws_mongo_id = await this.drawsRepository.create(tabsDTO);
     if (!draws_mongo_id) {
       throw new NotFoundError('(CreateDrawService)[MongoDB]: Failed to create a Mongo DB Document for user\'s draws', 500);
     }

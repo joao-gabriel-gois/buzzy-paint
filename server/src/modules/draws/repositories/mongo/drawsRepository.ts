@@ -1,5 +1,5 @@
 import { IDrawsRepository } from "@modules/draws/repositories/IDrawsRepository.ts";
-import { IDrawsDTO, IDrawsMongoDocumentDTO } from "@modules/draws/DTOs/DrawsDTO.ts";
+import { ITabsDTO, IDrawsMongoDocumentDTO } from "@modules/draws/DTOs/DrawsDTO.ts";
 import { mongoConnection, Collection, ObjectId, IMongoConnection,  } from "@shared/infra/mongo/config.ts"; 
 import { ApplicationError } from "@shared/errors/ApplicationError.ts";
 
@@ -14,7 +14,8 @@ class DrawsRepository implements IDrawsRepository {
   async findById(draws_id: string) {
     await this.#updateCollection();
     try {
-      return await this.collection!.findOne({ _id: new ObjectId(draws_id) });
+      const mongoId = new ObjectId(draws_id);
+      return await this.collection!.findOne({ _id: mongoId });
     }
     catch(error) {
       throw new ApplicationError(
@@ -25,10 +26,10 @@ class DrawsRepository implements IDrawsRepository {
     }
   }
   
-  async create(drawsDTO: IDrawsDTO[]) {
+  async create(tabsDTO: ITabsDTO) {
     await this.#updateCollection();
     try {
-      const created = await this.collection!.insertOne({ draws: drawsDTO });
+      const created = await this.collection!.insertOne({ data: tabsDTO });
       if (created.acknowledged) {
         return created.insertedId.toString() || null;
       }
@@ -45,15 +46,16 @@ class DrawsRepository implements IDrawsRepository {
 
   async update(drawsMongoDocDTO: IDrawsMongoDocumentDTO) {
     await this.#updateCollection();
-    const { id, draws } = drawsMongoDocDTO;
+    const { id, data } = drawsMongoDocDTO;
     try {
-      return await this.collection!.updateOne({
+      const updated = await this.collection!.updateOne({
           _id: new ObjectId(id)
         }, {
         $set: {
-          draws
+          data,
         }
       });
+      return updated;
     }
     catch(error) {
       throw new ApplicationError(
@@ -94,6 +96,7 @@ class DrawsRepository implements IDrawsRepository {
         error as Error
       );
     }
+
   }
 
 }

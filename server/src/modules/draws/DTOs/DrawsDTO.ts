@@ -1,5 +1,3 @@
-import { MongoId } from "@modules/draws/types.d.ts";
-
 type Point = [number, number];
 type Position = {
   position: Point
@@ -49,11 +47,16 @@ type EventQueue = Command[];
 type UndoStack = EventQueue;
 
 export interface IDrawsDTO {
+  tabName: string;
   eventQueue: EventQueue;
   undoStack: UndoStack; // turn it in a tree later (/TODO on client side)
+}
+export interface ITabsDTO {
+  activeIndex: number;
+  draws: IDrawsDTO[];
 }
 
 export interface IDrawsMongoDocumentDTO {
   id: string;
-  draws: IDrawsDTO[];
+  data: ITabsDTO;
 }

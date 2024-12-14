@@ -6,15 +6,15 @@ import { ApplicationError, BadRequestError, InvalidParameterError, NotFoundError
 import { refreshUserTokenService } from "@modules/accounts/useCases/RefreshUserToken/refreshUserTokenService.ts";
 
 export const refreshUserTokenController = async (request: Request, response: Response, next: NextFunction) => {
-  let {
+  const {
     refresh_token
   } = request.cookies;
-  
+
   if (!refresh_token) {
-    return next(new BadRequestError('Refresh token doesn\'t exists for this client. User will need to login again!'));
+    return next(new BadRequestError('Refresh token doesn\'t exists for this user. User will need to login again!'));
   }
   
-  refresh_token = refresh_token.split('=')[1].split(';'[0]);
+  // refresh_token = refresh_token.split('=')[1].split(';')[0];
   
   const { refresh_token_expires_in } = auth;
   if (!refresh_token_expires_in) {
@@ -37,13 +37,13 @@ export const refreshUserTokenController = async (request: Request, response: Res
   
   const { refresh_token: newRefreshToken, token } = refreshedSessionInfo;
   
-  const maxAge = expiryDateMapper(refresh_token_expires_in!) / 1000;
+  const maxAge = expiryDateMapper(refresh_token_expires_in!);
   response.cookie('refresh_token', newRefreshToken, {
     httpOnly: true,  // prevents JS access
+    maxAge,
     // disabling bellow options for testing
     // secure: true,    // only HTTPS
     // sameSite: 'strict', // avoid CSRF
-    maxAge,
   });
 
   return response.json({

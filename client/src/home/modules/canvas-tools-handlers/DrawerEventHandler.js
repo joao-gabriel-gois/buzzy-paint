@@ -25,7 +25,6 @@ export class Drawer extends ToolEventHandler {
   handleOnMouseDown(event) {
     this.cursorStyle = 'crosshair';
     super.handleOnMouseDown(event);
-    // console.log(this.currentStyle);
     const drawThicknessRate = 1 + this.currentStyle.drawThickness / 8;
     this.context.strokeStyle = this.currentStyle.drawColor;
     this.context.lineWidth = drawThicknessRate;

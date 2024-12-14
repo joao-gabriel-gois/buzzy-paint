@@ -8,13 +8,12 @@ export const getDrawsController = async (request: AuthRequest, response: Respons
   if (!id) {
     return next(new UnauthorizedError('No user was found for this action!'));
   }
-  let draws;
+  let data;
   try {
-    draws = await getDrawsService.execute(id);
+    data = await getDrawsService.execute(id);
   }
   catch(error) {
     return next(error);
   }
-
-  return response.json({ draws });
+  return response.json({ data });
 }

@@ -1,9 +1,9 @@
-import './js/router.js';
+import { handleTabsDataFetching } from './shared/api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   animateLoadingText('#bottom-side p');
+  handleTabsDataFetching();
 });
-
 
 function animateLoadingText(textSelector) {
   const p = document.querySelector(textSelector);
@@ -21,5 +21,5 @@ function animateLoadingText(textSelector) {
     p.style.marginRight = originalMarginLeft;
     margin = 0;
     
-  }, 1200);
+  }, 800);
 }

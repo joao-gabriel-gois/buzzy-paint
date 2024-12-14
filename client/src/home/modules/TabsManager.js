@@ -4,48 +4,87 @@ import {
   removeCSSClass
 } from './utils/cssUtils.js'
 import { CanvasEventListener } from "./CanvasEventListener.js";
+import { storage as strg } from '../../shared/global.js';
+import { handleTabsDataSaving, handleTabsDataFetching } from '../../shared/api.js';
 
 export class TabsManager {
-  constructor(canvasWrapperReference, canvasReference, tabWrapperReference) {
+  constructor(
+    canvasWrapperReference,
+    canvasReference,
+    tabWrapperReference,
+    tokenStorageKey = 'token',
+    tabsStorageKey = 'tabsData',
+    apiSave = handleTabsDataSaving,
+    storage = strg,
+  ) {
     this.canvasWrapper = document.querySelector(canvasWrapperReference);
     this.canvasReference = canvasReference;
     this.tabButtonsWrapper = document.querySelector(tabWrapperReference);
     this.newTabBtn = this.tabButtonsWrapper.children[
       this.tabButtonsWrapper.children.length - 1
     ];
+    
+    this.getToken = () => storage.getItem(tokenStorageKey);
+    const data = storage.getItem(tabsStorageKey);
+    const { 
+      activeIndex,
+      draws
+    } = data ?? { activeIndex: 0, draws: [] };
 
-    this.tabs = [{ active: true }];
+    this.apiSave = apiSave;
+    this.tabsData = draws || [];
+    this.activeIndex = activeIndex;
+    this.previousActiveIndex = -1;
+
+    this.tabs = [];
 
     this.assignNewTab = this.assignNewTab.bind(this);
     this.alternateTab = this.alternateTab.bind(this);
-  }
-
-  getActiveIndex() {
-    return this.tabs.findIndex(tab => tab.active);
+    this.onKeyDown = this.onKeyDown.bind(this);
   }
   
   assignTabs() {
-    // if there tabs with saved status, it should be able to assign them correctly
-    // with something like this:
-    // const fetchedTabs = await (await fetch('/tabs/).then(r => r));
-    // if (!fetched tabs) { // if none, create them
-    this.tabs.forEach((tab, i) => {
-      this.tabs[i] = {
-        ...tab,
-        tabButton: this.createTabButton(i),
-        canvasListener: new CanvasEventListener(this.canvasReference) //dependency injection to be refatored
+    if (this.tabsData.length === 0) {
+      const blankTab = {
+        tabButton: this.createTabButton(0),
+        canvasListener: new CanvasEventListener(this.canvasReference)
       };
-      if (tab.active) {
-        this.tabButtonsWrapper.insertBefore(
-          this.tabs[i].tabButton,
-          this.newTabBtn
-        );
+
+      this.tabs.push(blankTab);
+      this.tabButtonsWrapper.insertBefore(
+        blankTab.tabButton,
+        this.newTabBtn
+      );
+      this.activateAndRenderTab(0);
+      return;
+    }
+
+    this.tabsData.forEach((tabData, i) => {
+      const {
+        eventQueue,
+        undoStack,
+        tabName
+      } = tabData;
+
+      const tabButton = this.createTabButton(i);
+      tabButton.innerText = tabName;
+
+      this.tabs[i] = {
+        tabButton,
+        canvasListener: new CanvasEventListener(
+          this.canvasReference,
+          eventQueue,
+          undoStack
+        )
+      };
+      this.tabButtonsWrapper.insertBefore(
+        this.tabs[i].tabButton,
+        this.newTabBtn
+      );
+      if (i === this.activeIndex) {
         this.activateAndRenderTab(i);
       }
     });
-    // return;
-    // }
-    // Assigning Fetch dada with logic bellow (else):
   }
 
   alternateTab(event) {
@@ -53,9 +92,9 @@ export class TabsManager {
     if (
       isNaN(tabIndex) || tabIndex > this.tabs.length - 1
     ) throw new Error('The Element reference is either NaN or does not relate to the current saved state!');
-    else if (tabIndex === this.getActiveIndex()) return;
+    else if (tabIndex === this.activeIndex) return;
 
-    this.deactivateTab(this.getActiveIndex());
+    this.deactivateTab(this.activeIndex);
     this.activateAndRenderTab(tabIndex);
   }
 
@@ -121,15 +160,13 @@ export class TabsManager {
   }
 
   assignNewTab() {
-    const previousTabIndex = this.getActiveIndex();
-    this.deactivateTab(previousTabIndex);
+    this.deactivateTab(this.activeIndex);
     
     const newTabIndex = this.tabs.length;
     const tabButton = this.createTabButton(newTabIndex);
     this.tabButtonsWrapper.insertBefore(tabButton, this.newTabBtn);
     
     this.tabs[newTabIndex] = {
-      active: false,
       tabButton,
       canvasListener: new CanvasEventListener(this.canvasReference)
     }
@@ -140,27 +177,23 @@ export class TabsManager {
       block: 'nearest',
       inline: 'center',
     });
-    // console.log(
-    //   "Tab created. Current Number of instances: ",
-    //   CanvasEventListener.getNumberOfInstances()
-    // );
-    // console.log('\n');
   }
   
   deactivateTab(index) {
+    if (index < 0) return;
     const {
       canvasListener: previousCanvasListener,
       tabButton: previousTabButton
     } = this.tabs[index];
 
-    this.tabs[index].active = false;
+    this.previousActiveIndex = index;
     previousCanvasListener.stop();
     removeCSSClass(previousTabButton, 'active');
-    // console.log("Deactivating Tab", index + 1);
   }
 
   activateAndRenderTab(index) {
-    this.tabs[index].active = true;
+    if (index < 0) return;
+    this.activeIndex = index;
     this.tabs[index].canvasListener.start();  
     addCSSClass(
       this.tabButtonsWrapper.children[index],
@@ -173,11 +206,48 @@ export class TabsManager {
       .dispatchEvent(
         new Event('render-call')
       );
-    // console.log("Activating Tab", index + 1);
   }
+
+  async saveTabsData() {
+    this.tabsData = this.tabs.map(tab => {
+      const tabName = tab.tabButton.innerText;
+      const {
+        eventQueue,
+        undoStack
+      } = tab.canvasListener;
+
+      return {
+        tabName,
+        eventQueue,
+        undoStack
+      }
+    });
+
+    const data = { 
+      draws: this.tabsData,
+      activeIndex: this.activeIndex
+    };
+
+    const response = await this.apiSave(data);
+    if (response.status === 200 || response.status === 201) {
+      alert('Your tabs were saved!'); // change to a rendered alert later
+    }
+    else {
+      console.error('It was not possible to save your tabs! Response status:', response.status);
+      alert('It was not possible to save your tabs!');
+    }
+  }
+
+  onKeyDown(event) {
+    if (event.ctrlKey && event.key === 's') {
+      event.preventDefault();
+      this.saveTabsData();
+    }
+  } 
   
   init() {
     this.assignTabs();
     this.newTabBtn.addEventListener('click', this.assignNewTab);
+    document.addEventListener('keydown', this.onKeyDown);
   }
 }

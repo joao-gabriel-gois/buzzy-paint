@@ -1,18 +1,16 @@
-import { getInstanceName } from '../modules/utils/eventUtils.js'
-import { getStyle } from '../modules/utils/cssUtils.js';
+import { getInstanceName } from './utils/eventUtils.js'
+import { getStyle } from './utils/cssUtils.js';
 
 export class CanvasEventListener {
   static #instancesCount = 0;
 
-  constructor(canvasReference) {
+  constructor(canvasReference, eventQueue = [], undoStack = [])  {
     CanvasEventListener.#instancesCount++;
     this.canvas = document.querySelector(canvasReference);
     this.context = this.canvas.getContext('2d');
     
-    this.eventQueue = [];
-    this.undoStack = [];
-
-    this.keysPressed = ['none'];
+    this.eventQueue = eventQueue;
+    this.undoStack = undoStack;
     
     this.zoomCurrentRate = 1;
     this.zoomPreviousRate = 1;
@@ -39,7 +37,6 @@ export class CanvasEventListener {
   }
 
   redrawSequences(event) {
-    // console.log(sequenceObj);
     const { sequence, style } = event;
     const drawThicknessRate = 1 + style.drawThickness / 8;
     this.context.strokeStyle = style.drawColor;
@@ -114,7 +111,6 @@ export class CanvasEventListener {
   }
 
   applyErasing(event) {
-    // console.log('Applying erasing with canvas element color.\nBG Color', this.context.fillStyle);
     const size = event.eraserSize;
     event.sequence.forEach(point => {
       const { position } = point;
@@ -180,23 +176,12 @@ export class CanvasEventListener {
   }
 
   onKeyDown(event) {
-    this.keysPressed.push(event.key);
-    const k = this.keysPressed;
-    const lastKey = k[k.length - 1];
-    const keyBeforeLastKey = k[k.length - 2];
-
-    if (keyBeforeLastKey === "Control" && lastKey === 'z') {
+    if (event.ctrlKey && event.key === 'z') {
       this.undo();
-      this.keysPressed = [ keyBeforeLastKey ];
-      return
     }
-    else if (keyBeforeLastKey === "Control" && lastKey === 'y') {
+    else if (event.ctrlKey && event === 'y') {
       this.redo();
-      this.keysPressed = [ keyBeforeLastKey ];
-      return
     }
-
-    this.keysPressed = [ lastKey ];
   } 
 
   onDraw(event) {
@@ -212,7 +197,6 @@ export class CanvasEventListener {
 
   onLine(event) {
     const { line, style } = event.detail;
-    // console.log(event.detail);
 
     this.eventQueue.push({
       type: 'LINE',
@@ -244,7 +228,6 @@ export class CanvasEventListener {
   }
 
   onExportCall(_) {
-    // console.log('2)CANVAS> dispatching queue value through export event');
     const exportEvent = new CustomEvent('export', {
       detail: this.eventQueue
     });

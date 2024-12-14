@@ -36,7 +36,7 @@ export const authenticateUserController = async (request: Request, response: Res
   }
   
   const { refresh_token, token, user } = sessionInfo;
-  const maxAge = expiryDateMapper(refresh_token_expires_in!) / 1000;
+  const maxAge = expiryDateMapper(refresh_token_expires_in!)// / 1000;
   response.cookie('refresh_token', refresh_token, {
     httpOnly: true,  // prevents JS access
     // disabling bellow options for testing

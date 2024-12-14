@@ -9,7 +9,7 @@ class UpdateUserService {
       if (hasUser) throw new BusinessLogicError('You can\'t update to an already registered email!');
     }
     
-    const updatedUser = await usersRepository.updateUser(updateUserDTO);
+    const updatedUser = await usersRepository.update(updateUserDTO);
 
     const { password: _, ...exposeableUser } = updatedUser;
 

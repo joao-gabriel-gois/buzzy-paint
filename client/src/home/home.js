@@ -1,17 +1,19 @@
-import "../js/router.js";
-import { TabsManager  } from "../js/modules/TabsManager.js";
-import { ToolbarClickListener } from '../js/modules/ToolbarClickListener.js';
+import "../shared/router.js";
+import { TabsManager  } from "./modules/TabsManager.js";
+import { ToolbarClickListener } from './modules/ToolbarClickListener.js';
 
-import { Drawer } from '../js/modules/canvas-tools-handlers/DrawerEventHandler.js';
-import { Liner } from '../js/modules/canvas-tools-handlers/LinerEventHandler.js';
-import { Writter } from '../js/modules/canvas-tools-handlers/WritterEventHandler.js';
-import { Zoomer } from '../js/modules/canvas-tools-handlers/ZoomerEventHandler.js';
-import { Eraser } from '../js/modules/canvas-tools-handlers/EraserEventHandler.js';
+import { Drawer } from './modules/canvas-tools-handlers/DrawerEventHandler.js';
+import { Liner } from './modules/canvas-tools-handlers/LinerEventHandler.js';
+import { Writter } from './modules/canvas-tools-handlers/WritterEventHandler.js';
+import { Zoomer } from './modules/canvas-tools-handlers/ZoomerEventHandler.js';
+import { Eraser } from './modules/canvas-tools-handlers/EraserEventHandler.js';
+import { router } from "../shared/router.js";
 
 
 (() => {
   document.addEventListener('DOMContentLoaded', () => {
     // addCorrectLanguageToText('#options ul');
+    // if (!checkLogin()) router('/');
     const toolbarClickListener = new ToolbarClickListener(
       '#tools ul',
       '#options ul'
@@ -57,6 +59,12 @@ import { Eraser } from '../js/modules/canvas-tools-handlers/EraserEventHandler.j
     );
 
     tabsManager.init();
+    document.querySelector('header nav button').addEventListener('click', (e) => {
+      e.preventDefault();
+      router('/logout');
+    });
+
+    startInputOptionsReactiveBackground();
   });
 
   // async function addCorrectLanguageToText(reference) {
@@ -67,3 +75,36 @@ import { Eraser } from '../js/modules/canvas-tools-handlers/EraserEventHandler.j
   //   // Implement content based on locale
   // }
 })();
+
+
+function startInputOptionsReactiveBackground() {
+  const observer = new MutationObserver((mutationsList) => {
+    for (let mutation of mutationsList) {
+      if (mutation.type === 'childList' || mutation.type === 'attributes') {
+        bgColorReactionForActiveItens();
+      }
+    }
+  });
+  const targetNode = document.querySelector('#options > ul');
+  observer.observe(targetNode, { attributes: true, childList: true, subtree: true });
+  
+  bgColorReactionForActiveItens();
+
+  function bgColorReactionForActiveItens() {
+    const aside = document.getElementById('options');
+    const listItems = aside.querySelectorAll('ul > li');
+    let hasActiveTab = false;
+  
+    listItems.forEach((li) => {
+      if (li.classList.contains('tabnav-active')) {
+        hasActiveTab = true;
+      }
+    });
+  
+    if (hasActiveTab) {
+      aside.style.backgroundColor = 'rgba(71, 61, 139, 0.25)'; 
+    } else {
+      aside.style.backgroundColor = 'transparent';
+    }
+  }
+}

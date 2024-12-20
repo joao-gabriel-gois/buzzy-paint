@@ -1,4 +1,5 @@
 import { handleLogin } from "../shared/api.js";
+import '../shared/validator.js';
 const $ = (queryTerm) => document.querySelector(queryTerm);
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,5 +12,5 @@ document.addEventListener('DOMContentLoaded', () => {
   submit.addEventListener('click', (event) => {
     event.preventDefault();
     handleLogin(email.value, password.value);
-  })
+  });
 });

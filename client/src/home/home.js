@@ -1,4 +1,4 @@
-import "../shared/router.js";
+import { router } from "../shared/router.js";
 import { TabsManager  } from "./modules/TabsManager.js";
 import { ToolbarClickListener } from './modules/ToolbarClickListener.js';
 
@@ -7,13 +7,18 @@ import { Liner } from './modules/canvas-tools-handlers/LinerEventHandler.js';
 import { Writter } from './modules/canvas-tools-handlers/WritterEventHandler.js';
 import { Zoomer } from './modules/canvas-tools-handlers/ZoomerEventHandler.js';
 import { Eraser } from './modules/canvas-tools-handlers/EraserEventHandler.js';
-import { router } from "../shared/router.js";
-
+import { getDataFromURLHash } from "../shared/global.js";
 
 (() => {
   document.addEventListener('DOMContentLoaded', () => {
-    // addCorrectLanguageToText('#options ul');
-    // if (!checkLogin()) router('/');
+    const user_id = getDataFromURLHash();
+    if (!user_id) {
+      console.error('Something went hugely wrong!');
+      return router('/logout');
+    }
+
+    console.log('UserID:', `'${user_id}'`);
+
     const toolbarClickListener = new ToolbarClickListener(
       '#tools ul',
       '#options ul'
@@ -56,13 +61,15 @@ import { router } from "../shared/router.js";
       '#canvas-wrapper',
       'canvas',
       '#tab-buttons-wrapper',
+      `${user_id}@tabsData`
     );
 
     tabsManager.init();
-    document.querySelector('header nav button').addEventListener('click', (e) => {
-      e.preventDefault();
-      router('/logout');
-    });
+    document.querySelector('header nav button')
+      .addEventListener('click', (e) => {
+        e.preventDefault();
+        router('/logout');
+      });
 
     startInputOptionsReactiveBackground();
   });
@@ -75,7 +82,6 @@ import { router } from "../shared/router.js";
   //   // Implement content based on locale
   // }
 })();
-
 
 function startInputOptionsReactiveBackground() {
   const observer = new MutationObserver((mutationsList) => {

@@ -1,6 +1,6 @@
 import ToolEventHandler from './models/ToolEventHandler.js';
-import { getRelativeCursorPos } from '../utils/eventUtils.js'
-import { getStyle } from '../utils/cssUtils.js'
+import { getRelativeCursorPos } from '../../../utils/eventUtils.js'
+import { getStyle } from '../../../utils/cssUtils.js'
 
 export class Eraser extends ToolEventHandler {
   constructor(elements) {

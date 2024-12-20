@@ -53,7 +53,8 @@ export interface IDrawsDTO {
 }
 export interface ITabsDTO {
   activeIndex: number;
-  draws: IDrawsDTO[];
+  draws: IDrawsDTO[]
+  timestamp: number;
 }
 
 export interface IDrawsMongoDocumentDTO {

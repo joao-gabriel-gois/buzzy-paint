@@ -1,3 +1,5 @@
+import { objectToBase32Like } from '../utils/encodingUtils.js';
+import { objectToBase64 } from '../utils/encodingUtils.js';
 import { handleLogout, checkLogin } from './api.js';
 import { location } from './global.js';
 
@@ -18,28 +20,35 @@ const getCurrentPath = () => {
 //   return null;
 // }
 
-const moveTo = (path) => {
+const moveTo = (path, data = null) => {
+  const hash = !!data ? `#${data}` : '';
   if (getCurrentPath() !== path) {
-    location.pathname = path;
+    location.href = location.protocol + '//' + location.hostname + ':' + location.port + path + hash;
   }
 };
 
-const routes = ['/', '/login', '/home', '/logout'];
+const routes = ['/', '/login', '/home', '/logout', '/signup'];
 // const callbacks = [fetchDraws, null, null, null];
 
-export function router(pathTo) {
+export function router(pathTo, data) {
+  data = data ? objectToBase32Like(data) : '';
+  console.log('current data:', data);
+  
   if (!routes.includes(pathTo)) return moveTo('/not-found/');
-  if (!checkLogin()) {
+  if (!checkLogin() && pathTo !== '/signup') {
     moveTo('/login');
   }
   else if (pathTo === '/logout') {
     handleLogout();
   }
   else if (pathTo === '/home') {
-    moveTo('/home')
+    moveTo('/home', data);
+  }
+  else if (pathTo === '/signup') {
+    moveTo('/signup');
   }
   else {
-    moveTo('/');
+    moveTo('/', data);
   }
 }
 

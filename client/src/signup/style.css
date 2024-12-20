@@ -10,27 +10,26 @@ body {
   overflow: hidden;
 }
 h1 {
-  margin-top: -0.5rem;
   font-size: 32pt;
 }
-#left-side {
-  grid-column: 1;
+#right-side {
+  grid-column: 2;
   background-color: rgba(87, 15, 155, 0.747);
   background-image: url(../assets/bg.svg);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 2.5em;
+  gap: 2em;
 }
-#left-side img {
+#right-side img {
   width: 14em;
   margin-top: -2em;
   opacity: 0.6;
   animation: show-grow-img 566ms ease-out;
 }
-#right-side {
-  grid-column: 2;
+#left-side {
+  grid-column: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,13 +38,13 @@ h1 {
   background-color: #FAEDF089;
   border-left: 4px groove rgb(182, 130, 238);
 }
-#right-side form, #right-side h1, #right-side a {
+#left-side form, #left-side h1, #left-side a {
   animation: show-grow 566ms ease-out;
 }
 
 form {
-  margin-top: 2.25rem;
-  padding: 2em 0;
+  margin-bottom: 1.25rem;
+  padding: 1em 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,9 +92,11 @@ input[type="submit"][disabled="true"] {
   opacity: 0.75;
   filter: blur(0.33px);
 }
+
 input[type="submit"]:hover {
   opacity: 0.75;
 }
+
 input[type="submit"][disabled="true"] {
   opacity: 0.75;
   filter: blur(0.33px);
@@ -115,6 +116,7 @@ a:hover {
   font-weight: 900;
   text-decoration: underline !important;
 }
+
 input[type="submit"]:hover {
   opacity: 0.8;
 }

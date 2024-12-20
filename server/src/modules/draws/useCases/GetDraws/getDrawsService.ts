@@ -20,7 +20,8 @@ class GetDrawsService {
       throw new BadRequestError("(GetDrawService): There is no User with this ID.");
     }
     if (!user.draws_mongo_id) {
-      throw new BusinessLogicError('(GetDrawService): This user doesn\'t have an assined tab state yet.');
+      // now draw assigned yet, clean state on client side once data is null
+      return null;
     }
     const document = await this.drawsRepository.findById(user.draws_mongo_id);
     if (!document) {

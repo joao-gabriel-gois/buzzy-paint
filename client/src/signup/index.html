@@ -5,9 +5,32 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Buzzy Paint</title>
-  <!-- <link href="style.css" rel="stylesheet">
-  <script type="module" src="login.js"></script> -->
+  <link href="../shared/validator.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <script type="module" src="signup.js"></script>
 </head>
-<body>
-  <h1>Hello World</h1>
-</body>
+  <body>
+    <div id="left-side">
+      <h1>Signup</h1>
+      <form>
+        <label for="email">Email</label>
+        <input name="email" />
+        <label for="firstName">First Name</label>
+        <input name="firstName" />
+        <label for="lastName">Last Name</label>
+        <input name="lastName" />
+        <label for="username">Username</label>
+        <input name="username" />
+        <label for="password">Password</label>
+        <input type="password" name="password" />
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" name="confirmPassword" />
+        <input type="submit" disabled="true" value="Criar conta!"/>
+      </form>
+    </div>
+    <div id="right-side">
+      <img src="../assets/pencil_case.png" />
+      <h1>Buzzy Paint</h1>
+    </div>
+  </body>
+</html>

@@ -2,7 +2,7 @@ import {
   hasCSSClass,
   addCSSClass,
   removeCSSClass
-} from './utils/cssUtils.js'
+} from '../../utils/cssUtils.js'
 
 export class ToolbarClickListener {
   constructor(menuReference, optiosnReference) {

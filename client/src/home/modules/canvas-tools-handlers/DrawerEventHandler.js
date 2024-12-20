@@ -1,5 +1,5 @@
 import ToolEventHandler from './models/ToolEventHandler.js';
-import { getRelativeCursorPos } from '../utils/eventUtils.js'
+import { getRelativeCursorPos } from '../../../utils/eventUtils.js'
 
 export class Drawer extends ToolEventHandler {
   constructor(elements) {

@@ -6,12 +6,13 @@ import { ITabsDTO } from "@modules/draws/DTOs/DrawsDTO.ts";
 export const createDrawsController = async (request: AuthRequest, response: Response, next: NextFunction) => {
   const {
     draws,
-    activeIndex
+    activeIndex,
+    timestamp
   } = request.body;
   // auth route, it will always have an user id on it
   const { id } = request.user!;
   
-  if (!(draws && !isNaN(Number(activeIndex)))) {
+  if (!(draws && !isNaN(Number(activeIndex)) && !isNaN(Number(timestamp)))) {
     return next(new BadRequestError('Data is either not present or in the wrong format!'));
   }
   // type / data validation below:
@@ -23,7 +24,7 @@ export const createDrawsController = async (request: AuthRequest, response: Resp
   }
 
   try {
-    await createDrawsService.execute(id, { draws, activeIndex } as ITabsDTO);
+    await createDrawsService.execute(id, { draws, activeIndex, timestamp } as ITabsDTO);
   }
   catch (error) {
     return next(error);

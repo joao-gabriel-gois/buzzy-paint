@@ -1,5 +1,5 @@
 import ToolEventHandler from './models/ToolEventHandler.js';
-import { getRelativeCursorPos } from '../utils/eventUtils.js'
+import { getRelativeCursorPos } from '../../../utils/eventUtils.js'
 
 
 // Tentar substituir todas as lógicas que lidam com o contexto ou com outra interface como no drawer

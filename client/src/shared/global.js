@@ -1,3 +1,4 @@
+import { base64ToObject, objectToBase64, base32LikeToObject} from '../utils/encodingUtils.js';
 // const { localStorage, navigator, screen } = window;
 // if (
 //   !(localStorage && location && navigator && screen)
@@ -19,34 +20,67 @@ storage.removeItem = (itemKey) => {
   localStorage.removeItem(itemKey);
 };
 
-storage.setItem = (itemKey, itemValue) => (
+storage.setItem = (itemKey, itemValue) => {
+  const isObject = typeof itemValue === 'object' && !Array.isArray(itemValue) && itemValue !== null;
+  if (isObject) {
+    Object.assign(itemValue, { timestamp: Date.now()});
+  }
+  else if (itemValue !== null) {
+    itemValue = {
+      value: itemValue,
+      timestamp: Date.now()
+    }
+  }
+
   localStorage.setItem(
     itemKey,
     objectToBase64(itemValue)
   )
-);
-
-export {
-  storage,
-  location
 };
 
+function getDataFromURLHash() {
+  const urlRawData = location.hash ? location.hash.slice(1, location.hash.length) : null;
+  if (!urlRawData) {
+    console.error('Not able to get URL data!', urlRawData);
+    alert('Something went wrong with user login!');
+    return null;
+  }
 
-//Utils;
-function base64ToObject(base) {
-  return JSON.parse(atob(base));
+  console.log(urlRawData);
+
+  let data;
+  try {
+    data = base32LikeToObject(urlRawData);
+  }
+  catch (error) {
+    console.error('Error parsing data from base32like!', data);
+    alert('Something went wrong with parsing the data!');
+    return null;
+  }
+
+  if (!data) {
+    console.error('No value for user id even after parsing!', data);
+    alert('Something went wrong with user id even after succesful parsing!');
+    return null;
+  }
+
+  return data;
 }
 
-function objectToBase64(object) {
-  return btoa(JSON.stringify(object));
-}
-
-// Utils
-export async function sleep(secs) {
+async function sleep(secs) {
   return new Promise(resolve => {
     setTimeout(() => resolve(), secs * 1000)
   });
 }
+
+export {
+  storage,
+  location,
+  getDataFromURLHash,
+  sleep
+};
+
+
 
 
 // Old approach to include unique identifier

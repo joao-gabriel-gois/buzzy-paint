@@ -2,18 +2,17 @@
 import {
   addCSSClass,
   removeCSSClass
-} from './utils/cssUtils.js'
+} from '../../utils/cssUtils.js'
 import { CanvasEventListener } from "./CanvasEventListener.js";
 import { storage as strg } from '../../shared/global.js';
-import { handleTabsDataSaving, handleTabsDataFetching } from '../../shared/api.js';
+import { handleTabsDataSaving } from '../../shared/api.js';
 
 export class TabsManager {
   constructor(
     canvasWrapperReference,
     canvasReference,
     tabWrapperReference,
-    tokenStorageKey = 'token',
-    tabsStorageKey = 'tabsData',
+    tabsStorageKey,
     apiSave = handleTabsDataSaving,
     storage = strg,
   ) {
@@ -24,14 +23,24 @@ export class TabsManager {
       this.tabButtonsWrapper.children.length - 1
     ];
     
-    this.getToken = () => storage.getItem(tokenStorageKey);
-    const data = storage.getItem(tabsStorageKey);
+    const storageTabsData = storage.getItem(tabsStorageKey);
+
+    this.setStorageTabsData = (data) => storage.setItem(tabsStorageKey, data);
     const { 
+      user_id,
       activeIndex,
       draws
-    } = data ?? { activeIndex: 0, draws: [] };
+    } = Object.keys(storageTabsData ?? {}).length > 1
+          ? storageTabsData
+          : {
+              user_id: storageTabsData ? storageTabsData.user_id : null,
+              activeIndex: 0,
+              draws: [],
+              timestamp: Date.now()
+            };
 
     this.apiSave = apiSave;
+    this.user_id = user_id || null;
     this.tabsData = draws || [];
     this.activeIndex = activeIndex;
     this.previousActiveIndex = -1;
@@ -228,13 +237,20 @@ export class TabsManager {
       activeIndex: this.activeIndex
     };
 
-    const response = await this.apiSave(data);
-    if (response.status === 200 || response.status === 201) {
-      alert('Your tabs were saved!'); // change to a rendered alert later
+    this.setStorageTabsData(data);
+    try {
+      const response = await this.apiSave(data);
+      if (response.status === 200 || response.status === 201) {
+        alert('Your tabs were saved!'); // change to a rendered alert later
+      }
+      else {
+        console.error('It was not possible to save your tabs! Response status:', response.status);
+        alert('It was not possible to save your tabs!');
+      }
     }
-    else {
-      console.error('It was not possible to save your tabs! Response status:', response.status);
-      alert('It was not possible to save your tabs!');
+    catch (error) {
+      console.error('It was not possible to save your tabs! Fatal Error status:', error);
+      alert('It was not possible to save your tabs! Could not connect to server.');
     }
   }
 

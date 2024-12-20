@@ -1,21 +1,5 @@
 import { storage as strg, sleep } from "./global.js";
 import { router as rtr} from "./router.js";
-//example:
-/*
-  api.get('/draws', {
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  });
-  api.post('/refresh-session', { credentials: 'include'});
-  api.post('/login', {
-    body: {
-      email: 'blabla@bla.bla,
-      password: 'supersecret'
-    },
-    credentials: 'include'
-  });
-*/
 
 const BASE_URL = 'http://127.0.0.1:3333';
 
@@ -55,6 +39,7 @@ function BuzzyPaintAPI(dependencies = deps) {
   async function apiCall(method, host, path, options) {
     path = path.split('/').find(str => str !== '');
     method = method.toUpperCase();
+
     return fetch(`${host}/${path}`, {
       method: method.toUpperCase(),
       ...options
@@ -63,13 +48,16 @@ function BuzzyPaintAPI(dependencies = deps) {
 
   async function handleTabsDataFetching(attempt = 0, retriesLimit = 3) {
     const token = storage.getItem(tokenStorageKey);
+    if (!token) router('/login');
     try {
       const resp = await api.get('/draws', {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token.value}`
         },
       });
+
+      let currentUserId = null;
     
       if (resp.status === 401) {
         const refreshed = await handleTokenRefresh();
@@ -81,39 +69,41 @@ function BuzzyPaintAPI(dependencies = deps) {
           return await handleTabsDataFetching(++attempt);
         }
       }
-      // TODO> handle unauth preserving tabsData state if there is any
       else if (resp.status === 400) {
-        // by removing token the /home routing will move user to /login instead, as expected
         storage.removeItem(tokenStorageKey);
       }
-      else if (resp.status === 404 || resp.status === 422) {
-        // either user is not found or it doesn't have any draw yet
-        // in this case its tabsData storage item should return null, always
-        const currentTabsData = storage.getItem(tabsDataStorageKey);
-        if (currentTabsData) storage.removeItem(tabsDataStorageKey);
+      else if (resp.status === 404) {
+        // Render Error message
+        console.log('Draws not found for this users')
       }
       else if (resp.status === 200) {
-        const { data } = await resp.json();
-        storage.setItem(tabsDataStorageKey, data);
+        const { user_id, data } = await resp.json();
+        currentUserId = user_id;
+        const currentTabsDataState = storage.getItem(`${user_id}@${tabsDataStorageKey}`);
+        if (!currentTabsDataState) {
+          storage.setItem(`${user_id}@${tabsDataStorageKey}`, data);
+        }
+        else {
+          console.log('(Api.handleTabsDataFetching) deciding the most recent state\n', currentTabsDataState.timestamp, 'X', data.timestamp);
+          const latestState = currentTabsDataState.timestamp > data.timestamp ? currentTabsDataState : data;
+          storage.setItem(`${user_id}@${tabsDataStorageKey}`, latestState);
+        }
       }
-      return router('/home');
+      return router('/home', currentUserId);
     } catch (error) {
       console.error('Not able to fetch draws. Error:', error);
-      throw new Error('Not able to fetch draws. Error:', error);
+      // throw new Error('Not able to fetch draws. Error:', error);
     }
   }
   
   async function handleTabsDataSaving(data, hasDraws = true) {
-    // save storage state before updating
     const token = storage.getItem(tokenStorageKey);
-    // update current storage
-    storage.setItem(tabsDataStorageKey, data);
     if (hasDraws) {
       try {
         const response = await api.put('/draws', {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token.value}`
           },
           body: JSON.stringify(data)       
         })
@@ -139,13 +129,14 @@ function BuzzyPaintAPI(dependencies = deps) {
       }
       catch(error) {
         console.error('tabsManager.saveTabsData() PUT-> Error:', error);
+        throw new Error('tabsManager.saveTabsData() PUT-> Error:', error);
       }
     }
     try {
       const response = await api.post('/draws', {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token.value}`
         },
         body: JSON.stringify(data)
       })
@@ -167,7 +158,8 @@ function BuzzyPaintAPI(dependencies = deps) {
       return response;
     }
     catch(error) {
-      console.error('tabsManager.saveTabsData() POST-> Error:', error);
+      console.error('BuzzyPaintAPI.handleTabsDataSaving POST-> Error:', error);
+      throw new Error('BuzzyPaintAPI.handleTabsDataSaving POST-> Error:', error);
     }
   }  
 
@@ -189,6 +181,31 @@ function BuzzyPaintAPI(dependencies = deps) {
     }
   }
 
+  async function handleCreateAccount(createUserDTO) {
+    try {
+      const response = await api.post('/users', {
+        body: JSON.stringify(createUserDTO),
+        headers: {'Content-Type': 'application/json'}
+      });
+
+      if (response.ok || response.created) {
+        // const success = renderSuccessModal();
+        alert('Successfully created!')
+        // if (success) {
+          return setTimeout(() => {
+            router('/login');
+          }, 2400);
+        //}
+      }
+      else if (response.error) { // maybe check by status
+        // renderValidationErrors()
+      }
+    }
+    catch(error) {
+        // renderErrorModal();
+    }
+  }
+
   async function handleLogin(email, password) {
     // const deviceInfo = getDeviceInfo();
     try {
@@ -196,7 +213,7 @@ function BuzzyPaintAPI(dependencies = deps) {
         body: JSON.stringify({ email, password }),
         headers: {'Content-Type': 'application/json'},
         credentials: 'include'
-      })
+      });
       // const response = await fetch(`${BASE_URL}/login`, {
       //   method: 'POST',
       //   body: JSON.stringify({ email, password }),
@@ -228,6 +245,7 @@ function BuzzyPaintAPI(dependencies = deps) {
   }
 
   return {
+    handleCreateAccount,
     handleTokenRefresh,
     handleLogin,
     handleLogout,
@@ -238,6 +256,7 @@ function BuzzyPaintAPI(dependencies = deps) {
 }
 
 export const {
+  handleCreateAccount,
   handleTokenRefresh,
   handleLogin,
   handleLogout,

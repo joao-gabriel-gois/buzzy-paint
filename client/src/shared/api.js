@@ -1,5 +1,7 @@
 import { storage as strg, sleep } from "./global.js";
 import { router as rtr} from "./router.js";
+import { createAndRenderAlert } from '../../shared/alerts.js';
+import { addCSSClass } from "../utils/cssUtils.js";
 
 const BASE_URL = 'http://127.0.0.1:3333';
 
@@ -16,7 +18,7 @@ const deps = {
   router: rtr,
   storage: strg,
 }
-
+parent
 // No npm in the frontend, so this is my axios (:
 function BuzzyPaintAPI(dependencies = deps) {
   const {
@@ -37,6 +39,8 @@ function BuzzyPaintAPI(dependencies = deps) {
   });  
 
   async function apiCall(method, host, path, options) {
+    // currently working only for /path routes. /path/to/anything might fail
+    // we can adjust it later, no need for now
     path = path.split('/').find(str => str !== '');
     method = method.toUpperCase();
 
@@ -110,13 +114,25 @@ function BuzzyPaintAPI(dependencies = deps) {
         if (response.status === 401) {
           const refreshed = await handleTokenRefresh();
           if (!refreshed) {
-            alert('Your session is expired, you\'ll need to login again!');
-            return router('/logout');
+            createAndRenderAlert(
+              {
+                type: 'warning',
+                title: 'Expired Session!',
+                message: 'Your session is expired, you\'ll need to login again.'
+              },
+              () => router('/logout')
+            );   
           }
         }
         else if (response.status === 404) {
-          alert('Something went really wrong with your serssion! Force logout!');
-          return router('/logout');
+          createAndRenderAlert(
+            {
+              type: 'error',
+              title: 'Not found!',
+              message: 'You have a document assigned but it could not be found. Forcing logout.'
+            },
+            () => router('/logout')
+          );
         }
         else if (response.status === 422) {
           return await handleTabsDataSaving(data, false);
@@ -125,7 +141,14 @@ function BuzzyPaintAPI(dependencies = deps) {
           return response;
         }
         console.error('Server is probably unavailable', response);
-        throw new Error('Server is probably unavailable', response);
+        createAndRenderAlert(
+          {
+            type: 'error',
+            title: 'Unexpected response!',
+            message: 'The response received is not expected. Forcing logout.'
+          },
+          () => router('/logout')
+        );
       }
       catch(error) {
         console.error('tabsManager.saveTabsData() PUT-> Error:', error);
@@ -143,17 +166,36 @@ function BuzzyPaintAPI(dependencies = deps) {
       if (response.status === 401) {
         const refreshed = await handleTokenRefresh();
         if (!refreshed) {
-          alert('Your session is expired, you\'ll need to login again!');
-          return router('/logout');
+          createAndRenderAlert(
+            {
+              type: 'warning',
+              title: 'Expired Session!',
+              message: 'Your session is expired, you\'ll need to login again.'
+            },
+            () => router('/logout')
+          );  
         }
       }
       else if (response.status === 404) {
-        alert('Something went really wrong with your serssion! Force logout!');
-        return router('/logout');
+        createAndRenderAlert(
+          {
+            type: 'error',
+            title: 'Not Saved!',
+              message: 'It was not possible to save your first tabs state.'
+          },
+          () => router('/logout')
+        );
       }
       if (response.status === 422) {
         console.error('Api identified this user with an already saved Draw but update was also not possible!');
-        throw new Error('Api identified this user with an already saved Draw but update was also not possible!');
+        createAndRenderAlert(
+          {
+            type: 'error',
+            title: 'Update failed!',
+            message: 'You should have assigned tabs, but it was not possible to update.'
+          },
+          () => router('/logout')
+        );
       }
       return response;
     }
@@ -190,19 +232,32 @@ function BuzzyPaintAPI(dependencies = deps) {
 
       if (response.ok || response.created) {
         // const success = renderSuccessModal();
-        alert('Successfully created!')
-        // if (success) {
-          return setTimeout(() => {
-            router('/login');
-          }, 2400);
-        //}
+        createAndRenderAlert(
+          {
+            type: 'success',
+            title: 'Account created!',
+              message: 'Your account has been successfully created. Moving to login page.'
+          },
+          () => router('/login')
+        );
       }
       else if (response.error) { // maybe check by status
-        // renderValidationErrors()
+        createAndRenderAlert({
+          type: 'error',
+          title: data.error.name,
+          message: data.error.message
+        });
+        renderValidationErrorFromResponse(response);
       }
     }
     catch(error) {
-        // renderErrorModal();
+      error.message = error.message + ', server is probably down.';
+      createAndRenderAlert({
+        type: 'error',
+        title: 'Connection Failure',
+        message: error.message
+      });
+      renderValidationErrorFromResponse(error);
     }
   }
 
@@ -226,10 +281,24 @@ function BuzzyPaintAPI(dependencies = deps) {
         router('/');
       }
       else if (data.error) {
+        createAndRenderAlert({
+          type: 'error',
+          title: data.error.name,
+          message: data.error.message
+        });
+
+        renderValidationErrorFromResponse(data.error);
         console.log("ERROR: ", data.error);
       }
-    } catch (error) {
-      console.error('Login failed', error);
+    }
+    catch (error) {
+      error.message = error.message + ', server is probably down.';
+      createAndRenderAlert({
+        type: 'error',
+        title: 'Connection Failure',
+        message: error.message
+      });
+      renderValidationErrorFromResponse(error);
     }
   };
   
@@ -264,3 +333,17 @@ export const {
   handleTabsDataFetching,
   handleTabsDataSaving
 } = BuzzyPaintAPI();
+
+
+function renderValidationErrorFromResponse(response) {
+  const submit = document.querySelector('[type="submit"]');
+  let currentMessage = submit.previousElementSibling;
+  const parent = submit.parentElement;
+  if (currentMessage.tagName === 'P') currentMessage.remove();
+  const p = document.createElement('p');
+  addCSSClass(p, 'validation');
+  // p.style.width = `${parseInt(getStyle(parent).width) + parseInt(getStyle(parent).paddingLeft) * 2.4}px`;
+
+  p.innerText = response.message;
+  submit.insertAdjacentElement('beforebegin', p);
+}

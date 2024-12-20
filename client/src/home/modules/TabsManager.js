@@ -1,4 +1,3 @@
-// import { DummyCanvasEventListener } from "./dummy-canvas-list.js";
 import {
   addCSSClass,
   removeCSSClass
@@ -6,6 +5,7 @@ import {
 import { CanvasEventListener } from "./CanvasEventListener.js";
 import { storage as strg } from '../../shared/global.js';
 import { handleTabsDataSaving } from '../../shared/api.js';
+import { createAndRenderAlert } from '../../shared/alerts.js';
 
 export class TabsManager {
   constructor(
@@ -241,16 +241,28 @@ export class TabsManager {
     try {
       const response = await this.apiSave(data);
       if (response.status === 200 || response.status === 201) {
-        alert('Your tabs were saved!'); // change to a rendered alert later
+        createAndRenderAlert({
+          type: 'success',
+          title: 'Saved!',
+          message: 'Your tabs were successfully saved!'
+        });
       }
       else {
         console.error('It was not possible to save your tabs! Response status:', response.status);
-        alert('It was not possible to save your tabs!');
+        createAndRenderAlert({
+          type: 'warning',
+          title: 'Not Saved!',
+          message: 'It was not possible to save your tabs!'
+        });
       }
     }
     catch (error) {
       console.error('It was not possible to save your tabs! Fatal Error status:', error);
-      alert('It was not possible to save your tabs! Could not connect to server.');
+      createAndRenderAlert({
+        type: 'error',
+        title: 'Not Saved!',
+        message: 'It was not possible to save your tabs! Could not connect to server.'
+      });
     }
   }
 

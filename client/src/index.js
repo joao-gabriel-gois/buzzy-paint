@@ -1,6 +1,6 @@
 import { handleTabsDataFetching } from './shared/api.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   animateLoadingText('#bottom-side p');
   handleTabsDataFetching();
 });

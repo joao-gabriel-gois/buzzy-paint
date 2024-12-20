@@ -14,22 +14,22 @@ export default (() => {
 
 const repeated = {
   names: {
-    message: 'Apenas letras e espaços são aceitos para o nome',
+    message: 'Names accepts only letters and spaces.',
     callback: validateName,
   },
   passwords: {
-    message: 'A senha precisa ter ao menos 10 caractéres, incluindo uma letra maíúscula, um número e um caractere especial.',
+    message: 'The password must have at least 10 characters, including an uppercased letter, a number and a special character.',
     callback: validatePassword
   }
 }
 
 const INPUT_NAMES = {
   email: {
-    message: 'Formato inválido para email, verifique erros de digitação.',
+    message: 'Invalid format for email, check for any typo.',
     callback: validateEmail
   },
   username: {
-    message: "Deve ter de 4 a 12 caractéres e conter letras, números ou os caracteres '.', '_', '%', '+' ou '-'",
+    message: "Username must have 4 to 12 caracters. It only accepts the following special characters: ., _, %, + or -",
     callback: validateUsername
   },
   lastname: repeated.names,
@@ -65,9 +65,8 @@ function renderValidationErrorsIfAny(input, eventType) {
   }
   currentMessage = input.nextElementSibling;
   if (currentMessage.tagName === 'P') currentMessage.remove();
-  else if (readyToSubmit()) submit.removeAttribute('disabled'
-
-  );
+  else if (readyToSubmit())
+    submit.removeAttribute('disabled');
   else if (input.name === 'confirmPassword') {
     p.innerText = "Confirme o password corretamente, os campos não estão iguais."
     input.insertAdjacentElement('afterend', p);

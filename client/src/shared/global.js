@@ -1,4 +1,5 @@
 import { base64ToObject, objectToBase64, base32LikeToObject} from '../utils/encodingUtils.js';
+import { createAndRenderAlert } from '../shared/alerts.js';
 // const { localStorage, navigator, screen } = window;
 // if (
 //   !(localStorage && location && navigator && screen)
@@ -42,7 +43,11 @@ function getDataFromURLHash() {
   const urlRawData = location.hash ? location.hash.slice(1, location.hash.length) : null;
   if (!urlRawData) {
     console.error('Not able to get URL data!', urlRawData);
-    alert('Something went wrong with user login!');
+    createAndRenderAlert({
+      type: 'error',
+      title: 'No user data!',
+      message: 'Something went wrong after user login, no data could be transfered between routes.'
+    });
     return null;
   }
 
@@ -54,13 +59,21 @@ function getDataFromURLHash() {
   }
   catch (error) {
     console.error('Error parsing data from base32like!', data);
-    alert('Something went wrong with parsing the data!');
+    createAndRenderAlert({
+      type: 'error',
+      title: 'Parsing Failure!',
+      message: 'Something went wrong with parsing the data.'
+    });
     return null;
   }
 
   if (!data) {
     console.error('No value for user id even after parsing!', data);
-    alert('Something went wrong with user id even after succesful parsing!');
+    createAndRenderAlert({
+      type: 'error',
+      title: 'Data not found!',
+      message: 'Something went wrong with user data even after succesfully parsing.'
+    });
     return null;
   }
 

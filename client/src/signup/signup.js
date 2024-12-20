@@ -23,5 +23,4 @@ document.addEventListener('DOMContentLoaded', () => {
       password: password.value
     });
   });
-  console.log('Event submited!');
 });

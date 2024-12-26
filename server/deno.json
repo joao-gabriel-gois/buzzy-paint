@@ -15,8 +15,12 @@
     "@shared/": "./src/shared/",
     "@utils/": "./src/utils/",
     "@types/": "./src/@types/",
-    "mongodb": "npm:mongodb@^6.11.0"
+    "mongodb": "npm:mongodb@^6.11.0",
+    "zod": "npm:zod@^3.24.1"
   },
-  "compilerOptions": { "types": [ "./src/@types/global.d.ts" ] },
+  "compilerOptions": { 
+    "types": [ "./src/@types/global.d.ts" ],
+    "strict": true
+  },
   "nodeModulesDir": "auto"
 }

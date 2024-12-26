@@ -42,7 +42,7 @@ export const refreshUserTokenController = async (request: Request, response: Res
     httpOnly: true,  // prevents JS access
     maxAge,
     // disabling bellow options for testing
-    // secure: true,    // only HTTPS
+    // secure: true,    // only HTTPS, turn it on in prod
     // sameSite: 'strict', // avoid CSRF
   });
 

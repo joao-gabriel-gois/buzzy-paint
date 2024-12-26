@@ -68,7 +68,8 @@ function renderValidationErrorsIfAny(input, eventType) {
   else if (readyToSubmit())
     submit.removeAttribute('disabled');
   else if (input.name === 'confirmPassword') {
-    p.innerText = "Confirme o password corretamente, os campos não estão iguais."
+    p.innerText = "Please confirm the password correctly."
+      + "The input for password and confirm-password are not the same.";
     input.insertAdjacentElement('afterend', p);
   }
 }
@@ -102,7 +103,7 @@ function validatePassword(passwordInput) {
   const passwordRule = new RegExp(
     "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)"
     + "(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,"
-    + ".<>\\/?])(?!.{0,10}$).+$",
+    + ".<>\\/?])(?!.{0,8}$).+$",
     "g"
   );
 

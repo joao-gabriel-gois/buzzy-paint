@@ -18,7 +18,6 @@ const deps = {
   router: rtr,
   storage: strg,
 }
-parent
 // No npm in the frontend, so this is my axios (:
 function BuzzyPaintAPI(dependencies = deps) {
   const {
@@ -230,6 +229,8 @@ function BuzzyPaintAPI(dependencies = deps) {
         headers: {'Content-Type': 'application/json'}
       });
 
+      const data = await response.json();
+
       if (response.ok || response.created) {
         // const success = renderSuccessModal();
         createAndRenderAlert(
@@ -241,13 +242,13 @@ function BuzzyPaintAPI(dependencies = deps) {
           () => router('/login')
         );
       }
-      else if (response.error) { // maybe check by status
+      else if (data.error) { // maybe check by status
         createAndRenderAlert({
           type: 'error',
           title: data.error.name,
           message: data.error.message
         });
-        renderValidationErrorFromResponse(response);
+        renderValidationErrorFromResponse(data.error);
       }
     }
     catch(error) {
@@ -337,13 +338,22 @@ export const {
 
 function renderValidationErrorFromResponse(response) {
   const submit = document.querySelector('[type="submit"]');
-  let currentMessage = submit.previousElementSibling;
-  const parent = submit.parentElement;
+  const currentMessage = submit.previousElementSibling;
   if (currentMessage.tagName === 'P') currentMessage.remove();
   const p = document.createElement('p');
   addCSSClass(p, 'validation');
-  // p.style.width = `${parseInt(getStyle(parent).width) + parseInt(getStyle(parent).paddingLeft) * 2.4}px`;
 
   p.innerText = response.message;
-  submit.insertAdjacentElement('beforebegin', p);
+  submit.insertAdjacentElement('afterend', p);
+  if (response.issues) {
+    response.issues.forEach(issue => {
+      const element = document.querySelector(`[name="${issue.path}"]`);
+      const currentElementMessage = element.nextElementSibling;
+      if (currentElementMessage.tagName === 'P') currentElementMessage.remove();
+      const p2 = document.createElement('p');
+      addCSSClass(p2, 'validation');
+      p2.innerText = issue.message;
+      element.insertAdjacentElement('afterend', p2);
+    });
+  }
 }

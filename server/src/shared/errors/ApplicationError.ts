@@ -1,3 +1,5 @@
+import * as zod from 'npm:zod';
+
 class ApplicationError extends Error {
   public readonly statusCode: number;
   public readonly isOperational: boolean;
@@ -24,6 +26,15 @@ class BadRequestError extends ApplicationError {
   constructor(message = 'Bad Request', status = 400, error?: Error) {
     super(message, status, error);
     super.name = "Bad Request";
+  }
+}
+
+class ValidationError extends ApplicationError {
+  public error;
+  constructor(message = "Invalid Input", status = 400, error: zod.ZodError) {
+    super(message, status, error);
+    super.name = 'Validation Error';
+    this.error = error;
   }
 }
 
@@ -66,6 +77,7 @@ export {
   ApplicationError,
   BusinessLogicError,
   BadRequestError,
+  ValidationError,
   DatabaseTransactionError,
   InvalidParameterError,
   UnauthorizedError,

@@ -9,15 +9,35 @@ export const createUserController = async (request: Request, response: Response,
     username,
     firstName,
     lastName,
-    password
+    password,
+    confirmPassword
   } = request.body;
 
-  if (!(email && username && firstName && lastName && password)) {
+  if (!(email && username && firstName && lastName && password && confirmPassword)) {
     return next(new BadRequestError('Request body is missing information to create new user!'));
+  }
+
+  if (password !== confirmPassword) {
+    return response.status(400).json({
+      error: {
+        name: 'Validation Error',
+        message: 'Error confirming password',
+        issues: [
+          {
+            message: "Please confirm the password correctly. "
+              + "The input for password and confirm-password are not the same.",
+            path: "confirmPassword"
+          }
+        ]
+      }
+    })
   }
 
   const usernameRule = new RegExp(
     '^[a-zA-Z0-9._%+-]{4,12}$',
+  );
+  const namesRule = new RegExp(
+    '^[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ]+)*$',
   );
   const passwordRuleString = '^(?=.*[A-Z])'
     + '(?=.*[a-z])'
@@ -33,17 +53,29 @@ export const createUserController = async (request: Request, response: Response,
       .min(4, { message: "Username must have at least 4 characters"})
       .max(12, { message: "Username can't have more than 12 characters"})
       .regex(usernameRule, {
-        message: "Username must only accepts letter, numbers and the"
-          + "following special characters: ., _, %, + or -"
+        message:  "Username must only accepts letter, numbers and"
+          + " the following special characters: ., _, %, + or -"
       }),
-    firstName: zod.string(),
-    lastName: zod.string(),
+    firstName: zod.string()
+      .regex(namesRule, {
+        message: "First Name only accepts Letters and spaces"
+      }),
+    lastName: zod.string()
+      .regex(namesRule, {
+        message: "First Name only accepts Letters and spaces"
+      }),
     password: zod.string()
       .min(10, { message: 'The password must have at least 10 characters.'})
       .regex(passwordRule, {
         message: 'The password must have at least one uppercased character'
         + ', one lowercased one, a number and a special character.'
-      })
+      }),
+      confirmPassword: zod.string()
+      .min(10, { message: 'The password must have at least 10 characters.'})
+      .regex(passwordRule, {
+        message: 'The password must have at least one uppercased character'
+        + ', one lowercased one, a number and a special character.'
+      }),
   });
 
   const inputValidation = singupSchema.safeParse(request.body);

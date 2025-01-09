@@ -7,5 +7,6 @@
   align-self: center;
   justify-self: center;
   margin-left: 1.5em;
-  width: inherit;
+  width: max-content;
+  max-width: 140%;
 }

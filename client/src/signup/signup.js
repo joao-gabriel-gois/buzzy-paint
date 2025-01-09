@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const username = $('[name="username"]');
   const email = $('[name="email"]');
   const password = $('[name="password"]');
+  const confirmPassword = $('[name="confirmPassword"]');
   
   const submit = $('[type="submit"]');
 
@@ -20,7 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
       lastName: lastName.value,
       username: username.value,
       email: email.value,
-      password: password.value
+      password: password.value,
+      confirmPassword: confirmPassword.value,
     });
   });
 });

@@ -64,11 +64,19 @@ function renderValidationErrorsIfAny(input, eventType) {
     return;
   }
   currentMessage = input.nextElementSibling;
-  if (currentMessage.tagName === 'P') currentMessage.remove();
-  else if (readyToSubmit())
+  console.log(readyToSubmit());
+  if (currentMessage.tagName === 'P') {
+    currentMessage.remove();
+  }
+  if (readyToSubmit()) {
     submit.removeAttribute('disabled');
+    if (
+      submit.nextElementSibling
+      && submit.nextElementSibling.tagName === 'P'
+    ) submit.nextElementSibling.remove();
+  }
   else if (input.name === 'confirmPassword') {
-    p.innerText = "Please confirm the password correctly."
+    p.innerText = "Please confirm the password correctly. "
       + "The input for password and confirm-password are not the same.";
     input.insertAdjacentElement('afterend', p);
   }
@@ -80,7 +88,12 @@ function readyToSubmit() {
     filled = filled && input.value.length > 0;
   }
   const formChildren = [...document.querySelector('form').children];
-  const hasP = formChildren.some(el => el.tagName === 'P');
+  const hasP = formChildren.some(el => {
+    return (
+      el.tagName === 'P'
+      && el.previousElementSibling.type !== 'submit'
+    );
+  });
 
   const [psswd, confirmPsswd] = formChildren.filter(el => el.type === 'password');
   if (!psswd || !confirmPsswd)
@@ -103,7 +116,7 @@ function validatePassword(passwordInput) {
   const passwordRule = new RegExp(
     "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)"
     + "(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,"
-    + ".<>\\/?])(?!.{0,8}$).+$",
+    + ".<>\\/?])(?!.{0,9}$).+$",
     "g"
   );
 

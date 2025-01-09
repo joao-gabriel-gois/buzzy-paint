@@ -16,6 +16,7 @@
     "@utils/": "./src/utils/",
     "@types/": "./src/@types/",
     "mongodb": "npm:mongodb@^6.11.0",
+    "pg": "npm:pg@^8.13.1",
     "zod": "npm:zod@^3.24.1"
   },
   "compilerOptions": { 

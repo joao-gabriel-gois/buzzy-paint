@@ -24,9 +24,9 @@ export class CanvasEventListener {
     this.onZoom = this.onZoom.bind(this);
     this.onErase = this.onErase.bind(this);
     this.renderCurrentState = this.renderCurrentState.bind(this);
-    this.onExportCall = this.onExportCall.bind(this);
-    this.onImportCall = this.onImportCall.bind(this);
-    this.onDownloadCall = this.onDownloadCall.bind(this);
+    // this.onExportCall = this.onExportCall.bind(this);
+    // this.onImportCall = this.onImportCall.bind(this);
+    // this.onDownloadCall = this.onDownloadCall.bind(this);
     this.paintBackground = this.paintBackground.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     // this.onStopCall = this.onStopCall.bind(this);
@@ -227,31 +227,31 @@ export class CanvasEventListener {
     });
   }
 
-  onExportCall(_) {
-    const exportEvent = new CustomEvent('export', {
-      detail: this.eventQueue
-    });
-    document.dispatchEvent(exportEvent);
-  }
+  // onExportCall(_) {
+  //   const exportEvent = new CustomEvent('export', {
+  //     detail: this.eventQueue
+  //   });
+  //   document.dispatchEvent(exportEvent);
+  // }
   
-  onImportCall(event) {
-    this.eventQueue = event.detail;
-    this.renderCurrentState();
-  }
+  // onImportCall(event) {
+  //   this.eventQueue = event.detail;
+  //   this.renderCurrentState();
+  // }
 
-  onDownloadCall(event) {
-    const { isPng, filename } = event.detail;
-    const ext = `image/${isPng ? 'png' : 'jpeg'}`;
-    const image = this.canvas.toDataURL(ext)
-    .replace(ext, "image/octet-stream");
-    const downloadHiddenAnchor = document.createElement('a');
-    downloadHiddenAnchor.setAttribute("href", image);
-    downloadHiddenAnchor.setAttribute("download", filename + `.${isPng ? 'png' : 'jpg'}`);
-    downloadHiddenAnchor.style.display = 'none';
-    this.renderCurrentState(!isPng && this.paintBackground);
-    downloadHiddenAnchor.click();
-    downloadHiddenAnchor.remove();
-  }
+  // onDownloadCall(event) {
+  //   const { isPng, filename } = event.detail;
+  //   const ext = `image/${isPng ? 'png' : 'jpeg'}`;
+  //   const image = this.canvas.toDataURL(ext)
+  //   .replace(ext, "image/octet-stream");
+  //   const downloadHiddenAnchor = document.createElement('a');
+  //   downloadHiddenAnchor.setAttribute("href", image);
+  //   downloadHiddenAnchor.setAttribute("download", filename + `.${isPng ? 'png' : 'jpg'}`);
+  //   downloadHiddenAnchor.style.display = 'none';
+  //   this.renderCurrentState(!isPng && this.paintBackground);
+  //   downloadHiddenAnchor.click();
+  //   downloadHiddenAnchor.remove();
+  // }
 
   paintBackground() {
     this.context.fillStyle = getStyle(this.canvas).backgroundColor;

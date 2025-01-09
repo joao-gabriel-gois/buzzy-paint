@@ -17,7 +17,6 @@ import { getDataFromURLHash } from "../shared/global.js";
       return router('/logout');
     }
 
-    console.log('UserID:', `'${user_id}'`);
 
     const toolbarClickListener = new ToolbarClickListener(
       '#tools ul',
@@ -65,6 +64,11 @@ import { getDataFromURLHash } from "../shared/global.js";
     );
 
     tabsManager.init();
+    document.querySelector('header nav ul li')
+      .addEventListener('click', (e) => {
+        e.preventDefault();
+        tabsManager.saveTabsData();
+      })
     document.querySelector('header nav button')
       .addEventListener('click', (e) => {
         e.preventDefault();

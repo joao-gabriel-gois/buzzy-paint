@@ -338,8 +338,11 @@ export const {
 
 function renderValidationErrorFromResponse(response) {
   const submit = document.querySelector('[type="submit"]');
-  const currentMessage = submit.previousElementSibling;
-  if (currentMessage.tagName === 'P') currentMessage.remove();
+  const currentMessage = submit.nextElementSibling;
+  if (
+    currentMessage
+    && currentMessage.tagName === 'P'
+  ) currentMessage.remove();
   const p = document.createElement('p');
   addCSSClass(p, 'validation');
 

@@ -4,32 +4,27 @@ import { getStyle } from '../../utils/cssUtils.js';
 export class CanvasEventListener {
   static #instancesCount = 0;
 
-  constructor(canvasReference, eventQueue = [], undoStack = [])  {
+  constructor(canvasReference, data = { eventQueue: [], undoStack: [] })  {
     CanvasEventListener.#instancesCount++;
     this.canvas = document.querySelector(canvasReference);
     this.context = this.canvas.getContext('2d');
     
-    this.eventQueue = eventQueue;
-    this.undoStack = undoStack;
-    
+    this.eventQueue = data.eventQueue;
+    this.undoStack = data.undoStack;
+
     this.zoomCurrentRate = 1;
     this.zoomPreviousRate = 1;
     this.isZoomActive = false;
 
     // Bindings
-    // this.rewritePoint = this.rewritePoint.bind(this);
     this.onDraw = this.onDraw.bind(this);
     this.onLine = this.onLine.bind(this);
     this.onWrite = this.onWrite.bind(this);
     this.onZoom = this.onZoom.bind(this);
     this.onErase = this.onErase.bind(this);
     this.renderCurrentState = this.renderCurrentState.bind(this);
-    // this.onExportCall = this.onExportCall.bind(this);
-    // this.onImportCall = this.onImportCall.bind(this);
-    // this.onDownloadCall = this.onDownloadCall.bind(this);
-    this.paintBackground = this.paintBackground.bind(this);
+
     this.onKeyDown = this.onKeyDown.bind(this);
-    // this.onStopCall = this.onStopCall.bind(this);
   }
 
   static getNumberOfInstances() {
@@ -42,7 +37,7 @@ export class CanvasEventListener {
     this.context.strokeStyle = style.drawColor;
     this.context.lineWidth = drawThicknessRate;
 
-    [...sequence].forEach((point, index) => {
+    sequence.forEach((point, index) => {
       if (!index) {
         this.context.beginPath();
         this.context.moveTo(...point);
@@ -112,27 +107,38 @@ export class CanvasEventListener {
 
   applyErasing(event) {
     const size = event.eraserSize;
+    this.context.beginPath();
+    if (event.isPng) {
+      console.log('we are about to use clearRect')
+      event.sequence.forEach(point => {
+        const { position } = point;
+        this.context.clearRect(position[0] - size / 2, position[1] - size / 2, size, size);
+      });
+      this.context.closePath();
+      return;
+    }
+
     event.sequence.forEach(point => {
       const { position } = point;
-      if (event.isPng)
-        this.context.clearRect(position[0] - size / 2, position[1] - size / 2, size, size);
-      else {
         this.context.fillStyle = getStyle(this.canvas).backgroundColor;
+        console.log('we are about to use fillRect')
         this.context.fillRect(position[0] - size / 2, position[1] - size / 2, size, size);
-      }
-    })
+    });
+    this.context.closePath();
   }
 
   renderCurrentState(cb) {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    
-    if (!getInstanceName(cb).includes('Event')) { 
-      cb && cb();
+    // Download (export) image case, painting background first (cb)
+    if (cb && !(cb instanceof Event)) {
+      console.log('JPG CASE:', cb);
+      // this.context.save();
+      cb();
+      // this.context.restore();
     }
 
-    if (this.isZoomActive) {
+    if (this.isZoomActive) 
       this.applyZoom();
-    }
     
     for (let event of this.eventQueue) {
       switch(event.type) {
@@ -227,35 +233,9 @@ export class CanvasEventListener {
     });
   }
 
-  // onExportCall(_) {
-  //   const exportEvent = new CustomEvent('export', {
-  //     detail: this.eventQueue
-  //   });
-  //   document.dispatchEvent(exportEvent);
-  // }
-  
-  // onImportCall(event) {
-  //   this.eventQueue = event.detail;
-  //   this.renderCurrentState();
-  // }
-
-  // onDownloadCall(event) {
-  //   const { isPng, filename } = event.detail;
-  //   const ext = `image/${isPng ? 'png' : 'jpeg'}`;
-  //   const image = this.canvas.toDataURL(ext)
-  //   .replace(ext, "image/octet-stream");
-  //   const downloadHiddenAnchor = document.createElement('a');
-  //   downloadHiddenAnchor.setAttribute("href", image);
-  //   downloadHiddenAnchor.setAttribute("download", filename + `.${isPng ? 'png' : 'jpg'}`);
-  //   downloadHiddenAnchor.style.display = 'none';
-  //   this.renderCurrentState(!isPng && this.paintBackground);
-  //   downloadHiddenAnchor.click();
-  //   downloadHiddenAnchor.remove();
-  // }
-
   paintBackground() {
     this.context.fillStyle = getStyle(this.canvas).backgroundColor;
-    this.context.fillRect(0, 0, this.canvas.width, this.canvas.style.height);
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   start() {
@@ -266,9 +246,6 @@ export class CanvasEventListener {
     this.canvas.addEventListener('erase', this.onErase);
     this.canvas.addEventListener('render-call', this.renderCurrentState);
     document.addEventListener('keydown', this.onKeyDown);
-    document.addEventListener('export-call', this.onExportCall);
-    document.addEventListener('import-call', this.onImportCall);
-    document.addEventListener('download-call', this.onDownloadCall);
   }
 
   stop() {
@@ -279,9 +256,6 @@ export class CanvasEventListener {
     this.canvas.removeEventListener('erase', this.onErase);
     this.canvas.removeEventListener('render-call', this.renderCurrentState);
     document.removeEventListener('keydown', this.onKeyDown);
-    document.removeEventListener('export-call', this.onExportCall);
-    document.removeEventListener('import-call', this.onImportCall);
-    document.removeEventListener('download-call', this.onDownloadCall);
   }
 }
 

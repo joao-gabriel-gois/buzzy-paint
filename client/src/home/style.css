@@ -31,6 +31,7 @@ header ul {
   font-weight: 600;
   gap: 4%;
   font-family: 'Arial';
+  width: 80%;
 }
 
 header ul li {

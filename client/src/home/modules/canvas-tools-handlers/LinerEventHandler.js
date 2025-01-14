@@ -24,23 +24,22 @@ export class Liner extends ToolEventHandler {
   handleOnMouseDown(event) {
     this.cursorStyle = 'crosshair';
     super.handleOnMouseDown(event);
-    const [x, y] = getRelativeCursorPos(event, this.canvas);
+    const position = getRelativeCursorPos(event, this.canvas);
     
     this.currentLine = {
-      start: [x, y],
-      end: [x, y]
+      start: position,
+      end: position
     };
   }
 
   handleOnMouseMove(event) {
     super.handleOnMouseMove(event);
     
-    const [x, y] = getRelativeCursorPos(event, this.canvas);    
+    const position = getRelativeCursorPos(event, this.canvas);    
     
-    this.currentLine = {
-      ...this.currentLine,
-      end: [x, y],
-    };
+    Object.assign(this.currentLine, {
+      end: position,
+    });  
     
     super.startRenderCall(); // clear for real time lining, overwriting with latest line state
     this.updateContextToCurrentStyle();
@@ -54,12 +53,10 @@ export class Liner extends ToolEventHandler {
     this.cursorStyle = 'default';
     super.handleOnMouseUp(event);
     
-    const [x, y] = getRelativeCursorPos(event, this.canvas);
-
-    this.currentLine = {
-      ...this.currentLine,
-      end: [x, y]
-    };
+    const position = getRelativeCursorPos(event, this.canvas);    
+    Object.assign(this.currentLine, {
+      end: position,
+    });
 
     super.dispacthToolEvent(this.createLineEvent()); // real and final line is saved
 

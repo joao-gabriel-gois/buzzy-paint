@@ -8,6 +8,9 @@ import { Writter } from './modules/canvas-tools-handlers/WritterEventHandler.js'
 import { Zoomer } from './modules/canvas-tools-handlers/ZoomerEventHandler.js';
 import { Eraser } from './modules/canvas-tools-handlers/EraserEventHandler.js';
 import { getDataFromURLHash } from "../shared/global.js";
+import { addJSONImportEvent } from "../utils/addJSONImportEvent.js";
+import { Exporter } from "../utils/Exporter.js";
+import { exportAsImage } from "../utils/exportAsImage.js";
 
 (() => {
   document.addEventListener('DOMContentLoaded', () => {
@@ -56,25 +59,31 @@ import { getDataFromURLHash } from "../shared/global.js";
 
     toolbarClickListener.init();
 
+    const exporter = new Exporter();
+
+    
     const tabsManager =  new TabsManager(
       '#canvas-wrapper',
       'canvas',
       '#tab-buttons-wrapper',
       `${user_id}@tabsData`
     );
-
+    
     tabsManager.init();
-    document.querySelector('header nav ul li')
-      .addEventListener('click', (e) => {
-        e.preventDefault();
-        tabsManager.saveTabsData();
-      })
-    document.querySelector('header nav button')
-      .addEventListener('click', (e) => {
-        e.preventDefault();
-        router('/logout');
-      });
-
+    
+    const [ saveItem, importItem, exportItem, downloadItem] = document.querySelectorAll('header nav ul li');
+    
+    saveItem.addEventListener('click', (e) => tabsManager.saveTabsData());
+    addJSONImportEvent(importItem.firstElementChild); // file input must be passed as argument
+    exportItem.addEventListener('click', (e) => exporter.start()); 
+    downloadItem.addEventListener('click', (e) => exportAsImage()); 
+    
+    const logoutButton = document.querySelector('header nav button');
+    logoutButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      router('/logout');
+    });
+    
     startInputOptionsReactiveBackground();
   });
 

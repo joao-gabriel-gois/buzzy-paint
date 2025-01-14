@@ -29,24 +29,24 @@ export class Drawer extends ToolEventHandler {
     this.context.strokeStyle = this.currentStyle.drawColor;
     this.context.lineWidth = drawThicknessRate;
     
-    const [x, y] = getRelativeCursorPos(event, this.canvas);
+    const position = getRelativeCursorPos(event, this.canvas);
     this.context.beginPath();
-    this.context.moveTo(x, y);
+    this.context.moveTo(...position);
 
     this.currentDrawSequence.push({
-      position: [x, y],
+      position,
     });
   }
 
   handleOnMouseMove(event) {
     super.handleOnMouseMove(event); 
-    const [x, y] = getRelativeCursorPos(event, this.canvas);
-    this.context.lineTo(x, y);
-    this.context.moveTo(x, y);
+    const position = getRelativeCursorPos(event, this.canvas);
+    this.context.lineTo(...position);
+    this.context.moveTo(...position);
     this.context.stroke();
 
     this.currentDrawSequence.push({
-      position: [x, y],
+      position,
     });
   }
 
@@ -54,13 +54,13 @@ export class Drawer extends ToolEventHandler {
     this.cursorStyle = 'default';
     super.handleOnMouseUp(event);
     
-    const [x, y] = getRelativeCursorPos(event, this.canvas);    
-    this.context.lineTo(x, y);
-    this.context.moveTo(x, y);
+    const position = getRelativeCursorPos(event, this.canvas);    
+    this.context.lineTo(...position);
+    this.context.moveTo(...position);
     this.context.stroke();
 
     this.currentDrawSequence.push({
-      position: [x, y],
+      position,
     });
     
     super.dispacthToolEvent(this.createDrawEvent());

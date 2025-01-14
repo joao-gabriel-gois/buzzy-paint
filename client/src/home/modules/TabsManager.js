@@ -22,10 +22,11 @@ export class TabsManager {
     this.newTabBtn = this.tabButtonsWrapper.children[
       this.tabButtonsWrapper.children.length - 1
     ];
-    
-    const storageTabsData = storage.getItem(tabsStorageKey);
-
+       
+    this.getStorageTabsData = () => storage.getItem(tabsStorageKey);
     this.setStorageTabsData = (data) => storage.setItem(tabsStorageKey, data);
+    
+    const storageTabsData = this.getStorageTabsData();
     const { 
       user_id,
       activeIndex,
@@ -50,6 +51,10 @@ export class TabsManager {
     this.assignNewTab = this.assignNewTab.bind(this);
     this.alternateTab = this.alternateTab.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+
+    this.onExportCall = this.onExportCall.bind(this);
+    this.onImportCall = this.onImportCall.bind(this);
+    this.onDownloadCall = this.onDownloadCall.bind(this);
   }
   
   assignTabs() {
@@ -75,15 +80,16 @@ export class TabsManager {
         tabName
       } = tabData;
 
-      const tabButton = this.createTabButton(i);
-      tabButton.innerText = tabName;
+      const tabButton = this.createTabButton(i, tabName);
 
       this.tabs[i] = {
         tabButton,
         canvasListener: new CanvasEventListener(
           this.canvasReference,
-          eventQueue,
-          undoStack
+          {
+            eventQueue,
+            undoStack
+          }
         )
       };
       this.tabButtonsWrapper.insertBefore(
@@ -107,11 +113,11 @@ export class TabsManager {
     this.activateAndRenderTab(tabIndex);
   }
 
-  createTabButton(index) {
+  createTabButton(index, tabName) {
     const canvasTabButton = document.createElement('button');
     canvasTabButton.id = `tab-${index}`;
     addCSSClass(canvasTabButton, 'tab');
-    canvasTabButton.innerText = `Tab ${index + 1}`;
+    canvasTabButton.innerText = tabName ? tabName : `Tab ${index + 1}`;
     canvasTabButton.addEventListener('click', this.alternateTab);
     canvasTabButton.addEventListener('dblclick', changeTabName);
 
@@ -168,16 +174,29 @@ export class TabsManager {
     }
   }
 
-  assignNewTab() {
+  assignNewTab(data = {
+      eventQueue: [],
+      undoStack: []
+    },
+    tabName = null
+  ) {
+    if (data instanceof Event) {
+      data.preventDefault();
+      data = {
+        eventQueue: [],
+        undoStack: []
+      }
+    }
     this.deactivateTab(this.activeIndex);
-    
+
     const newTabIndex = this.tabs.length;
-    const tabButton = this.createTabButton(newTabIndex);
+    const tabButton = this.createTabButton(newTabIndex, tabName);
+    
     this.tabButtonsWrapper.insertBefore(tabButton, this.newTabBtn);
     
     this.tabs[newTabIndex] = {
       tabButton,
-      canvasListener: new CanvasEventListener(this.canvasReference)
+      canvasListener: new CanvasEventListener(this.canvasReference, data)
     }
     this.activateAndRenderTab(newTabIndex);
     
@@ -218,24 +237,7 @@ export class TabsManager {
   }
 
   async saveTabsData() {
-    this.tabsData = this.tabs.map(tab => {
-      const tabName = tab.tabButton.innerText;
-      const {
-        eventQueue,
-        undoStack
-      } = tab.canvasListener;
-
-      return {
-        tabName,
-        eventQueue,
-        undoStack
-      }
-    });
-
-    const data = { 
-      draws: this.tabsData,
-      activeIndex: this.activeIndex
-    };
+    const data = this.getCurrentTabsDataState();
 
     this.setStorageTabsData(data);
     try {
@@ -266,16 +268,95 @@ export class TabsManager {
     }
   }
 
+  getCurrentTabsDataState() {
+    this.tabsData = this.tabs.map(tab => {
+      const tabName = tab.tabButton.innerText;
+      const {
+        eventQueue,
+        undoStack
+      } = tab.canvasListener;
+
+      return {
+        tabName,
+        eventQueue,
+        undoStack
+      }
+    });
+
+    return { 
+      draws: this.tabsData,
+      activeIndex: this.activeIndex
+    };
+  }
+
+  renderPromptDialog() {
+    return prompt('Choose a filename to export your drawings as JSON: ');
+  }
+
   onKeyDown(event) {
     if (event.ctrlKey && event.key === 's') {
       event.preventDefault();
       this.saveTabsData();
     }
   } 
+
+  onExportCall(_) {
+    const data = this.getCurrentTabsDataState();
+    const filename = this.renderPromptDialog();
+    if (!filename) return;
+    downloadObjectAsJson(
+      data.draws[data.activeIndex],
+      filename
+    );
+    
+    function downloadObjectAsJson(exportObj, exportName){
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+      const downloadHiddenAnchor = document.createElement('a');
+      downloadHiddenAnchor.setAttribute("href", dataStr);
+      downloadHiddenAnchor.setAttribute("download", exportName + ".json");
+      downloadHiddenAnchor.style.display = 'none';
+      downloadHiddenAnchor.click();
+      downloadHiddenAnchor.remove();
+    }
+  }
+  
+  onImportCall(event) {
+    const { filename, data } = event.detail;
+    this.assignNewTab(data, filename);
+  }
+
+  onDownloadCall(event) {
+    const currentCavansListener = this.tabs[this.activeIndex].canvasListener;
+    const { isPng, filename } = event.detail;
+    const ext = `image/${isPng ? 'png' : 'jpeg'}`;
+    // not transparent case needs to appl paintBg callback
+    currentCavansListener.renderCurrentState(!isPng && currentCavansListener.paintBackground);
+    const image = currentCavansListener
+      .canvas
+      .toDataURL(ext)
+      .replace(ext, "image/octet-stream");
+    const downloadHiddenAnchor = document.createElement('a');
+    downloadHiddenAnchor.setAttribute("href", image);
+    downloadHiddenAnchor.setAttribute("download", filename + `.${isPng ? 'png' : 'jpg'}`);
+    downloadHiddenAnchor.style.display = 'none';
+    downloadHiddenAnchor.click();
+    downloadHiddenAnchor.remove();
+  }
+  
   
   init() {
     this.assignTabs();
     this.newTabBtn.addEventListener('click', this.assignNewTab);
     document.addEventListener('keydown', this.onKeyDown);
+    document.addEventListener('export-call', this.onExportCall);
+    document.addEventListener('import-call', this.onImportCall);
+    document.addEventListener('download-call', this.onDownloadCall);
+  }
+
+  destroy() {
+    this.newTabBtn.removeEventListener('click', this.assignNewTab);
+    document.removeEventListener('export-call', this.onExportCall);
+    document.removeEventListener('import-call', this.onImportCall);
+    document.removeEventListener('download-call', this.onDownloadCall);
   }
 }

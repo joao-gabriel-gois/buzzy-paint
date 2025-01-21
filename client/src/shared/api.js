@@ -65,6 +65,7 @@ function BuzzyPaintAPI(dependencies = deps) {
       if (resp.status === 401) {
         const refreshed = await handleTokenRefresh();
         if (!refreshed) {
+          console.log('not refreshed, edge case!');
           return router('/logout');
         }
         if (attempt < retriesLimit) {
@@ -87,7 +88,6 @@ function BuzzyPaintAPI(dependencies = deps) {
           storage.setItem(`${user_id}@${tabsDataStorageKey}`, data);
         }
         else {
-          console.log('(Api.handleTabsDataFetching) deciding the most recent state\n', currentTabsDataState.timestamp, 'X', data.timestamp);
           const latestState = currentTabsDataState.timestamp > data.timestamp ? currentTabsDataState : data;
           storage.setItem(`${user_id}@${tabsDataStorageKey}`, latestState);
         }
@@ -113,18 +113,19 @@ function BuzzyPaintAPI(dependencies = deps) {
         if (response.status === 401) {
           const refreshed = await handleTokenRefresh();
           if (!refreshed) {
-            createAndRenderAlert(
+            return createAndRenderAlert(
               {
                 type: 'warning',
                 title: 'Expired Session!',
                 message: 'Your session is expired, you\'ll need to login again.'
               },
               () => router('/logout')
-            );   
+            );
           }
+          return await handleTabsDataSaving(data);
         }
         else if (response.status === 404) {
-          createAndRenderAlert(
+          return createAndRenderAlert(
             {
               type: 'error',
               title: 'Not found!',
@@ -136,10 +137,15 @@ function BuzzyPaintAPI(dependencies = deps) {
         else if (response.status === 422) {
           return await handleTabsDataSaving(data, false);
         }
-        else if (response.status === 200) {
+        else if (response.status === 200) {                
+          createAndRenderAlert({
+            type: 'success',
+            title: 'Saved!',
+            message: 'Your tabs were successfully saved!'
+          });
           return response;
         }
-        console.error('Server is probably unavailable', response);
+        console.error('PUT FAILED: Server is probably unavailable', response);
         createAndRenderAlert(
           {
             type: 'error',
@@ -154,6 +160,7 @@ function BuzzyPaintAPI(dependencies = deps) {
         throw new Error('tabsManager.saveTabsData() PUT-> Error:', error);
       }
     }
+
     try {
       const response = await api.post('/draws', {
         headers: {
@@ -165,7 +172,7 @@ function BuzzyPaintAPI(dependencies = deps) {
       if (response.status === 401) {
         const refreshed = await handleTokenRefresh();
         if (!refreshed) {
-          createAndRenderAlert(
+          return createAndRenderAlert(
             {
               type: 'warning',
               title: 'Expired Session!',
@@ -176,7 +183,7 @@ function BuzzyPaintAPI(dependencies = deps) {
         }
       }
       else if (response.status === 404) {
-        createAndRenderAlert(
+        return createAndRenderAlert(
           {
             type: 'error',
             title: 'Not Saved!',
@@ -185,9 +192,9 @@ function BuzzyPaintAPI(dependencies = deps) {
           () => router('/logout')
         );
       }
-      if (response.status === 422) {
+      else if (response.status === 422) {
         console.error('Api identified this user with an already saved Draw but update was also not possible!');
-        createAndRenderAlert(
+        return createAndRenderAlert(
           {
             type: 'error',
             title: 'Update failed!',
@@ -196,7 +203,23 @@ function BuzzyPaintAPI(dependencies = deps) {
           () => router('/logout')
         );
       }
-      return response;
+      else if (response.status === 201) {                
+        createAndRenderAlert({
+          type: 'success',
+          title: 'Saved!',
+          message: 'Your tabs were successfully saved!'
+        });
+        return response;
+      }
+      console.error('POST FAILED: Server is probably unavailable', response);
+      createAndRenderAlert(
+        {
+          type: 'error',
+          title: 'Unexpected response!',
+          message: 'The response received is not expected. Forcing logout.'
+        },
+        () => router('/logout')
+      );
     }
     catch(error) {
       console.error('BuzzyPaintAPI.handleTabsDataSaving POST-> Error:', error);
@@ -215,10 +238,10 @@ function BuzzyPaintAPI(dependencies = deps) {
         storage.setItem(tokenStorageKey, token);
         return token;
       }
-      handleLogout();
+      return false;
     } catch (error) {
       console.error("Handle Refresh Token ERROR:", error)
-      handleLogout();
+      return false;
     }
   }
 

@@ -20,19 +20,20 @@
   transform: translate(-50%, -50%); */
   z-index: 10000;
   padding: 1em 1.5em;
-  min-width: 30vw;
-  max-width: 70vw;
+  min-width: 25vw;
+  max-width: 55vw;
   color: #FFF;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
   flex-direction: column;
   border-radius: 9px;
+  opacity: 0.92;
 }
 
 #alert button {
   font-weight: bolder;
-  font-family: monospace;
+  font-family: Ubuntu, Verdana, Geneva, Tahoma, sans-serif;
   transition: 277ms ease-out all;
 }
 
@@ -52,8 +53,8 @@
 
 #alert header h1 {
   margin: 0;
-  font-size: 16pt;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size: 14pt;
+  font-family: Arial, Helvetica, sans-serif;
   color: white;
 }
 
@@ -66,14 +67,14 @@
 }
 
 #close {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background-color: transparent;
-  border: 3px solid #FFF; /* rgba(98, 37, 158, 0.765); */
+  border: 2px solid #FFF; /* rgba(98, 37, 158, 0.765); */
   color: #FFF;
-  font-size: 16px;
-  font-weight: bolder;
+  font-size: 10.5pt;
+  font-weight: bold;
   padding: 0;
   margin: 0;
 }
@@ -87,29 +88,96 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  gap: 0.1em;
+  margin: 1em 0;
 }
 
-#content p {
-  margin: 2.5em 0;
-  font-size: 11pt;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
+#content p, #content label {
+  margin: 1em 0;
+  font-size: 10.5pt;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
-#content button {
-  padding: 0.5em 1.25em;
+#content label {
+  font-weight: 600;
+}
+
+#alert #prompt {
+  color: #DCDCDC;
+  margin: 0.25em 0;
+  padding: 0.75em 2.5em;
+  border: 3px blueviolet solid;
+  transition: 300ms ease-out all;
+  border-radius: 3rem;
+  background-color: rgba(210, 177, 241, 0.126);
+}
+
+#alert #prompt:focus {
+  outline: none;
+}
+
+
+#alert #buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  width: 100%;
+}
+
+#buttons button:disabled {
+  opacity: 0.4;
+}
+
+#alert #buttons > :first-child {
+  background-color: #4fdd3d;
+  color: #FFF;
+  margin-right: 1em;
+}
+
+
+#alert #buttons > :last-child {
+  background-color: #f12e2e;
+  color: #FFF;
+}
+
+#content button, #alert #buttons > button {
+  display: flex;
+  align-items: center;
+  padding: 1.2em;
+  margin: 0;
+  margin-top: 1.25em;
   border-radius: 9px;
   border: 0;
   font-size: 12pt;
-  margin-top: 0.25em;
   color: rgba(98, 37, 158, 0.765);
   background-color: #FFF;
 }
 
-.content-bellow {
-  filter: blur(4px);
-  background-color: rgba(30, 22, 83, 0.307);
+#alert #checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.25em;
 }
 
+#alert #checkbox-wrapper #checkbox {
+  width: 1.25em;
+  height: 1.25em;
+  border: 0;
+  border-radius: 30px;
+}
+
+/* To guarantee transition once alert is fading out as well */
+body header, body main, body aside {
+  transition: all ease-out 377ms;
+}
+
+.content-bellow {
+  filter: blur(4px);
+  background-color: rgba(30, 22, 83, 0.347);
+  transition: all ease-out 377ms;
+}
 
 .success #alert {
   background-color: #6bab27;

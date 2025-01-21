@@ -1,4 +1,4 @@
-import ToolEventHandler from './models/ToolEventHandler.js';
+import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/eventUtils.js'
 
 export class Drawer extends ToolEventHandler {
@@ -15,7 +15,7 @@ export class Drawer extends ToolEventHandler {
   // 1) Private Event Handler - Event Related Functions
   createDrawEvent() {
     const drawEvent = super.createToolEvent('draw', {
-      sequenceArray: this.currentDrawSequence,
+      sequence: this.currentDrawSequence,
       style: this.currentStyle,
     });
 
@@ -33,9 +33,7 @@ export class Drawer extends ToolEventHandler {
     this.context.beginPath();
     this.context.moveTo(...position);
 
-    this.currentDrawSequence.push({
-      position,
-    });
+    this.currentDrawSequence.push(position);
   }
 
   handleOnMouseMove(event) {
@@ -45,9 +43,7 @@ export class Drawer extends ToolEventHandler {
     this.context.moveTo(...position);
     this.context.stroke();
 
-    this.currentDrawSequence.push({
-      position,
-    });
+    this.currentDrawSequence.push(position);
   }
 
   handleOnMouseUp(event) {
@@ -59,9 +55,7 @@ export class Drawer extends ToolEventHandler {
     this.context.moveTo(...position);
     this.context.stroke();
 
-    this.currentDrawSequence.push({
-      position,
-    });
+    this.currentDrawSequence.push(position);
     
     super.dispacthToolEvent(this.createDrawEvent());
     this.currentDrawSequence = [];
@@ -109,11 +103,9 @@ export class Drawer extends ToolEventHandler {
       drawColor,
       drawThickness
     } = this.currentStyle;
-
-    const drawThicknessRate = 1 + drawThickness / 8;
     
-    this.context.strokeStyle =  drawColor;
-    this.context.lineWidth = drawThicknessRate;
+    this.context.strokeStyle = drawColor;
+    this.context.lineWidth = drawThickness;
   }
 
   // 3) Public interfaces

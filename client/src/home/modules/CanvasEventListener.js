@@ -17,21 +17,24 @@ export class CanvasEventListener {
     this.isZoomActive = false;
 
     // Bindings
-    this.onDraw = this.onDraw.bind(this);
-    this.onLine = this.onLine.bind(this);
-    this.onWrite = this.onWrite.bind(this);
+    // this.onDraw = this.onDraw.bind(this);
+    this.onCanvasEvent = this.onCanvasEvent.bind(this);
+    // this.onLine = this.onLine.bind(this);
+    // this.onWrite = this.onWrite.bind(this);
+    // this.onDrawRectangle = this.onDrawRectangle.bind(this);
+    // this.onErase = this.onErase.bind(this);
     this.onZoom = this.onZoom.bind(this);
-    this.onErase = this.onErase.bind(this);
     this.renderCurrentState = this.renderCurrentState.bind(this);
 
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.paintBackground = this.paintBackground.bind(this);
   }
 
   static getNumberOfInstances() {
     return CanvasEventListener.#instancesCount;
   }
 
-  redrawSequences(event) {
+  redrawSequence(event) {
     const { sequence, style } = event;
     const drawThicknessRate = 1 + style.drawThickness / 8;
     this.context.strokeStyle = style.drawColor;
@@ -50,18 +53,17 @@ export class CanvasEventListener {
     this.context.stroke();
   }
 
-  redrawLines(event) {
+  redrawLine(event) {
     const { line, style } = event;
-    const lineThicknessRate = 1 + style.lineThickness / 8;
     this.context.strokeStyle = style.lineColor;
-    this.context.lineWidth = lineThicknessRate;
+    this.context.lineWidth = style.lineThickness;
     this.context.beginPath();
     this.context.moveTo(...line.start);
     this.context.lineTo(...line.end);
     this.context.stroke();
   }
 
-  rewritePoints(event) {
+  rewriteAtPoint(event) {
     const { position } = event;
     const { 
       fontSize,
@@ -76,6 +78,24 @@ export class CanvasEventListener {
     }`;
     
     this.context.fillText(innerText, ...position);
+  }
+
+  redrawRectangle(event) {
+    const {
+      rect,
+      style,
+    } = event;
+    const { x, y, width, height } = rect;
+
+    if (style.filled) {
+      this.context.fillStyle = style.fillColor;
+      this.context.fillRect(x, y, width, height);
+    }
+    if (style.stroked) {
+      this.context.strokeStyle = style.rectOutlineColor;
+      this.context.lineWidth = style.rectThickness;
+      this.context.strokeRect(x, y, width, height);
+    }
   }
 
   applyZoom() {
@@ -109,7 +129,6 @@ export class CanvasEventListener {
     const size = event.eraserSize;
     this.context.beginPath();
     if (event.isPng) {
-      console.log('we are about to use clearRect')
       event.sequence.forEach(point => {
         const { position } = point;
         this.context.clearRect(position[0] - size / 2, position[1] - size / 2, size, size);
@@ -121,7 +140,6 @@ export class CanvasEventListener {
     event.sequence.forEach(point => {
       const { position } = point;
         this.context.fillStyle = getStyle(this.canvas).backgroundColor;
-        console.log('we are about to use fillRect')
         this.context.fillRect(position[0] - size / 2, position[1] - size / 2, size, size);
     });
     this.context.closePath();
@@ -129,13 +147,9 @@ export class CanvasEventListener {
 
   renderCurrentState(cb) {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    // Download (export) image case, painting background first (cb)
-    if (cb && !(cb instanceof Event)) {
-      console.log('JPG CASE:', cb);
-      // this.context.save();
-      cb();
-      // this.context.restore();
-    }
+    
+    // JPG case for exporting images, cb shoud paintBackground before exporting
+    if (cb && !(cb instanceof Event)) cb();
 
     if (this.isZoomActive) 
       this.applyZoom();
@@ -143,13 +157,16 @@ export class CanvasEventListener {
     for (let event of this.eventQueue) {
       switch(event.type) {
         case 'DRAW':
-          this.redrawSequences(event);
+          this.redrawSequence(event);
           break;
         case 'LINE':
-          this.redrawLines(event);
+          this.redrawLine(event);
           break;
         case 'WRITE':
-          this.rewritePoints(event);
+          this.rewriteAtPoint(event);
+          break;
+        case 'RECT':
+          this.redrawRectangle(event);
           break;
         case 'ERASE': 
           event = {
@@ -163,8 +180,9 @@ export class CanvasEventListener {
   }
 
   undo() {
-    if (this.undoStack.length > 60) 
+    if (this.undoStack.length > 60) {
       this.undoStack = [];
+    }
     
     const removedEvent = this.eventQueue.pop();
     if (removedEvent) {
@@ -185,39 +203,16 @@ export class CanvasEventListener {
     if (event.ctrlKey && event.key === 'z') {
       this.undo();
     }
-    else if (event.ctrlKey && event === 'y') {
+    else if (event.ctrlKey && event.key === 'y') {
       this.redo();
     }
   } 
-
-  onDraw(event) {
-    const { sequenceArray, style } = event.detail;
-    const sequence = sequenceArray.map(sequenceObj => sequenceObj.position); 
-
-    this.eventQueue.push({
-      type: 'DRAW',
-      sequence,
-      style, // if you put style directly it will always change all drawSequences style to latest
-    });
-  }
-
-  onLine(event) {
-    const { line, style } = event.detail;
-
-    this.eventQueue.push({
-      type: 'LINE',
-      line,
-      style, // if you put style directly it will always change all drawSequences style to latest
-    });
-  }
-
-  onWrite(event) {
-    const writtenPoint = event.detail;
-
-    this.eventQueue.push({
-      type: 'WRITE',
-      ...writtenPoint
-    });
+  
+  onCanvasEvent(event) {
+    let { detail, type } = event;
+    type = type.toUpperCase();
+    Object.assign(detail, { type });
+    this.eventQueue.push(detail);
   }
 
   onZoom(event) {
@@ -226,34 +221,29 @@ export class CanvasEventListener {
     this.zoomCurrentRate = zoom;
   }
 
-  onErase(event) {
-    this.eventQueue.push({
-      type: 'ERASE',
-      ...event.detail
-    });
-  }
-
   paintBackground() {
     this.context.fillStyle = getStyle(this.canvas).backgroundColor;
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   start() {
-    this.canvas.addEventListener('draw', this.onDraw);
-    this.canvas.addEventListener('line', this.onLine);
-    this.canvas.addEventListener('write', this.onWrite);
+    this.canvas.addEventListener('draw', this.onCanvasEvent);
+    this.canvas.addEventListener('line', this.onCanvasEvent);
+    this.canvas.addEventListener('write', this.onCanvasEvent);
+    this.canvas.addEventListener('rect', this.onCanvasEvent);
     this.canvas.addEventListener('zoom', this.onZoom);
-    this.canvas.addEventListener('erase', this.onErase);
+    this.canvas.addEventListener('erase', this.onCanvasEvent);
     this.canvas.addEventListener('render-call', this.renderCurrentState);
     document.addEventListener('keydown', this.onKeyDown);
   }
 
   stop() {
-    this.canvas.removeEventListener('draw', this.onDraw);
-    this.canvas.removeEventListener('line', this.onLine);
-    this.canvas.removeEventListener('write', this.onWrite);
+    this.canvas.removeEventListener('draw', this.onCanvasEvent);
+    this.canvas.removeEventListener('line', this.onCanvasEvent);
+    this.canvas.removeEventListener('write', this.onCanvasEvent);
     this.canvas.removeEventListener('zoom', this.onZoom);
-    this.canvas.removeEventListener('erase', this.onErase);
+    this.canvas.removeEventListener('rect', this.onCanvasEvent);
+    this.canvas.removeEventListener('erase', this.onCanvasEvent);
     this.canvas.removeEventListener('render-call', this.renderCurrentState);
     document.removeEventListener('keydown', this.onKeyDown);
   }

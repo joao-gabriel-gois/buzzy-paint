@@ -13,7 +13,6 @@ export const refreshUserTokenController = async (request: Request, response: Res
   if (!refresh_token) {
     return next(new BadRequestError('Refresh token doesn\'t exists for this user. User will need to login again!'));
   }
-  
   // refresh_token = refresh_token.split('=')[1].split(';')[0];
   
   const { refresh_token_expires_in } = auth;

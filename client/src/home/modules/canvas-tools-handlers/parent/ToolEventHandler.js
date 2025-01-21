@@ -5,19 +5,12 @@ export default class ToolEventHandler {
     this.canvas = document.querySelector(elements.canvas);
     this.styleSwitcher = document.querySelector(elements.styleSwitcher);
     
-    // States
-    // _related to canvas
     this.context = this.canvas.getContext('2d');
-    this.canvasSize = {
-      real: {
-        width: this.canvas.width,
-        height: this.canvas.height,
-      },
-      style: {
-        width: Number(window.getComputedStyle(this.canvas).width.match(/\d+/g)[0]),
-        height: Number(window.getComputedStyle(this.canvas).height.match(/\d+/g)[0]),
-      },
-    };
+    this.context.lineJoin = 'round';
+    this.context.lineCap = 'round';
+    this.context.imageSmoothingEnabled = true;
+    this.context.imageSmoothingQuality = 'high';
+    this.context.miterLimit = 10;
 
     this.currentStyle = {};
     this.cursorStyle = 'default';
@@ -34,8 +27,8 @@ export default class ToolEventHandler {
 
     this.renderCallEvent = new Event('render-call');
   }
+  
   // 1 - Utils
-
   createToolEvent(eventName, detail) {
     const toolEvent = new CustomEvent(eventName, {
       detail,
@@ -48,12 +41,9 @@ export default class ToolEventHandler {
     this.canvas.dispatchEvent(toolEvent);
   }
 
-
-
   startRenderCall() {
     this.canvas.dispatchEvent(this.renderCallEvent);
   }
-
 
   // 2 - Event Handlers
   handleOnMouseDown(event) {
@@ -76,9 +66,10 @@ export default class ToolEventHandler {
 
   handleStyleSwitch(event) {
     event.preventDefault();
+    const el = event.target;
     return this.updateCurrentStyle({
       ...this.currentStyle,
-      [`${event.target.getAttribute('id')}`]: event.target.value,
+      [`${el.getAttribute('id')}`]: el.type === 'checkbox' ? el.checked : el.value,
     });
   }
 
@@ -110,10 +101,10 @@ export default class ToolEventHandler {
   start() {
     if (!this.activeCounter) {
       this.styleSwitcher.onchange = this.handleStyleSwitch;
-      this.styleSwitcher.onsubmit = (e) => {
-        e.preventDefault();
-        e.target.blur();
-      }
+      // this.styleSwitcher.onsubmit = (e) => {
+      //   e.preventDefault();
+      //   e.target.blur();
+      // }
     }
     this.setActiveState(true);
     this.activeCounter++;
@@ -122,15 +113,15 @@ export default class ToolEventHandler {
   stop() {
     this.setActiveState(false);
     this.canvas.style.cursor = 'default';
-    console.table({
-      'stop_time': new Date().toLocaleDateString('pt-br', {
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric'
-      }),
-      'active_state': this.activeState,
-      'active_counter': this.activeCounter,
-      'current_style': JSON.stringify(this.currentStyle),
-    });
+    // console.table({
+    //   'stop_time': new Date().toLocaleDateString('pt-br', {
+    //     hour: 'numeric',
+    //     minute: 'numeric',
+    //     second: 'numeric'
+    //   }),
+    //   'active_state': this.activeState,
+    //   'active_counter': this.activeCounter,
+    //   'current_style': JSON.stringify(this.currentStyle),
+    // });
   }
 }

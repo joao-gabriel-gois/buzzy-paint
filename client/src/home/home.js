@@ -4,13 +4,16 @@ import { ToolbarClickListener } from './modules/ToolbarClickListener.js';
 
 import { Drawer } from './modules/canvas-tools-handlers/DrawerEventHandler.js';
 import { Liner } from './modules/canvas-tools-handlers/LinerEventHandler.js';
+import { Polygoner } from './modules/canvas-tools-handlers/PolygonEventHandler.js';
 import { Writter } from './modules/canvas-tools-handlers/WritterEventHandler.js';
 import { Zoomer } from './modules/canvas-tools-handlers/ZoomerEventHandler.js';
 import { Eraser } from './modules/canvas-tools-handlers/EraserEventHandler.js';
+import { Rectangler } from './modules/canvas-tools-handlers/RectangleEventHandler.js';
 import { getDataFromURLHash } from "../shared/global.js";
 import { addJSONImportEvent } from "../utils/addJSONImportEvent.js";
 import { Exporter } from "../utils/Exporter.js";
 import { exportAsImage } from "../utils/exportAsImage.js";
+import { createAndRenderAlert } from "../shared/alerts.js";
 
 (() => {
   document.addEventListener('DOMContentLoaded', () => {
@@ -35,6 +38,11 @@ import { exportAsImage } from "../utils/exportAsImage.js";
       canvas: '#canvas-wrapper canvas',
       styleSwitcher: '#line-options',
     });
+
+    const polygoner = new Polygoner({
+      canvas: '#canvas-wrapper canvas',
+      styleSwitcher: '#polygon-line-options',
+    });
     
     const writter = new Writter({
       canvas: '#canvas-wrapper canvas',
@@ -51,16 +59,24 @@ import { exportAsImage } from "../utils/exportAsImage.js";
       styleSwitcher: '#eraser-options',
     });
 
+    const rectangler = new Rectangler({
+      canvas: '#canvas-wrapper canvas',
+      styleSwitcher: '#rectangle-options',
+      checkBoxReactiveContainers: ['stroke', 'fill']
+    });
+
     toolbarClickListener.subscribe(drawer);
     toolbarClickListener.subscribe(liner);
+    toolbarClickListener.subscribe(polygoner);
+    toolbarClickListener.subscribe(rectangler);
+    toolbarClickListener.subscribe(eraser);
     toolbarClickListener.subscribe(writter);
     toolbarClickListener.subscribe(zoomer);
-    toolbarClickListener.subscribe(eraser);
 
     toolbarClickListener.init();
 
+    // need to change exporter approach, it is mandatory to be instantiated before tabs manager init!
     const exporter = new Exporter();
-
     
     const tabsManager =  new TabsManager(
       '#canvas-wrapper',

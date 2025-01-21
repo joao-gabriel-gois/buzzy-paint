@@ -1,4 +1,4 @@
-import ToolEventHandler from './models/ToolEventHandler.js';
+import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/eventUtils.js'
 
 

@@ -21,7 +21,7 @@
         <li>Export JSON</li>
         <li>Export Image</li>
       </ul>
-      <button>logout</button>
+      <button>Logout</button>
     </nav>
   </header>
   
@@ -30,9 +30,11 @@
       <ul>
         <li><img src="../assets/pencil.svg" /></li>
         <li><img src="../assets/line.svg" /></li>
+        <li><img src="../assets/polygon.svg" /></li>
+        <li><img src="../assets/rectangler.svg" /></li>
+        <li><img src="../assets/eraser.svg" /></li>
         <li><img src="../assets/text.svg" /></li>
         <li><img src="../assets/zoom-in.svg" /></li>
-        <li><img src="../assets/eraser.svg" /></li>
       </ul>
     </aside>
 
@@ -46,11 +48,11 @@
     <aside id="options">
       <ul>
         <li>
-          <h3>Lápis</h3>
+          <h3>Pencil</h3>
           <form id="draw-options">
             <div>
               <label for="drawColor" name="DrawColor">
-                Cor:
+                Color:
               </label>
               <div class="color-input-container">
                 <input type="color" id="drawColor" />
@@ -58,7 +60,7 @@
             </div>
             <div>
               <label for="drawThickness" name="DrawThickness">
-                Grossura do Traço:
+                Stroke Width:
               </label>
               <input type="number" class="number" id="drawThickness" />
             </div>
@@ -66,8 +68,28 @@
         </li>
 
         <li>
-          <h3>Linha</h3>
+          <h3>Line</h3>
           <form id="line-options">
+            <div>
+              <label for="lineColor" name="LineColor">
+                Color:
+              </label>
+              <div class="color-input-container">
+                <input type="color" id="lineColor" />
+              </div>
+            </div>
+            <div>
+              <label for="lineThickness" name="DrawThickness">
+                Line Thickness:
+              </label>
+              <input type="number" class="number" id="lineThickness" />
+            </div>
+          </form>
+        </li>
+
+        <li>
+          <h3>Polygon</h3>
+          <form id="polygon-line-options">
             <div>
               <label for="lineColor" name="LineColor">
                 Cor:
@@ -77,8 +99,8 @@
               </div>
             </div>
             <div>
-              <label for="lineThickness" name="DrawThickness">
-                Grossura do Traço:
+              <label for="lineThickness" name="lineThickness">
+                Line Width:
               </label>
               <input type="number" class="number" id="lineThickness" />
             </div>
@@ -86,17 +108,79 @@
         </li>
 
         <li>
-          <h3>Texto</h3>
+          <h3>Rectangle</h3>
+          <form id="rectangle-options">
+            <div id="check-settings">
+              <div>
+                <label for="stroked" name="stroked">
+                  Outline:
+                </label>
+                <div class="rectangle-input-container">
+                  <input type="checkbox" id="stroked" />
+                </div>
+              </div>
+              <div>
+                <label for="filled" name="filled">
+                  Fill:
+                </label>
+                <div class="rectangle-input-container">
+                  <input type="checkbox" id="filled" />
+                </div>
+              </div>
+            </div>
+            <div id="stroke">
+              <div class="number-container">
+                <label for="rectThickness" name="rectThickness">
+                  Outline Width:
+                </label>
+                <div>
+                  <input type="number" class="number" id="rectThickness" />
+                </div>
+              </div>
+              <div>
+                <label for="rectOutlineColor" name="rectOutlineColor">
+                  Outline Color
+                </label>
+                <div class="color-input-container">
+                  <input type="color" id="rectOutlineColor" />
+                </div>
+              </div>
+            </div>
+            <div id="fill">
+              <label for="fillColor" name="fillColor">
+                Fill Color
+              </label>
+              <div class="color-input-container">
+                <input type="color" id="fillColor" />
+              </div>
+            </div>
+          </form>
+        </li>
+
+        <li>
+          <h3>Eraser</h3>
+          <form id="eraser-options">
+            <div class="number-container">
+              <label for="eraserSize" name="eraserSize">
+                Size:
+              </label>
+              <input type="number" class="number" id="eraserSize" />
+            </div>
+          </form>
+        </li>
+
+        <li>
+          <h3>Text</h3>
           <form id="text-options">
             <div>
               <label for="fontSize" name="FontSize">
-                Tamanho da Fonte:
+                Fonte Size:
               </label>
               <input type=number class="number" id="fontSize" />pt
             </div>
             <div>
               <label for="textColor" name="TextColor">
-                Cor do Texto:
+                Text Color:
               </label>
               <div class="color-input-container">
                 <input type="color" id="textColor" />
@@ -104,12 +188,12 @@
             </div>
             <div>
               <label for="fontFamily" name="FontFamily">
-                Tipo da Fonte:
+                Font Family:
               </label>
               <input type="text" id="fontFamily" />
             </div>
             <div class="text-area-container">
-              <label for="innerText" name="InnerText">Conteúdo do texto:</label>
+              <label for="innerText" name="InnerText">Content:</label>
               <textarea id="innerText"></textarea>
             </div>
           </form>
@@ -118,23 +202,9 @@
         <li>
           <h3>Zoom</h3>
           <form id="zoom-options">
-            <div class="zoom-number-container">
+            <div class="number-container">
               <label for="zoom" name="Zoom">Zoom:</label>
               <input type="number" id="zoom" class="number" />%
-            </div>
-          </form>
-        </li>
-
-        <li>
-          <h3>Borracha</h3>
-          <form id="eraser-options">
-            <div>
-              <label for="eraserSize" name="eraserSize">
-                Tamanho
-              </label>
-              <div class="eraser-input-container">
-                <input type="number" id="eraserSize" />
-              </div>
             </div>
           </form>
         </li>

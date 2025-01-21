@@ -1,4 +1,4 @@
-import ToolEventHandler from './models/ToolEventHandler.js';
+import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/eventUtils.js'
 import { getStyle } from '../../../utils/cssUtils.js'
 
@@ -9,6 +9,7 @@ export class Eraser extends ToolEventHandler {
     this.currentEraseSequence = [];
     this.currentStyle.eraserSize = 35;
     this.tooltipDiv = document.createElement('div');
+    this.cursorStyle = 'none';
 
     this.updateEraserTooltip = this.updateEraserTooltip.bind(this);
   }
@@ -40,7 +41,6 @@ export class Eraser extends ToolEventHandler {
       position: [x, y],
     });
     const size = this.currentStyle.eraserSize;
-
     // super.dispacthToolEvent(this.createEraseEvent());
     this.context.fillRect(x - size / 2, y - size / 2, size, size)
   }
@@ -58,6 +58,7 @@ export class Eraser extends ToolEventHandler {
     this.context.fillRect(x - size / 2, y - size / 2, size, size)
 
     this.currentEraseSequence = [];
+
   }
 
 
@@ -65,22 +66,41 @@ export class Eraser extends ToolEventHandler {
   addEraserTooltip() {
     this.tooltipDiv.classList.add('erase-tooltip-added');
     document.body.append(this.tooltipDiv);
-    this.canvas.addEventListener('mousemove', this.updateEraserTooltip);
   }
 
   updateEraserTooltip(event) {
-    this.tooltipDiv.style.display = 'inherit';  
+    const [cx, cy] = getRelativeCursorPos(event, this.canvas);
     let {
       border
     } = getStyle(this.tooltipDiv);
+    border = parseInt(border);
+
+    this.tooltipDiv.style.display = 'inherit';  
     
     const [x, y] = [event.pageX, event.pageY];
     const ratioW = Math.ceil(parseFloat(getStyle(this.canvas).width)) / this.canvas.width;
     const ratioH = Math.ceil(parseFloat(getStyle(this.canvas).height)) / this.canvas.height;
     const sizeW = this.currentStyle.eraserSize * ratioW;
     const sizeH = this.currentStyle.eraserSize * ratioH;
-    
-    border = parseInt(border);
+    const [ minBoundX, minBoundY ] = [
+      sizeW / 2,
+      sizeH / 2,
+    ];
+    const [ maxBoundX, maxBoundY ] = [
+      this.canvas.width - minBoundX,
+      this.canvas.height - minBoundY
+    ]
+
+    if (
+      cx <  minBoundX || cx > maxBoundX
+        || cy < minBoundY  || cy > maxBoundY
+    ) {
+      this.removeEraserTooltip();
+    }
+    else {
+      this.addEraserTooltip();
+    }
+
     const left = x - sizeW / 2 - border; // discounting the border
     const top = y - sizeH / 2 - border; // idem;
 
@@ -93,17 +113,19 @@ export class Eraser extends ToolEventHandler {
   removeEraserTooltip() {
     // this.tooltipDiv.setAttribute('style', 'display: none;');
     this.tooltipDiv.classList.remove('erase-tooltip-added');
-    this.canvas.removeEventListener('mousemove', this.updateEraserTooltip);
   }
 
   start() {
+    this.canvas.style.cursor = 'none';
     super.start();
     this.addEraserTooltip();
+    document.addEventListener('mousemove', this.updateEraserTooltip);
   }
-
+  
   stop() {
     super.stop();
     this.removeEraserTooltip();
+    document.removeEventListener('mousemove', this.updateEraserTooltip);
+    this.canvas.style.cursor = 'default';
   }
-
 }

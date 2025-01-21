@@ -5,7 +5,7 @@ import {
 import { CanvasEventListener } from "./CanvasEventListener.js";
 import { storage as strg } from '../../shared/global.js';
 import { handleTabsDataSaving } from '../../shared/api.js';
-import { createAndRenderAlert } from '../../shared/alerts.js';
+import { createAndRenderAlert, createAndRenderPrompt } from '../../shared/alerts.js';
 
 export class TabsManager {
   constructor(
@@ -15,6 +15,7 @@ export class TabsManager {
     tabsStorageKey,
     apiSave = handleTabsDataSaving,
     storage = strg,
+    renderPromptDialog = createAndRenderPrompt,
   ) {
     this.canvasWrapper = document.querySelector(canvasWrapperReference);
     this.canvasReference = canvasReference;
@@ -22,6 +23,7 @@ export class TabsManager {
     this.newTabBtn = this.tabButtonsWrapper.children[
       this.tabButtonsWrapper.children.length - 1
     ];
+    this.renderPromptDialog = renderPromptDialog;
        
     this.getStorageTabsData = () => storage.getItem(tabsStorageKey);
     this.setStorageTabsData = (data) => storage.setItem(tabsStorageKey, data);
@@ -241,22 +243,7 @@ export class TabsManager {
 
     this.setStorageTabsData(data);
     try {
-      const response = await this.apiSave(data);
-      if (response.status === 200 || response.status === 201) {
-        createAndRenderAlert({
-          type: 'success',
-          title: 'Saved!',
-          message: 'Your tabs were successfully saved!'
-        });
-      }
-      else {
-        console.error('It was not possible to save your tabs! Response status:', response.status);
-        createAndRenderAlert({
-          type: 'warning',
-          title: 'Not Saved!',
-          message: 'It was not possible to save your tabs!'
-        });
-      }
+      await this.apiSave(data);
     }
     catch (error) {
       console.error('It was not possible to save your tabs! Fatal Error status:', error);
@@ -289,10 +276,6 @@ export class TabsManager {
     };
   }
 
-  renderPromptDialog() {
-    return prompt('Choose a filename to export your drawings as JSON: ');
-  }
-
   onKeyDown(event) {
     if (event.ctrlKey && event.key === 's') {
       event.preventDefault();
@@ -302,13 +285,18 @@ export class TabsManager {
 
   onExportCall(_) {
     const data = this.getCurrentTabsDataState();
-    const filename = this.renderPromptDialog();
-    if (!filename) return;
-    downloadObjectAsJson(
-      data.draws[data.activeIndex],
-      filename
-    );
-    
+    this.renderPromptDialog({
+      type: 'info',
+      title: 'Exporting as JSON',
+      message: 'Choose a filename to export the drawing from this tab as JSON: '
+    }).then(filename => {
+      if (!filename) return;
+      downloadObjectAsJson(
+        data.draws[data.activeIndex],
+        filename.text
+      );
+    });
+ 
     function downloadObjectAsJson(exportObj, exportName){
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
       const downloadHiddenAnchor = document.createElement('a');
@@ -329,8 +317,8 @@ export class TabsManager {
     const currentCavansListener = this.tabs[this.activeIndex].canvasListener;
     const { isPng, filename } = event.detail;
     const ext = `image/${isPng ? 'png' : 'jpeg'}`;
-    // not transparent case needs to appl paintBg callback
     currentCavansListener.renderCurrentState(!isPng && currentCavansListener.paintBackground);
+    // not transparent case needs to appl paintBg callback
     const image = currentCavansListener
       .canvas
       .toDataURL(ext)

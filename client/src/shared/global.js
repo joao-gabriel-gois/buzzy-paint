@@ -51,8 +51,6 @@ function getDataFromURLHash() {
     return null;
   }
 
-  console.log(urlRawData);
-
   let data;
   try {
     data = base32LikeToObject(urlRawData);

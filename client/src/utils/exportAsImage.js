@@ -1,12 +1,20 @@
+import { createAndRenderPrompt } from "../shared/alerts.js";
+
 export const exportAsImage = () => {
-  const filename = prompt('Choose a filename:');
-  if (!filename) return;
-  const transparent = confirm('Do you want a transparent background?');
-  const downloadEvent = new CustomEvent('download-call', {
-    detail: {
-      isPng: transparent,
-      filename: filename
-    }
+  createAndRenderPrompt({
+    type: 'info',
+    title: 'Image Details',
+    message: 'Choose the filename and the transparency settings:',
+    checkboxTitle: 'Transparent: ',
+  }).then(response => {
+    if (!response) return;
+    const { text, checkbox } = response;
+    const downloadEvent = new CustomEvent('download-call', {
+      detail: {
+        isPng: checkbox,
+        filename: text
+      }
+    });
+    document.dispatchEvent(downloadEvent);
   });
-  document.dispatchEvent(downloadEvent);
 }

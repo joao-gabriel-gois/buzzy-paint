@@ -70,7 +70,9 @@ class UsersTokensRepository implements IUsersTokensRepository {
       result = await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new DatabaseTransactionError('Database Transaction for finding Token by refresh_token and user_id has failed.');
+      const dbError = new DatabaseTransactionError(
+        'Database Transaction for finding Token by refresh_token and user_id has failed.'
+      );
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError}) Query has failed ⮷\n`,
@@ -92,7 +94,9 @@ class UsersTokensRepository implements IUsersTokensRepository {
       await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new DatabaseTransactionError('Database Transaction for deleting token for this user has failed');
+      const dbError = new DatabaseTransactionError(
+        'Database Transaction for deleting token for this user has failed'
+      );
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError}) Query has failed ⮷\n`,
@@ -109,7 +113,9 @@ class UsersTokensRepository implements IUsersTokensRepository {
       await pool.query(query);
     }
     catch(error) {
-      const dbError = new DatabaseTransactionError('Database Transaction for deleting all expired refresh tokens has failed');
+      const dbError = new DatabaseTransactionError(
+        'Database Transaction for deleting all expired refresh tokens has failed'
+      );
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError}) Query has failed ⮷\n`,

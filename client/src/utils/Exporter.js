@@ -19,7 +19,6 @@ export class Exporter {
     // console.log('1) EXPORTER>start called');
     const exportEvent = new Event('export-call');
     document.dispatchEvent(exportEvent);
-    console.log(exportEvent);
   }
   
   exportCallback(event) {

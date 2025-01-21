@@ -32,7 +32,6 @@ const routes = ['/', '/login', '/home', '/logout', '/signup'];
 
 export function router(pathTo, data) {
   data = data ? objectToBase32Like(data) : '';
-  console.log('current data:', data);
   
   if (!routes.includes(pathTo)) return moveTo('/not-found/');
   if (!checkLogin() && pathTo !== '/signup') {

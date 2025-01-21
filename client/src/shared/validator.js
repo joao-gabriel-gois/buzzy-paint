@@ -64,7 +64,6 @@ function renderValidationErrorsIfAny(input, eventType) {
     return;
   }
   currentMessage = input.nextElementSibling;
-  console.log(readyToSubmit());
   if (currentMessage.tagName === 'P') {
     currentMessage.remove();
   }

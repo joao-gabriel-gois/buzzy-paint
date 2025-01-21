@@ -1,13 +1,14 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/eventUtils.js'
-export class Liner extends ToolEventHandler {
+export class Polygoner extends ToolEventHandler {
   constructor(elements) {
     super(elements);
     super.currentStyle = {
       lineThickness: 1,
       lineColor: '#000',
     }
-    // array of positions of current draw
+
+    this.firstLineDone = false;
     this.currentLine = {};
   }
 
@@ -20,27 +21,8 @@ export class Liner extends ToolEventHandler {
 
     return lineEvent;
   }
-  
-  handleOnMouseDown(event) {
-    this.cursorStyle = 'crosshair';
-    super.handleOnMouseDown(event);
-    const position = getRelativeCursorPos(event, this.canvas);
-    
-    this.currentLine = {
-      start: position,
-      end: position
-    };
-  }
 
-  handleOnMouseMove(event) {
-    super.handleOnMouseMove(event);
-    
-    const position = getRelativeCursorPos(event, this.canvas);    
-    
-    Object.assign(this.currentLine, {
-      end: position,
-    });  
-    
+  strokeLineAtCurrentPosition() {
     super.startRenderCall(); // clear for real time lining, overwriting with latest line state
     this.updateContextToCurrentStyle();
     this.context.beginPath();
@@ -48,19 +30,41 @@ export class Liner extends ToolEventHandler {
     this.context.lineTo(...this.currentLine.end);
     this.context.stroke();
   }
+  
+  handleOnMouseDown(event) {
+    this.cursorStyle = 'crosshair';
+    const position = getRelativeCursorPos(event, this.canvas);
+    super.handleOnMouseDown(event);
+    if (!this.firstLineDone) {
+      this.currentLine = {
+        start: position,
+        end: position
+      };
+      return;
+    }
 
-  handleOnMouseUp(event) {
-    this.cursorStyle = 'default';
-    super.handleOnMouseUp(event);
-    
+    this.currentLine = {
+      start: this.currentLine.end,
+      end: position
+    }
+    this.strokeLineAtCurrentPosition();
+  }
+
+  handleOnMouseMove(event) {
+    super.handleOnMouseMove(event);
     const position = getRelativeCursorPos(event, this.canvas);    
     Object.assign(this.currentLine, {
       end: position,
     });
+    
+    this.strokeLineAtCurrentPosition();
+  }
 
-    super.dispacthToolEvent(this.createLineEvent()); // real and final line is saved
-
-    this.currentLine = {};
+  handleOnMouseUp(event) {
+    this.cursorStyle = 'default';
+    super.handleOnMouseUp(event);
+    if (!this.firstLineDone) this.firstLineDone = true;
+    this.dispacthToolEvent(this.createLineEvent());
   }
 
   handleStyleSwitch(event) {
@@ -75,7 +79,6 @@ export class Liner extends ToolEventHandler {
   // 2.a) - Private Class Utils:
   getPreviousInputValue(event) {
     const currentInput = `${event.target.getAttribute('id')}`;
-    
     return this.cursorStyle[currentInput];
   }
 
@@ -84,11 +87,6 @@ export class Liner extends ToolEventHandler {
     this.updateContextToCurrentStyle();
   }
 
-  // 2.b) Specific Util for this implementation (same format but specific for each event handler)
-
-  // Bellow method is only necessary for Tools such as Writter and Drawer
-  // because both classes needs to render while updating CanvasListener
-  // Data structure
   updateContextToCurrentStyle() {
     const {
       lineColor,
@@ -103,17 +101,12 @@ export class Liner extends ToolEventHandler {
   }
 
   // 3) Public interfaces
-
   setActiveState(state) {
-    if (Boolean(state)) this.context.strokeStyle = this.updateContextToCurrentStyle();
+    if (Boolean(state)) this.updateContextToCurrentStyle();
+    else {
+      this.currentLine = {};
+      this.firstLineDone = false;
+    }
     super.setActiveState(state);
   }
-
-  // start() {
-  //   super.start();
-  // }
-
-  // stop() {
-  //   super.stop();
-  // }
 }

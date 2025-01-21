@@ -1,16 +1,20 @@
-import ToolEventHandler from "./models/ToolEventHandler.js";
+import ToolEventHandler from "./parent/ToolEventHandler.js";
+import { createAndRenderAlert } from '../../../shared/alerts.js'
 
 export class Zoomer extends ToolEventHandler {
-  constructor(elements) {
+  constructor(elements, alert = createAndRenderAlert) {
     super(elements);
     this.currentStyle = {
       zoom: 1,
       state: this.activeState,
     };
+    this.alert = alert;
+
+    this.updateCursorStyle = this.updateCursorStyle.bind(this);
   }
 
   createZoomEvent(zoom) {
-    this.updateCurrentStyle({ zoom: zoom });
+    this.updateCurrentStyle({ zoom });
 
     const zoomEvent = super.createToolEvent('zoom', this.currentStyle);
 
@@ -18,8 +22,6 @@ export class Zoomer extends ToolEventHandler {
   }
 
   // 1) Utils
-
-  
   resetZoomState() {
     super.dispacthToolEvent(this.createZoomEvent(1))
     super.startRenderCall();
@@ -40,7 +42,7 @@ export class Zoomer extends ToolEventHandler {
 
   updateCursorStyle(cursorStyle) {
     this.cursorStyle = cursorStyle;
-    this.canvas.style.cursor = this.cursorStyle;
+    this.canvas.style.cursor = this.cursorStyle; 
   }
 
   updateCurrentStyle(currentStyle) {
@@ -55,10 +57,13 @@ export class Zoomer extends ToolEventHandler {
   }
 
   // 2 - overrides from extended class
-
   handleOnMouseDown(event) {
     if (this.cursorStyle === 'help') {
-      alert('Please, set a zoom percentage');
+      this.alert({
+        type: 'info',
+        title: 'Invalid Input',
+        message: 'Please, set a zoom percentage'
+      });
       return;
     }
 
@@ -74,7 +79,7 @@ export class Zoomer extends ToolEventHandler {
 
   setActiveState(state) {
     super.setActiveState(state);
-    this.updateCurrentStyle({state: state});
+    this.updateCurrentStyle({state});
   }
 
   start() {
@@ -84,10 +89,15 @@ export class Zoomer extends ToolEventHandler {
   }
 
   stop() {
-    if (this.activeCounter == 1) {
-      alert("You can not write or draw with zoom applied!");
+    if (this.activeCounter === 1) {
+      this.alert({
+        type: 'warning',
+        title: 'Warning',
+        message: "You can not write or draw with zoom applied!"
+      });
     }
     this.resetZoomState();
+    this.updateCursorStyle('default');
     // should handle different this reset, let this way for now
     this.styleSwitcher.children[0].children[1].value = '';
     super.stop();

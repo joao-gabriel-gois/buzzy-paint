@@ -9,6 +9,7 @@ interface IPayload {
 
 export const ensureAuthentication = (request: AuthRequest, _: Response, next: NextFunction) => {
   const bearer = request.headers.authorization;
+
   if (!bearer) next(new UnauthorizedError('Authorization Header not Found!'))
   else {
     const token = bearer.split(' ')[1];

@@ -13,7 +13,6 @@ import { getDataFromURLHash } from "../shared/global.js";
 import { addJSONImportEvent } from "../utils/addJSONImportEvent.js";
 import { Exporter } from "../utils/Exporter.js";
 import { exportAsImage } from "../utils/exportAsImage.js";
-import { createAndRenderAlert } from "../shared/alerts.js";
 
 (() => {
   document.addEventListener('DOMContentLoaded', () => {

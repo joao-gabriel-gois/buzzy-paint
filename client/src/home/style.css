@@ -1,11 +1,13 @@
 body {
-  background-color: rgba(71, 61, 139, 0.559);
+  background-color: rgba(71, 61, 139, 0.62);
+  background-image: url(../assets/bg_transparent.svg);
   width: 100%;
   padding: 0;
   margin: 0;
   box-sizing: border-box;
   user-select: none;
   animation: show ease-out 0.666s;
+  overflow-x: hidden;
 }
 
 input:focus {
@@ -13,7 +15,8 @@ input:focus {
 }
 
 header {
-  background-color: rgba(71, 61, 139, 0.25);
+  background-color:#78699db8;  /* rgba(71, 61, 139, 0.25) */
+  background: linear-gradient(0deg,#a490db70 30%,rgba(138, 109, 202, 0.75) 100%);
   margin-bottom: 3em;
   width: 100%;
 }
@@ -22,7 +25,7 @@ header nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.2em 0.75em;
+  padding: 0.2em 0;
   width: 100%;
 }
 
@@ -73,7 +76,7 @@ main {
 
 aside {
   border-radius: 5px;
-  background-color: rgba(71, 61, 139, 0.25);  /* rgba(137, 43, 226, 0.485); */
+  background-color: #837CB18B;  /* rgba(137, 43, 226, 0.485); */
   display: flex;
   justify-content: center;
 }
@@ -83,9 +86,9 @@ aside {
   gap: 0.5em;
   overflow-x: scroll;
   /* bellow margin is a way to get full screen tab-btn-wrapper */
-  /* margin: 0 -16.9%; */
   margin-top: -2.33em;
 }
+
 /* width */
 ::-webkit-scrollbar {
   height: 0.33em;
@@ -113,6 +116,7 @@ aside {
 button, input#tab-text-changing {
   border: 2px rgba(71, 61, 139, 0.8) solid;
   background-color: #DDD;
+  background: linear-gradient(15deg, #f6ddfe 0%, rgb(169, 165, 243)  100%);
   color: rgb(71, 61, 139);
   font-size: 12pt;
   font-weight: 600;
@@ -193,21 +197,23 @@ aside#options {
   margin: 0;
   flex-wrap: nowrap;
   padding:0;
-  border-radius: 3px;
+  border-radius: 4px;
   align-items: center;
   height: inherit;
 }
+
 
 #tools ul li {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #deb88799;
-  border: 3px rgb(8, 25, 54) solid;
+  background: linear-gradient(95deg,rgb(170, 168, 215) 0%,   rgb(147, 113, 222) 100%);
+  border: 2px #352B71 solid;
   text-align: center;
-  padding: 5px;
-  max-height: 40px;
+  padding: 4px;
+  max-height: 26px;
   margin: 1px;
+  margin-bottom: .15em;
   border-radius: 5px;
   /* border-bottom: 5px rgb(8, 25, 54) solid; */
   cursor: pointer;
@@ -215,7 +221,7 @@ aside#options {
 }
 
 #tools ul li:hover {
-  filter: invert(98%) sepia(9%) saturate(1176%) hue-rotate(71deg) brightness(1018%) contrast(119%);
+  filter: invert(78%) sepia(12%) saturate(196%) hue-rotate(158deg) brightness(148%) contrast(72%);
 }
 
 #tools ul {
@@ -280,7 +286,7 @@ aside#options {
   font-weight: 600;
   font-size: 18pt;
   margin: 1.5em 0;
-  color: #013;
+  color: rgb(53, 43, 113) 
 }
 
 
@@ -288,6 +294,8 @@ aside#options {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10pt;
   margin-right: 0.2em;
+  color: rgba(71, 61, 139, 0.95);
+  font-weight: 600;
 }
 
 #options ul form > div input, #innerText  {
@@ -458,7 +466,7 @@ canvas {
 /* JS Style Handlers*/
 li.active {
   /* filter: invert(60%) sepia(79%) saturate(876%) hue-rotate(85deg) brightness(818%) contrast(179%); */
-  filter: invert(60%) sepia(79%) saturate(476%) hue-rotate(120deg) brightness(100%) contrast(100%);
+  filter: invert(60%) sepia(79%) saturate(496%) hue-rotate(123deg) brightness(96%) contrast(110%);
 
 }
 

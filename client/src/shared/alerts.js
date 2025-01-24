@@ -66,15 +66,11 @@ export const createAndRenderAlert = ({ type, title, message }, closeCallback) =>
   renderedAlerts++;
 }
 
-// Confirm:
-// example:
-  // setTimeout(() => {
-  //   createAndRenderConfirm({
-  //     type: 'info',
-  //     title: 'Do you accept?',
-  //     message: 'Details bla bla bla, accept!?'
-  //   }).then(console.log);
-  // }, 1000);
+// createAndRenderConfirm({
+//   type: 'info',
+//   title: 'Do you accept?',
+//   message: 'Details bla bla bla, accept!?'
+// }).then(console.log);
 export const createAndRenderConfirm = ({ type, title, message }) => {
   type = type.toLowerCase();
   if (!ALERT_TYPES.hasOwnProperty(type)) {
@@ -111,9 +107,9 @@ export const createAndRenderConfirm = ({ type, title, message }) => {
   const siblings = [...document.body.children]
     .filter(el => el.id !== 'alert-wrapper');
   siblings.forEach(sib => sib.classList.add('content-bellow'));
-  ;
+  
   document.body.appendChild(wrapper);
-
+  renderedAlerts++;
 
   return new Promise((resolve, reject) => {
     const [ confirm, deny ] = [...wrapper.querySelector('#buttons').children];
@@ -133,13 +129,11 @@ export const createAndRenderConfirm = ({ type, title, message }) => {
   });
 }
 
-// setTimeout(() => {
-//   createAndRenderPrompt({
-//     type: 'info',
-//     title: 'Do you accept?',
-//     message: 'Details bla bla bla, please fill it and confirm:'
-//   }).then(console.log);
-// }, 1000);
+// createAndRenderPrompt({
+//   type: 'info',
+//   title: 'Do you accept?',
+//   message: 'Details bla bla bla, please fill it and confirm:'
+// }).then(console.log);
 export const createAndRenderPrompt = ({ type, title, message, checkboxTitle = null }) => { // confirm the string if user sent it, otherwise send false;
   type = type.toLowerCase();
   if (!ALERT_TYPES.hasOwnProperty(type)) {
@@ -196,8 +190,9 @@ export const createAndRenderPrompt = ({ type, title, message, checkboxTitle = nu
     if (input.value.length > 0) confirm.removeAttribute('disabled');
     else confirm.setAttribute('disabled', true);
   });
-  document.body.appendChild(wrapper);
 
+  document.body.appendChild(wrapper);
+  renderedAlerts++;
 
   return new Promise((resolve, reject) => {
     confirm.addEventListener('click', () => {

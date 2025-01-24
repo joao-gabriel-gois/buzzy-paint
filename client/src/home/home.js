@@ -136,7 +136,7 @@ function startInputOptionsReactiveBackground() {
     });
   
     if (hasActiveTab) {
-      aside.style.backgroundColor = 'rgba(71, 61, 139, 0.25)'; 
+      aside.style.backgroundColor = '#837CB18B'; 
     } else {
       aside.style.backgroundColor = 'transparent';
     }

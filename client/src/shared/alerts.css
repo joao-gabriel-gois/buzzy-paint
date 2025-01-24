@@ -35,6 +35,11 @@
   font-weight: bolder;
   font-family: Ubuntu, Verdana, Geneva, Tahoma, sans-serif;
   transition: 277ms ease-out all;
+  max-height: 2em;
+  overflow: hidden;
+  white-space: nowrap;
+  cursor: pointer;
+  background: none;
 }
 
 #alert button:hover {
@@ -49,6 +54,7 @@
   padding: 0;
   background-color: transparent;
   margin: 0;
+  background: none;
 }
 
 #alert header h1 {

@@ -15,7 +15,7 @@ h1 {
 }
 #left-side {
   grid-column: 1;
-  background-color: rgba(87, 15, 155, 0.747);
+  background-color: #570f9bbe;
   background-image: url(../assets/bg.svg);
   display: flex;
   align-items: center;

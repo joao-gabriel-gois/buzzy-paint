@@ -1,4 +1,3 @@
-import { getInstanceName } from '../../utils/getRelativeCursorPos.js'
 import { getStyle } from '../../utils/cssUtils.js';
 
 export class CanvasEventListener {
@@ -17,15 +16,9 @@ export class CanvasEventListener {
     this.isZoomActive = false;
 
     // Bindings
-    // this.onDraw = this.onDraw.bind(this);
     this.onCanvasEvent = this.onCanvasEvent.bind(this);
-    // this.onLine = this.onLine.bind(this);
-    // this.onWrite = this.onWrite.bind(this);
-    // this.onDrawRectangle = this.onDrawRectangle.bind(this);
-    // this.onErase = this.onErase.bind(this);
     this.onZoom = this.onZoom.bind(this);
     this.renderCurrentState = this.renderCurrentState.bind(this);
-
     this.onKeyDown = this.onKeyDown.bind(this);
     this.paintBackground = this.paintBackground.bind(this);
   }
@@ -147,7 +140,6 @@ export class CanvasEventListener {
 
   renderCurrentState(cb) {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    
     // JPG case for exporting images, cb shoud paintBackground before exporting
     if (cb && !(cb instanceof Event)) cb();
 
@@ -182,8 +174,7 @@ export class CanvasEventListener {
   undo() {
     if (this.undoStack.length > 60) {
       this.undoStack = [];
-    }
-    
+    } 
     const removedEvent = this.eventQueue.pop();
     if (removedEvent) {
       this.undoStack.push(removedEvent);
@@ -201,9 +192,11 @@ export class CanvasEventListener {
 
   onKeyDown(event) {
     if (event.ctrlKey && event.key === 'z') {
+      console.log('undo')
       this.undo();
     }
     else if (event.ctrlKey && event.key === 'y') {
+      console.log('redo')
       this.redo();
     }
   } 
@@ -213,6 +206,7 @@ export class CanvasEventListener {
     type = type.toUpperCase();
     Object.assign(detail, { type });
     this.eventQueue.push(detail);
+    this.undoStack = [];
   }
 
   onZoom(event) {

@@ -41,9 +41,9 @@ h1 {
   background-color: #FAEDF089;
   border-left: 4px groove rgb(182, 130, 238);
 }
-/* #left-side form, #left-side h1, #left-side a {
+#left-side form, #left-side h1, #left-side a {
   animation: show-grow 566ms ease-out;
-} */
+}
 
 form {
   margin-bottom: 1.25rem;

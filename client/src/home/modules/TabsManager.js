@@ -16,6 +16,7 @@ export class TabsManager {
     apiSave = handleTabsDataSaving,
     storage = strg,
     renderPromptDialog = createAndRenderPrompt,
+    renderAlertDialog = createAndRenderAlert
   ) {
     this.canvasWrapper = document.querySelector(canvasWrapperReference);
     this.canvasReference = canvasReference;
@@ -24,6 +25,7 @@ export class TabsManager {
       this.tabButtonsWrapper.children.length - 1
     ];
     this.renderPromptDialog = renderPromptDialog;
+    this.renderAlertDialog = renderAlertDialog;
        
     this.getStorageTabsData = () => storage.getItem(tabsStorageKey);
     this.setStorageTabsData = (data) => storage.setItem(tabsStorageKey, data);
@@ -74,13 +76,13 @@ export class TabsManager {
       this.activateAndRenderTab(0);
       return;
     }
-
-    this.tabsData.forEach((tabData, i) => {
+    
+    for (let i = 0; i < this.tabsData.length; i++) {
       const {
         eventQueue,
         undoStack,
         tabName
-      } = tabData;
+      } = this.tabsData[i];
 
       const tabButton = this.createTabButton(i, tabName);
 
@@ -101,7 +103,7 @@ export class TabsManager {
       if (i === this.activeIndex) {
         this.activateAndRenderTab(i);
       }
-    });
+    };
   }
 
   alternateTab(event) {
@@ -247,7 +249,7 @@ export class TabsManager {
     }
     catch (error) {
       console.error('It was not possible to save your tabs! Fatal Error status:', error);
-      createAndRenderAlert({
+      this.renderAlertDialog({
         type: 'error',
         title: 'Not Saved!',
         message: 'It was not possible to save your tabs! Could not connect to server.'
@@ -336,14 +338,13 @@ export class TabsManager {
     this.assignTabs();
     this.newTabBtn.addEventListener('click', this.assignNewTab);
     document.addEventListener('keydown', this.onKeyDown);
-    document.addEventListener('export-call', this.onExportCall);
     document.addEventListener('import-call', this.onImportCall);
     document.addEventListener('download-call', this.onDownloadCall);
   }
 
-  destroy() {
+  stop() {
     this.newTabBtn.removeEventListener('click', this.assignNewTab);
-    document.removeEventListener('export-call', this.onExportCall);
+    document.removeEventListener('keydown', this.onKeyDown);
     document.removeEventListener('import-call', this.onImportCall);
     document.removeEventListener('download-call', this.onDownloadCall);
   }

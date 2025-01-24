@@ -51,7 +51,7 @@ function BuzzyPaintAPI(dependencies = deps) {
 
   async function handleTabsDataFetching(attempt = 0, retriesLimit = 3) {
     const token = storage.getItem(tokenStorageKey);
-    if (!token) router('/login');
+    if (!token) return router('/login');
     try {
       const resp = await api.get('/draws', {
         headers: {
@@ -109,7 +109,7 @@ function BuzzyPaintAPI(dependencies = deps) {
             'Authorization': `Bearer ${token.value}`
           },
           body: JSON.stringify(data)       
-        })
+        });
         if (response.status === 401) {
           const refreshed = await handleTokenRefresh();
           if (!refreshed) {
@@ -146,7 +146,7 @@ function BuzzyPaintAPI(dependencies = deps) {
           return response;
         }
         console.error('PUT FAILED: Server is probably unavailable', response);
-        createAndRenderAlert(
+        return createAndRenderAlert(
           {
             type: 'error',
             title: 'Unexpected response!',
@@ -293,12 +293,6 @@ function BuzzyPaintAPI(dependencies = deps) {
         headers: {'Content-Type': 'application/json'},
         credentials: 'include'
       });
-      // const response = await fetch(`${BASE_URL}/login`, {
-      //   method: 'POST',
-      //   body: JSON.stringify({ email, password }),
-      //   headers: {'Content-Type': 'application/json'},
-      //   credentials: 'include'
-      // });
       const data = await response.json();
       if (data.token) {
         storage.setItem(tokenStorageKey, data.token);

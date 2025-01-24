@@ -11,8 +11,7 @@ import { Eraser } from './modules/canvas-tools-handlers/EraserEventHandler.js';
 import { Rectangler } from './modules/canvas-tools-handlers/RectangleEventHandler.js';
 import { getDataFromURLHash } from "../shared/global.js";
 import { addJSONImportEvent } from "../utils/addJSONImportEvent.js";
-import { Exporter } from "../utils/Exporter.js";
-import { exportAsImage } from "../utils/exportAsImage.js";
+import { handleImageDownload } from "../utils/handleImageDownload.js";
 
 (() => {
   document.addEventListener('DOMContentLoaded', () => {
@@ -21,7 +20,6 @@ import { exportAsImage } from "../utils/exportAsImage.js";
       console.error('Something went hugely wrong!');
       return router('/logout');
     }
-
 
     const toolbarClickListener = new ToolbarClickListener(
       '#tools ul',
@@ -71,11 +69,7 @@ import { exportAsImage } from "../utils/exportAsImage.js";
     toolbarClickListener.subscribe(eraser);
     toolbarClickListener.subscribe(writter);
     toolbarClickListener.subscribe(zoomer);
-
     toolbarClickListener.init();
-
-    // need to change exporter approach, it is mandatory to be instantiated before tabs manager init!
-    const exporter = new Exporter();
     
     const tabsManager =  new TabsManager(
       '#canvas-wrapper',
@@ -86,12 +80,18 @@ import { exportAsImage } from "../utils/exportAsImage.js";
     
     tabsManager.init();
     
-    const [ saveItem, importItem, exportItem, downloadItem] = document.querySelectorAll('header nav ul li');
-    
+    const [
+      saveItem,
+      importItem,
+      exportItem,
+      downloadItem
+    ] = document.querySelectorAll('header nav ul li');
+    const fileInput = importItem.firstElementChild;
+
     saveItem.addEventListener('click', (e) => tabsManager.saveTabsData());
-    addJSONImportEvent(importItem.firstElementChild); // file input must be passed as argument
-    exportItem.addEventListener('click', (e) => exporter.start()); 
-    downloadItem.addEventListener('click', (e) => exportAsImage()); 
+    addJSONImportEvent(fileInput); 
+    exportItem.addEventListener('click', (e) => tabsManager.onExportCall()); 
+    downloadItem.addEventListener('click', (e) => handleImageDownload()); 
     
     const logoutButton = document.querySelector('header nav button');
     logoutButton.addEventListener('click', (e) => {

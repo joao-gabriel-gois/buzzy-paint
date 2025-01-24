@@ -170,7 +170,6 @@ export const createAndRenderPrompt = ({ type, title, message, checkboxTitle = nu
             </div>`
           : ''
         }
-      </div>
         <div id="buttons">
           <button>Confirm</button>
           <button>Cancel</button>

@@ -1,4 +1,4 @@
-import { getInstanceName } from '../../utils/eventUtils.js'
+import { getInstanceName } from '../../utils/getRelativeCursorPos.js'
 import { getStyle } from '../../utils/cssUtils.js';
 
 export class CanvasEventListener {

@@ -1,11 +1,3 @@
-export const getInstanceName = (event) => (
-  event
-    ? Object.getPrototypeOf(event) 
-        .constructor
-        .name
-    : ''
-);
-
 export function getRelativeCursorPos(event, element) {
   const rect = element.getBoundingClientRect();
   const fixedPos = [

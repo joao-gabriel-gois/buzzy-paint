@@ -1,5 +1,5 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
-import { getRelativeCursorPos } from '../../../utils/eventUtils.js'
+import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
 import { getStyle } from '../../../utils/cssUtils.js';
 import { fromRGBtoHex } from '../../../utils/fromRGBtoHex.js';
 import { createAndRenderAlert, createAndRenderConfirm } from '../../../shared/alerts.js';

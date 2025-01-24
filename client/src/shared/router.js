@@ -3,22 +3,12 @@ import { objectToBase64 } from '../utils/encodingUtils.js';
 import { handleLogout, checkLogin } from './api.js';
 import { location } from './global.js';
 
-// NEED TO TEST NEW CALLBACK APPROACH FOR FETCHING DRAWS
 const getCurrentPath = () => {
   const path = location.pathname;
   return path.length > 1
           ? path.slice(0, path.length - 1)
           : path;
 }
-
-// const getPreviousPath = () => {
-//   const splittedHref = document.referrer.split('/');
-//   const prev = splittedHref.at(-2);
-//   if (
-//     splittedHref[2] === location.host
-//   ) return (prev !== location.host ? '/' + prev : '/'); 
-//   return null;
-// }
 
 const moveTo = (path, data = null) => {
   const hash = !!data ? `#${data}` : '';
@@ -32,7 +22,6 @@ const routes = ['/', '/login', '/home', '/logout', '/signup'];
 
 export function router(pathTo, data) {
   data = data ? objectToBase32Like(data) : '';
-  
   if (!routes.includes(pathTo)) return moveTo('/not-found/');
   if (!checkLogin() && pathTo !== '/signup') {
     moveTo('/login');

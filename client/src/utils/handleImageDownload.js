@@ -1,6 +1,6 @@
 import { createAndRenderPrompt } from "../shared/alerts.js";
 
-export const exportAsImage = () => {
+export const handleImageDownload = () => {
   createAndRenderPrompt({
     type: 'info',
     title: 'Image Details',

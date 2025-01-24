@@ -1,5 +1,5 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
-import { getRelativeCursorPos } from '../../../utils/eventUtils.js'
+import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
 export class Liner extends ToolEventHandler {
   constructor(elements) {
     super(elements);

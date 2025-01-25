@@ -103,11 +103,12 @@ export const createAndRenderConfirm = ({ type, title, message }) => {
   wrapper.innerHTML = alertContent;
   const closeButton = wrapper.querySelector('#close');
   closeButton.addEventListener('click', (_) => fadeAlertOut(wrapper));
-  
-  const siblings = [...document.body.children]
-    .filter(el => el.id !== 'alert-wrapper');
-  siblings.forEach(sib => sib.classList.add('content-bellow'));
-  
+
+  if (renderedAlerts === 0) {
+    const siblings = [...document.body.children]
+      .filter(el => el.id !== 'alert-wrapper');
+    siblings.forEach(sib => sib.classList.add('content-bellow'));
+  }
   document.body.appendChild(wrapper);
   renderedAlerts++;
 
@@ -177,9 +178,11 @@ export const createAndRenderPrompt = ({ type, title, message, checkboxTitle = nu
   const closeButton = wrapper.querySelector('#close');
   closeButton.addEventListener('click', (_) => fadeAlertOut(wrapper));
   
-  const siblings = [...document.body.children]
-    .filter(el => el.id !== 'alert-wrapper');
-  siblings.forEach(sib => sib.classList.add('content-bellow'));
+  if (renderedAlerts === 0) {
+    const siblings = [...document.body.children]
+      .filter(el => el.id !== 'alert-wrapper');
+    siblings.forEach(sib => sib.classList.add('content-bellow'));
+  }
   
   const [ confirm, cancel ] = [...wrapper.querySelector('#buttons').children];
   confirm.setAttribute('disabled', true);

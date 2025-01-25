@@ -125,8 +125,8 @@ function startInputOptionsReactiveBackground() {
   bgColorReactionForActiveItens();
 
   function bgColorReactionForActiveItens() {
-    const aside = document.getElementById('options');
-    const listItems = aside.querySelectorAll('ul > li');
+    const ul = document.getElementById('options').firstElementChild;
+    const listItems = ul.querySelectorAll('li');
     let hasActiveTab = false;
   
     listItems.forEach((li) => {
@@ -136,9 +136,9 @@ function startInputOptionsReactiveBackground() {
     });
   
     if (hasActiveTab) {
-      aside.style.backgroundColor = '#837CB18B'; 
+      ul.style.backgroundColor = '#837CB176'; 
     } else {
-      aside.style.backgroundColor = 'transparent';
+      ul.style.backgroundColor = 'transparent';
     }
   }
 }

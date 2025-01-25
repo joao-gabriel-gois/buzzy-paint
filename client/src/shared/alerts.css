@@ -180,9 +180,8 @@ body header, body main, body aside {
 }
 
 .content-bellow {
-  filter: blur(4px);
-  background-color: rgba(30, 22, 83, 0.347);
-  transition: all ease-out 377ms;
+  filter: blur(4px) invert(0.27) brightness(110%);
+  transition: all ease-out 287ms;
 }
 
 .success #alert {
@@ -212,3 +211,4 @@ body header, body main, body aside {
 .info #content button {
   color: #473D8B;
 }
+

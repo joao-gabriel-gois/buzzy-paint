@@ -11,7 +11,8 @@ export class TabsManager {
   constructor(
     canvasWrapperReference,
     canvasReference,
-    tabWrapperReference,
+    tabsWrapperReference,
+    newTabBtn,
     tabsStorageKey,
     apiSave = handleTabsDataSaving,
     storage = strg,
@@ -20,10 +21,8 @@ export class TabsManager {
   ) {
     this.canvasWrapper = document.querySelector(canvasWrapperReference);
     this.canvasReference = canvasReference;
-    this.tabButtonsWrapper = document.querySelector(tabWrapperReference);
-    this.newTabBtn = this.tabButtonsWrapper.children[
-      this.tabButtonsWrapper.children.length - 1
-    ];
+    this.tabsWrapper = document.querySelector(tabsWrapperReference);
+    this.newTabBtn = document.querySelector(newTabBtn);
     this.renderPromptDialog = renderPromptDialog;
     this.renderAlertDialog = renderAlertDialog;
        
@@ -49,16 +48,17 @@ export class TabsManager {
     this.tabsData = draws || [];
     this.activeIndex = activeIndex;
     this.previousActiveIndex = -1;
-
     this.tabs = [];
+
+    this.wheelCount = 0;
 
     this.assignNewTab = this.assignNewTab.bind(this);
     this.alternateTab = this.alternateTab.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
-
     this.onExportCall = this.onExportCall.bind(this);
     this.onImportCall = this.onImportCall.bind(this);
     this.onDownloadCall = this.onDownloadCall.bind(this);
+    this.onMouseWheel = this.onMouseWheel.bind(this);
   }
   
   assignTabs() {
@@ -69,9 +69,8 @@ export class TabsManager {
       };
 
       this.tabs.push(blankTab);
-      this.tabButtonsWrapper.insertBefore(
+      this.tabsWrapper.appendChild(
         blankTab.tabButton,
-        this.newTabBtn
       );
       this.activateAndRenderTab(0);
       return;
@@ -96,9 +95,8 @@ export class TabsManager {
           }
         )
       };
-      this.tabButtonsWrapper.insertBefore(
+      this.tabsWrapper.appendChild(
         this.tabs[i].tabButton,
-        this.newTabBtn
       );
       if (i === this.activeIndex) {
         this.activateAndRenderTab(i);
@@ -107,10 +105,16 @@ export class TabsManager {
   }
 
   alternateTab(event) {
-    const tabIndex = Number(event.target.id.split('-')[1]);
+    let tabIndex;
+    if (event instanceof Event) {
+      tabIndex = this.tabs.findIndex(tab => tab.tabButton === event.target);
+    }
+    else {
+      tabIndex = Number(event);
+    }
     if (
       isNaN(tabIndex) || tabIndex > this.tabs.length - 1
-    ) throw new Error('The Element reference is either NaN or does not relate to the current saved state!');
+    ) throw new Error('The Element reference is either NaN or does not relate to the current tabs state!');
     else if (tabIndex === this.activeIndex) return;
 
     this.deactivateTab(this.activeIndex);
@@ -119,18 +123,67 @@ export class TabsManager {
 
   createTabButton(index, tabName) {
     const canvasTabButton = document.createElement('button');
-    canvasTabButton.id = `tab-${index}`;
-    addCSSClass(canvasTabButton, 'tab');
+    const closeTabButton = createCloseTabButton();
     canvasTabButton.innerText = tabName ? tabName : `Tab ${index + 1}`;
-    canvasTabButton.addEventListener('click', this.alternateTab);
+    closeTab = closeTab.bind(this);
+    canvasTabButton.addEventListener('click', (e) => {
+      if (e.target.id !== closeTabButton.id)
+        this.alternateTab(e);
+      else
+        closeTab(e);
+    });
     canvasTabButton.addEventListener('dblclick', changeTabName);
+    canvasTabButton.append(closeTabButton);
 
     return canvasTabButton;
-    
+
+    // closure event handlers
+    function closeTab(event) {
+      const index = this.getCurrentTargetIndex(event);
+      event.preventDefault();
+      const lastIndex = this.tabs.length - 1;
+      const realPreviousTab = this.previousActiveIndex;
+
+      if (this.activeIndex === index) {
+        if (index === lastIndex)
+          this.alternateTab(index - 1);
+        else
+          this.alternateTab(index + 1);
+        this.previousActiveIndex = realPreviousTab;
+      }
+      if (
+        this.previousActiveIndex === index
+          || this.previousActiveIndex == this.activeIndex
+      ) this.previousActiveIndex = -1;
+
+      if (this.activeIndex > index)
+        this.activeIndex--;
+      if (this.previousActiveIndex > index)
+        this.previousActiveIndex--;
+
+      // freeing memory of the closing tab canvasListener's instance
+      delete this.tabs[index].canvasListener;
+      this.tabs = [
+        ...this.tabs.slice(0, index),
+        ...this.tabs.slice(index + 1, this.tabs.length)
+      ];
+
+      canvasTabButton.remove();
+    }
+
+    function createCloseTabButton() {
+      const closeTabButton = document.createElement('button');
+      closeTabButton.innerText = 'x';
+      closeTabButton.id = 'tab-close-btn';
+      addCSSClass(canvasTabButton, 'tab');
+      return closeTabButton;
+    }
+
     function changeTabName(event) {
       const { target: currentTabEl } = event;
 
-      const oldText = currentTabEl.innerText;
+      let oldText = currentTabEl.innerText;
+      oldText = oldText.slice(0, oldText.length - 1);
       const inputParentWidth = parseInt(getComputedStyle(currentTabEl).width);
       const inputParentPaddingR = parseInt(getComputedStyle(currentTabEl).paddingRight);
 
@@ -153,6 +206,7 @@ export class TabsManager {
         function checkOutsideClick(clickEvent) {
           if (clickEvent.currentTarget !== document.activeElement) {
             currentTabEl.innerText = oldText;
+            currentTabEl.append(createCloseTabButton());
           }
           document.removeEventListener('click', checkOutsideClick);
         }
@@ -160,6 +214,7 @@ export class TabsManager {
         function handleInputChange(changeEvent) {
           if (!isEscPressed) {
             currentTabEl.innerText = changeEvent.target.value;
+            currentTabEl.append(createCloseTabButton());
           }
           document.removeEventListener('click', checkOutsideClick);
         }
@@ -171,11 +226,18 @@ export class TabsManager {
           if (keyEvent.key === 'Escape') {
             isEscPressed = true;
             currentTabEl.innerText = oldText;
+            currentTabEl.append(createCloseTabButton());
           }
           document.removeEventListener('click', checkOutsideClick);
         }
       }
     }
+  }
+
+  getCurrentTargetIndex(event) {
+    return this.tabs.findIndex(
+      t => t.tabButton === event.currentTarget
+    );
   }
 
   assignNewTab(data = {
@@ -196,19 +258,13 @@ export class TabsManager {
     const newTabIndex = this.tabs.length;
     const tabButton = this.createTabButton(newTabIndex, tabName);
     
-    this.tabButtonsWrapper.insertBefore(tabButton, this.newTabBtn);
+    this.tabsWrapper.appendChild(tabButton);
     
     this.tabs[newTabIndex] = {
       tabButton,
       canvasListener: new CanvasEventListener(this.canvasReference, data)
     }
     this.activateAndRenderTab(newTabIndex);
-    
-    this.newTabBtn.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-      inline: 'center',
-    });
   }
   
   deactivateTab(index) {
@@ -228,9 +284,17 @@ export class TabsManager {
     this.activeIndex = index;
     this.tabs[index].canvasListener.start();  
     addCSSClass(
-      this.tabButtonsWrapper.children[index],
+      this.tabsWrapper.children[index],
       'active'
     );
+
+    this.tabs[index]
+      .tabButton
+      .scrollIntoView({
+          behavior: 'smooth',
+          block: 'end',
+          inline: 'center',
+        });
 
     this.tabs[index]
       .canvasListener
@@ -259,7 +323,8 @@ export class TabsManager {
 
   getCurrentTabsDataState() {
     this.tabsData = this.tabs.map(tab => {
-      const tabName = tab.tabButton.innerText;
+      const rawTabName = tab.tabButton.innerText;
+      const tabName = rawTabName.slice(0, rawTabName.length - 1);
       const {
         eventQueue,
         undoStack
@@ -319,8 +384,8 @@ export class TabsManager {
     const currentCavansListener = this.tabs[this.activeIndex].canvasListener;
     const { isPng, filename } = event.detail;
     const ext = `image/${isPng ? 'png' : 'jpeg'}`;
+    // not transparent case needs to apply the paintBg callback
     currentCavansListener.renderCurrentState(!isPng && currentCavansListener.paintBackground);
-    // not transparent case needs to appl paintBg callback
     const image = currentCavansListener
       .canvas
       .toDataURL(ext)
@@ -333,13 +398,32 @@ export class TabsManager {
     downloadHiddenAnchor.remove();
   }
   
-  
+  onMouseWheel(event) {
+    event.preventDefault();
+    this.wheelCount++;   
+    // dreceasing wheel sensitiveness;
+    if (this.wheelCount % 2 === 0) return;
+    // neves uses more than 2 bytes (if it would an actual integer 16)
+    if (this.wheelCount === 0XFFFF) this.whellCount = 1;
+    
+    const {
+      wheelDelta,
+    } = event;
+    const next = this.activeIndex + 1;
+    const prev = this.activeIndex - 1;
+    if (wheelDelta > 0 && next < this.tabs.length)
+      this.alternateTab(this.activeIndex + 1)
+    else if (wheelDelta < 0 && prev >= 0)
+      this.alternateTab(this.activeIndex - 1)
+  }
+
   init() {
     this.assignTabs();
     this.newTabBtn.addEventListener('click', this.assignNewTab);
     document.addEventListener('keydown', this.onKeyDown);
     document.addEventListener('import-call', this.onImportCall);
     document.addEventListener('download-call', this.onDownloadCall);
+    this.tabsWrapper.addEventListener('mousewheel', this.onMouseWheel);
   }
 
   stop() {
@@ -347,5 +431,6 @@ export class TabsManager {
     document.removeEventListener('keydown', this.onKeyDown);
     document.removeEventListener('import-call', this.onImportCall);
     document.removeEventListener('download-call', this.onDownloadCall);
+    this.tabsWrapper.removeEventListener('mousewheel', this.onMouseWheel);
   }
 }

@@ -8,6 +8,7 @@ export class Drawer extends ToolEventHandler {
       drawThickness: 1,
       drawColor: '#000',
     }
+    
     // array of positions of current draw
     this.currentDrawSequence = [];
   }
@@ -78,19 +79,8 @@ export class Drawer extends ToolEventHandler {
   }
 
   handleThicknessChange(event) {
-    const drawThicknessRate = 1 + Number(event.target.value) / 8;
-    let willThicknessBeApplied = true;
-
-    if (drawThicknessRate > 11) {
-      willThicknessBeApplied = confirm('This much thickness may show render distortion!\n\tPlease confirm to go on:');
-    }
-
-    if (willThicknessBeApplied) {
-      super.handleStyleSwitch(event);
-      this.updateContextToCurrentStyle();
-    } else {
-      event.target.value = this.getPreviousInputValue(event);
-    }
+    super.handleStyleSwitch(event);
+    this.updateContextToCurrentStyle();
   }
 
   // 2.b) Specific Util for this implementation (same format but specific for each event handler)

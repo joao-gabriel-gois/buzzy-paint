@@ -1,5 +1,5 @@
 body {
-  background-color: rgba(33, 10, 101, 0.47);
+  background-color: #7868a9AD;
   background-image: url(../assets/bg_transparent.svg);
   backdrop-filter: blur(2px);
   width: 100%;
@@ -18,7 +18,8 @@ input:focus {
 
 header {
   background-color:#78699db8;  /* rgba(71, 61, 139, 0.25) */
-  background: linear-gradient(0deg,#a490db70 30%,rgba(138, 109, 202, 0.75) 100%);
+  background: linear-gradient(0deg,#9b88d089 35%,rgba(133, 102, 201, 0.7) 100%);
+  border-bottom:2px rgba(71, 61, 139, 0.45) solid;
   margin-bottom: 3em;
   width: 100%;
 }
@@ -44,14 +45,14 @@ header ul {
 }
 
 header ul li {
-  color: rgb(71, 61, 139);
-  transition: 333ms ease-out all;
+  color: rgb(62, 52, 126);
+  transition: 289ms ease-out all;
   cursor: pointer;
-  opacity: 1;
+  opacity: 0.94;
 }
 
 header ul li:hover {
-  opacity: 0.85;
+  opacity: 0.78;
   color: rgb(87, 76, 157);
 }
 
@@ -66,7 +67,7 @@ header nav button {
 
 header nav button:hover {
   opacity: 1;
-  transform: scale(1.12);
+  transform: scale(1.1);
 }
 
 main {
@@ -85,14 +86,49 @@ aside {
 }
 
 #tab-buttons-wrapper {
-  display: flex;
-  gap: 0.5em;
-  overflow-x: scroll;
-  /* bellow margin is a way to get full screen tab-btn-wrapper */
+  display:flex;
+  justify-content: center;
   margin-top: -2.33em;
+  gap: 0.5em;
+  /* width:92vw; */
 }
 
-/* width */
+#tabs-wrapper {
+  display: flex;
+  width: 100%;
+  gap: 0.5em;
+  margin: 0;  /* bellow margin is a way to get full screen tab-btn-wrapper */
+  /* margin-top: -2.33em; */
+  overflow-x: scroll;
+  padding-right: 1em;
+}
+
+button#tab-close-btn {
+  border: 2px ridge rgba(71, 61, 139, 0.66);
+  color: rgba(71, 61, 139, 0.66);
+  font-weight: 600;
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.22em;
+  line-height: 0.52em;
+  margin-bottom: 0.7em;
+  margin-left: 1em;
+  margin-right: -0.45em;
+  font-size: 8pt;
+  font-family: monospace;
+  border-radius: 50%;
+  transition: 70ms ease-in all;
+}
+
+button#tab-close-btn:hover {
+  border: 2px dotted rgb(71, 61, 139);
+  color: rgb(71, 61, 139);
+  transform: scale(1.11);
+  font-weight: 800;
+}
+
 ::-webkit-scrollbar {
   height: 0.33em;
   width: 100%;
@@ -119,33 +155,35 @@ aside {
 button, input#tab-text-changing {
   border: 2px rgba(71, 61, 139, 0.8) solid;
   background-color: #DDD;
-  background: linear-gradient(15deg, #f6ddfe 0%, rgb(169, 165, 243)  100%);
+  background: linear-gradient(180deg, #f6ddfe -20%, rgb(169, 165, 243)  120%);
   color: rgb(71, 61, 139);
   font-size: 12pt;
   font-weight: 600;
   padding: 0.25em 0.5em;
-  transition: 333ms ease-out all;
+  transition: 165ms ease-in all;
   margin-bottom: 0.15em;
   max-height: 2em;
   overflow: hidden;
   white-space: nowrap;
   cursor: pointer;
+  outline: none;
 }
 
 button.tab {
   display: flex;
-  flex-shrink: 0;
-  min-width: 5em;
   align-items: center;
-  justify-content: center;
+  justify-content: space-evenly;
+  flex-shrink: 0;
+  /* min-width: 6em; */
   border-radius: 6px;
-  opacity: 0.55;
+  opacity: 0.48;
 }
 
 input#tab-text-changing {
   align-items: center;
   border: 0;
   color: rgba(71, 61, 139, 0.875);
+  background: linear-gradient(180deg, #f7f2f8e6 -30%, rgb(155, 151, 222)  130%);
   outline: none;
   padding: 0;
   margin: 0;
@@ -160,12 +198,20 @@ input#tab-text-changing {
 
 
 button.tab.active {
-  opacity: 0.85;
-  font-weight: 900;
+  opacity: 1;
+  font-weight: 700;
+  background: linear-gradient(180deg, #f7f2f8e6 0%, rgb(155, 151, 222)  100%);
+  border-width: 2.5px;
+}
+
+button.tab.active:hover {
+  opacity: 1;
+  transform: scale(1);
 }
 
 button.tab:hover {
- opacity: 1;
+ opacity: 0.8;
+ transform: scale(1.006);
 }
 
 button#add-tab {
@@ -174,8 +220,9 @@ button#add-tab {
   justify-content: center;
   border-radius: 50%;
   opacity: 0.55;
-  justify-self: end;
+  width: max-content;
   flex-shrink: 0;
+  padding: 0 0.65em;
 }
 
 button#add-tab:hover {
@@ -212,20 +259,21 @@ aside#options {
   justify-content: center;
   align-items: center;
   background: linear-gradient(95deg,rgb(170, 168, 215) 0%,   rgb(147, 113, 222) 100%);
-  border: 2px #352B71 solid;
   text-align: center;
   padding: 4px;
   max-height: 26px;
   margin: 1px;
-  margin-bottom: .15em;
+  margin-bottom: 3px;
+  border: 1px #352B71 solid;
   border-radius: 5px;
-  /* border-bottom: 5px rgb(8, 25, 54) solid; */
+  border-top: 3px #201946 solid;
+  border-left: 2px #201946 solid;
   cursor: pointer;
   transition: 180ms all ease-out;
 }
 
 #tools ul li:hover {
-  filter: invert(78%) sepia(12%) saturate(196%) hue-rotate(158deg) brightness(148%) contrast(72%);
+  filter: invert(78%) sepia(12%) saturate(196%) hue-rotate(158deg) brightness(148%) contrast(72%);  
 }
 
 #options ul {
@@ -233,12 +281,15 @@ aside#options {
   align-items: center;
   justify-content: space-between;
   flex-direction: column;
-  background-color: transparent;
+  /* background-color: transparent; */
   margin: 0;
   padding: 0.5em 1.75em 3em;
   min-width: 40%;
   max-height: 50%;
-  border-radius: 0.43em;
+  border: 2px #352B71 solid;
+  border-radius: 5px;
+  border-bottom: 4px #201946 solid;
+  border-left: 3px #201946 solid;
 }
 
 #options ul li {

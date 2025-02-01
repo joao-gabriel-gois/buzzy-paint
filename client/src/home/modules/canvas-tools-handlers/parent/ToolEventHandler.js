@@ -10,7 +10,7 @@ export default class ToolEventHandler {
     this.context.lineCap = 'round';
     this.context.imageSmoothingEnabled = true;
     this.context.imageSmoothingQuality = 'high';
-    // this.context.miterLimit = 10;
+    this.context.miterLimit = 10;
 
     this.currentStyle = {};
     this.cursorStyle = 'default';

@@ -50,6 +50,7 @@ export const createAndRenderAlert = ({ type, title, message }, closeCallback) =>
   for (const button of buttons) {
     button.addEventListener('click', (_) => fadeAlertOut(wrapper, closeCallback));
   }
+  wrapper.addEventListener('keydown', onKeyDown);
 
   if (renderedAlerts === 0) {
     const siblings = [...document.body.children]
@@ -63,6 +64,7 @@ export const createAndRenderAlert = ({ type, title, message }, closeCallback) =>
   }
 
   document.body.appendChild(wrapper);
+  buttons[1].focus();
   renderedAlerts++;
 }
 
@@ -103,17 +105,20 @@ export const createAndRenderConfirm = ({ type, title, message }) => {
   wrapper.innerHTML = alertContent;
   const closeButton = wrapper.querySelector('#close');
   closeButton.addEventListener('click', (_) => fadeAlertOut(wrapper));
+  wrapper.addEventListener('keydown', onKeyDown);
 
   if (renderedAlerts === 0) {
     const siblings = [...document.body.children]
       .filter(el => el.id !== 'alert-wrapper');
     siblings.forEach(sib => sib.classList.add('content-bellow'));
   }
+
   document.body.appendChild(wrapper);
+  const [ confirm, deny ] = [...wrapper.querySelector('#buttons').children];
+  confirm.focus();
   renderedAlerts++;
 
   return new Promise((resolve, reject) => {
-    const [ confirm, deny ] = [...wrapper.querySelector('#buttons').children];
     try {
       confirm.addEventListener('click', () => {
         fadeAlertOut(wrapper);
@@ -174,9 +179,9 @@ export const createAndRenderPrompt = ({ type, title, message, checkboxTitle = nu
   `;
 
   wrapper.innerHTML = alertContent;
-  console.log(wrapper);
   const closeButton = wrapper.querySelector('#close');
   closeButton.addEventListener('click', (_) => fadeAlertOut(wrapper));
+  wrapper.addEventListener('keydown', onKeyDown);
   
   if (renderedAlerts === 0) {
     const siblings = [...document.body.children]
@@ -195,6 +200,7 @@ export const createAndRenderPrompt = ({ type, title, message, checkboxTitle = nu
   });
 
   document.body.appendChild(wrapper);
+  input.focus();
   renderedAlerts++;
 
   return new Promise((resolve, reject) => {
@@ -218,6 +224,14 @@ export const createAndRenderPrompt = ({ type, title, message, checkboxTitle = nu
       return resolve(false)
     });
   });
+}
+
+
+function onKeyDown(e) {
+  console.log('triggered')
+  if (e.key === 'Escape') {
+    fadeAlertOut(e.currentTarget);
+  }
 }
 
 function fadeAlertOut(wrapper, confirmationCallback, siblings = [...document.body.children]) {

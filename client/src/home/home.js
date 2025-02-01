@@ -74,7 +74,8 @@ import { handleImageDownload } from "../utils/handleImageDownload.js";
     const tabsManager =  new TabsManager(
       '#canvas-wrapper',
       'canvas',
-      '#tab-buttons-wrapper',
+      '#tabs-wrapper',
+      '#add-tab',
       `${user_id}@tabsData`
     );
     
@@ -136,9 +137,16 @@ function startInputOptionsReactiveBackground() {
     });
   
     if (hasActiveTab) {
-      ul.style.backgroundColor = '#837CB176'; 
+      ul.style.backgroundColor = '#A37CD189'; 
+      ul.style.borderWidth = '5px 3px 1px 1px';
+      ul.style.borderColor = "#352B71";
+      ul.style.borderStyle = "solid";
+      // ul.style.borderBottom = '4px #201946 solid';
+      // ul.style.borderLeft = '3px #201946 solid';
+      ul.style.borderRadius = '5px';
     } else {
       ul.style.backgroundColor = 'transparent';
+      ul.style.border = 'none';
     }
   }
 }

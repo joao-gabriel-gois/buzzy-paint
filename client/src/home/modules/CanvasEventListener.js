@@ -91,6 +91,28 @@ export class CanvasEventListener {
     }
   }
 
+  redrawEllipse(event) {
+    const {
+      ellipse,
+      style,
+    } = event;
+    const { x, y, radiusWidth, radiusHeight } = ellipse;
+
+    if (style.filled) {
+      this.context.fillStyle = style.ellipseFillColor;
+      this.context.beginPath();
+      this.context.ellipse(x, y, radiusWidth, radiusHeight, 0, 0, 2 * Math.PI);
+      this.context.fill();
+    }
+    if (style.stroked) {
+      this.context.strokeStyle = style.ellipseOutlineColor;
+      this.context.lineWidth = style.ellipseThickness;
+      this.context.beginPath();
+      this.context.ellipse(x, y, radiusWidth, radiusHeight, 0, 0, 2 * Math.PI);
+      this.context.stroke();
+    }
+  }
+
   applyZoom() {
     const invertedPreviousZoomRate = 1 / this.zoomPreviousRate;
     const zoomfactor = this.zoomCurrentRate;
@@ -160,6 +182,9 @@ export class CanvasEventListener {
         case 'RECT':
           this.redrawRectangle(event);
           break;
+        case 'ELLIPSE':
+          this.redrawEllipse(event);
+          break;
         case 'ERASE': 
           event = {
             ...event,
@@ -225,6 +250,7 @@ export class CanvasEventListener {
     this.canvas.addEventListener('line', this.onCanvasEvent);
     this.canvas.addEventListener('write', this.onCanvasEvent);
     this.canvas.addEventListener('rect', this.onCanvasEvent);
+    this.canvas.addEventListener('ellipse', this.onCanvasEvent);
     this.canvas.addEventListener('zoom', this.onZoom);
     this.canvas.addEventListener('erase', this.onCanvasEvent);
     this.canvas.addEventListener('render-call', this.renderCurrentState);
@@ -237,6 +263,7 @@ export class CanvasEventListener {
     this.canvas.removeEventListener('write', this.onCanvasEvent);
     this.canvas.removeEventListener('zoom', this.onZoom);
     this.canvas.removeEventListener('rect', this.onCanvasEvent);
+    this.canvas.removeEventListener('ellipse', this.onCanvasEvent);
     this.canvas.removeEventListener('erase', this.onCanvasEvent);
     this.canvas.removeEventListener('render-call', this.renderCurrentState);
     document.removeEventListener('keydown', this.onKeyDown);

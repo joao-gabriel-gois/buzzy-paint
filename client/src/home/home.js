@@ -12,6 +12,7 @@ import { Rectangler } from './modules/canvas-tools-handlers/RectangleEventHandle
 import { getDataFromURLHash } from "../shared/global.js";
 import { addJSONImportEvent } from "../utils/addJSONImportEvent.js";
 import { handleImageDownload } from "../utils/handleImageDownload.js";
+import { Ellipser } from "./modules/canvas-tools-handlers/EllipseEventHandler.js";
 
 (() => {
   document.addEventListener('DOMContentLoaded', () => {
@@ -62,10 +63,17 @@ import { handleImageDownload } from "../utils/handleImageDownload.js";
       checkBoxReactiveContainers: ['stroke', 'fill']
     });
 
+    const ellipser = new Ellipser({
+      canvas: '#canvas-wrapper canvas',
+      styleSwitcher: '#ellipse-options',
+      checkBoxReactiveContainers: ['stroke', 'fill']
+    });
+
     toolbarClickListener.subscribe(drawer);
     toolbarClickListener.subscribe(liner);
     toolbarClickListener.subscribe(polygoner);
     toolbarClickListener.subscribe(rectangler);
+    toolbarClickListener.subscribe(ellipser);
     toolbarClickListener.subscribe(eraser);
     toolbarClickListener.subscribe(writter);
     toolbarClickListener.subscribe(zoomer);

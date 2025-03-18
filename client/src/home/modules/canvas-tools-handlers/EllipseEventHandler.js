@@ -4,13 +4,17 @@ import { getStyle } from '../../../utils/cssUtils.js';
 import { fromRGBtoHex } from '../../../utils/fromRGBtoHex.js';
 import { createAndRenderAlert, createAndRenderConfirm } from '../../../shared/alerts.js';
 
-export class Rectangler extends ToolEventHandler {
+/*
+  TODO:
+  4) testar tudo
+*/
+export class Ellipser extends ToolEventHandler {
   constructor(elements, alert = createAndRenderAlert, confirm = createAndRenderConfirm) {
     super(elements);
     super.currentStyle = {
-      rectThickness: 1,
-      rectOutlineColor: '#000',
-      fillColor: getStyle(this.canvas).backgroundColor,
+      ellipseThickness: 1,
+      ellipseOutlineColor: '#000',
+      ellipseFillColor: getStyle(this.canvas).backgroundColor,
       filled: false,
       stroked: true,
     }
@@ -21,11 +25,8 @@ export class Rectangler extends ToolEventHandler {
       .map(id => document.getElementById(id));
 
     this.initOptionsInputHandler();
-    // this.initOptionsInputHandler = this.initOptionsInputHandler.bind(this);
-    // array of positions of current draw
-    this.currentRect = {};
+    this.currentEllipse = {};
     this.ctrlKeyCapturing = this.ctrlKeyCapturing.bind(this);
-    // this.ctrlKeyCapturingCancel = this.ctrlKeyCapturingCancel.bind(this);
 
     this.keepConfirm = true;
   }
@@ -34,8 +35,8 @@ export class Rectangler extends ToolEventHandler {
     const [strokeCheck, fillCheck] = this.styleSwitcher.querySelectorAll('[type="checkbox"]');
     const [strokeWrapper, fillWrapper] = this.checkboxReactiveInputContainers;
     
-    const fillColorInput = this.styleSwitcher.querySelector('#fillColor');
-    fillColorInput.value = fromRGBtoHex(this.currentStyle.fillColor);
+    const ellipseFillColorInput = this.styleSwitcher.querySelector('#ellipseFillColor');
+    ellipseFillColorInput.value = fromRGBtoHex(this.currentStyle.ellipseFillColor);
 
     const display = {
       fill: getStyle(fillWrapper).display,
@@ -59,7 +60,7 @@ export class Rectangler extends ToolEventHandler {
         this.alert({
           type: 'warning',
           title: 'Not possible!',
-          message: 'You need at least outline selected to draw a rectangle.'
+          message: 'You need at least outline selected to draw an ellipse.'
         });
         strokeCheck.click();
       }
@@ -75,13 +76,13 @@ export class Rectangler extends ToolEventHandler {
   }
 
   // 1) Private Event Handler - Event Related Functions
-  createRectangleEvent() {
-    const rectangleEvent = super.createToolEvent('rect', {
-      rect: this.currentRect,
+  createEllipseEvent() {
+    const ellipseEvent = super.createToolEvent('ellipse', {
+      ellipse: this.currentEllipse,
       style: this.currentStyle,
     });
 
-    return rectangleEvent;
+    return ellipseEvent;
   }
   
   handleOnMouseDown(event) {
@@ -89,10 +90,10 @@ export class Rectangler extends ToolEventHandler {
     super.handleOnMouseDown(event);
     const [x, y] = getRelativeCursorPos(event, this.canvas);
     
-    this.currentRect = {
+    this.currentEllipse = {
       x, y,
-      width: 0,
-      height: 0,
+      radiusWidth: 0,
+      radiusHeight: 0,
     };
   }
 
@@ -100,9 +101,9 @@ export class Rectangler extends ToolEventHandler {
     super.handleOnMouseMove(event);
     
     const [x, y] = getRelativeCursorPos(event, this.canvas);    
-    Object.assign(this.currentRect, {
-      width: x - this.currentRect.x,
-      height: y - this.currentRect.y,
+    Object.assign(this.currentEllipse, {
+      radiusWidth: x - this.currentEllipse.x,
+      radiusHeight: y - this.currentEllipse.y,
     });
     
     super.startRenderCall(); // clear for real time lining, overwriting with latest line state
@@ -112,35 +113,37 @@ export class Rectangler extends ToolEventHandler {
     let {
       x: startX,
       y: startY,
-      width,
-      height
-    } = this.currentRect;
+      radiusWidth,
+      radiusHeight
+    } = this.currentEllipse;
     
-    if (this.ctrlPressed) { // if ctrl is pressed, force the rectangle to become a square
-      const wasNegativeWidth = width < 0;
-      const wasNegativeHeight = height < 0;
-      width = Math.abs(width) > Math.abs(height) ? width : height;
-      height = width;
-
-      if (wasNegativeWidth && width >= 0) width = -width; 
-      if (wasNegativeHeight && height >= 0) height = -height;
-      
-      Object.assign(this.currentRect, { width, height });
-    }
+    radiusWidth = Math.abs(radiusWidth);
+    radiusHeight = Math.abs(radiusHeight);
+    if (this.ctrlPressed) { // if ctrl is pressed, force the ellipse to become a circle
+      radiusWidth = radiusWidth > radiusHeight ? radiusWidth : radiusHeight;
+      radiusHeight = radiusWidth;
+    }   
+    Object.assign(this.currentEllipse, { radiusWidth, radiusHeight });
 
     if (filled) {
-      this.context.fillRect(startX, startY, width, height);
+      this.context.beginPath();
+      this.context.ellipse(startX, startY, radiusWidth, radiusHeight, 0, 0, 2 * Math.PI);
+      this.context.fill();
+      this.context.closePath();
     }
     if (stroked) {
-      this.context.strokeRect(startX, startY, width, height);
+      this.context.beginPath();
+      this.context.ellipse(startX, startY, radiusWidth, radiusHeight, 0, 0, 2 * Math.PI);
+      this.context.stroke();
+      this.context.closePath();
     }
   }
 
   handleOnMouseUp(event) {
     this.cursorStyle = 'default';
     super.handleOnMouseUp(event);
-    super.dispacthToolEvent(this.createRectangleEvent()); // real and final rect is saved
-    this.currentRect = {};
+    super.dispacthToolEvent(this.createEllipseEvent()); // real and final rect is saved
+    this.currentEllipse = {};
   }
 
   handleStyleSwitch(event) {
@@ -165,14 +168,14 @@ export class Rectangler extends ToolEventHandler {
 
   updateContextToCurrentStyle() {
     const {
-      rectOutlineColor,
-      rectThickness,
-      fillColor,
+      ellipseOutlineColor,
+      ellipseThickness,
+      ellipseFillColor,
     } = this.currentStyle;
 
-    this.context.strokeStyle = rectOutlineColor;
-    this.context.fillStyle = fillColor;
-    this.context.lineWidth = rectThickness;
+    this.context.strokeStyle = ellipseOutlineColor;
+    this.context.fillStyle = ellipseFillColor;
+    this.context.lineWidth = ellipseThickness;
   }
 
   startCtrlKeyCapturing() {
@@ -189,32 +192,15 @@ export class Rectangler extends ToolEventHandler {
     this.ctrlPressed = Boolean(event.ctrlKey);
   }
 
-  // ctrlKeyCapturingCancel(event) {
-  //   setTimeout(() => {
-  //     this.ctrlKeyCapturing(event)
-  //   }, 20);
-  // }
-
   setActiveState(state) {
     if (Boolean(state)) {
       this.updateContextToCurrentStyle();
       this.startCtrlKeyCapturing();
-      // if (this.keepConfirm) {
-      //   this.confirm({
-      //     type: 'info',
-      //     title: 'Feature Reminder',
-      //     message: 'You can also draw squares when keeping <strong>\'ctrl\''
-      //       + ' </strong>pressed.<br><br><strong style="display:flex;justify'
-      //       + '-self:center;">Do you want to cancel this reminder?</strong>'
-      //   }).then(cancel => {
-      //     this.keepConfirm = !cancel;
-      //   });
-      // }
       if (this.activeCounter === 0) {
         this.alert({
           type: 'info',
           title: 'Feature Reminder',
-          message: 'You can also draw squares by keeping'
+          message: 'You can also draw circles by keeping'
             + ' <strong>\'ctrl\'</strong> pressed.'
         });
       }

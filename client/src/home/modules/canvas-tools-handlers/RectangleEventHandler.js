@@ -10,7 +10,7 @@ export class Rectangler extends ToolEventHandler {
     super.currentStyle = {
       rectThickness: 1,
       rectOutlineColor: '#000',
-      fillColor: getStyle(this.canvas).backgroundColor,
+      rectFillColor: getStyle(this.canvas).backgroundColor,
       filled: false,
       stroked: true,
     }
@@ -34,8 +34,8 @@ export class Rectangler extends ToolEventHandler {
     const [strokeCheck, fillCheck] = this.styleSwitcher.querySelectorAll('[type="checkbox"]');
     const [strokeWrapper, fillWrapper] = this.checkboxReactiveInputContainers;
     
-    const fillColorInput = this.styleSwitcher.querySelector('#fillColor');
-    fillColorInput.value = fromRGBtoHex(this.currentStyle.fillColor);
+    const rectFillColorInput = this.styleSwitcher.querySelector('#rectFillColor');
+    rectFillColorInput.value = fromRGBtoHex(this.currentStyle.rectFillColor);
 
     const display = {
       fill: getStyle(fillWrapper).display,
@@ -167,11 +167,11 @@ export class Rectangler extends ToolEventHandler {
     const {
       rectOutlineColor,
       rectThickness,
-      fillColor,
+      rectFillColor,
     } = this.currentStyle;
 
     this.context.strokeStyle = rectOutlineColor;
-    this.context.fillStyle = fillColor;
+    this.context.fillStyle = rectFillColor;
     this.context.lineWidth = rectThickness;
   }
 

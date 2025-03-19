@@ -145,17 +145,15 @@ export class CanvasEventListener {
     this.context.beginPath();
     if (event.isPng) {
       event.sequence.forEach(point => {
-        const { position } = point;
-        this.context.clearRect(position[0] - size / 2, position[1] - size / 2, size, size);
+        this.context.clearRect(point[0] - size / 2, point[1] - size / 2, size, size);
       });
       this.context.closePath();
       return;
     }
 
     event.sequence.forEach(point => {
-      const { position } = point;
         this.context.fillStyle = getStyle(this.canvas).backgroundColor;
-        this.context.fillRect(position[0] - size / 2, position[1] - size / 2, size, size);
+        this.context.fillRect(point[0] - size / 2, point[1] - size / 2, size, size);
     });
     this.context.closePath();
   }

@@ -359,7 +359,7 @@ h3 {
   transition: box-shadow 300ms linear;
 }
 
-#rectangle-options {
+#rectangle-options, #ellipse-options {
   display: flex;
   flex-direction: column;
   align-items: flex-end; 
@@ -367,25 +367,25 @@ h3 {
   width: 100%;  
 }
 
-#rectangle-options #check-settings {
+#rectangle-options #check-settings, #ellipse-options #check-settings {
   width: 100%;  
   margin-bottom: 1em;
 }
 
-#rectangle-options #check-settings > div {
+#rectangle-options #check-settings > div, #ellipse-options #check-settings > div {
   display: flex;
   align-items: center;
   flex-direction: row;
 }
 
-#rectangle-options #stroke {
+#rectangle-options #rectStroke, #ellipse-options #ellipseStroke {
   display: flex;
   flex-direction: column;
   width: 100%;
   gap: 0.5em;
 }
 
-#rectangle-options #stroke > div {
+#rectangle-options #rectStroke > div, #ellipse-options #ellipseStroke > div {
   width: 100%;
   display: flex;
   flex-direction: row;

@@ -1,12 +1,8 @@
 type Point = [number, number];
-type Position = {
-  position: Point
-}
 
-// By adjusting the frontend later, we can fix this typing
 interface IDrawCommand {
   type: 'DRAW';
-  sequence: Position[];
+  sequence: Point[];
   style: {
     drawThickness: number;
     drawColor: string;
@@ -38,11 +34,48 @@ interface IWriteCommand {
 
 interface IEraseCommand {
   type: 'ERASE';
-  sequence: Position[];
+  sequence: Point[];
   eraserSize: number;
 }
 
-type Command = IDrawCommand | IWriteCommand  | ILineCommand | IEraseCommand;
+
+interface IRectangleCommand {
+  type: 'RECT';
+  rect: {
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  },
+  style: {
+    rectThickness: number;
+    rectOutlineColor: string;
+    rectFillColor: string;
+    filled: boolean;
+    stroked: boolean;
+  }
+}
+
+interface IEllipseCommand {
+  type: 'ELLIPSE';
+  ellipse: {
+    x: number,
+    y: number,
+    radiusWidth: number,
+    radiusHeight: number
+  },
+  style: {
+    ellipseThickness: number;
+    ellipseOutlineColor: string;
+    ellipseFillColor: string;
+    filled: boolean;
+    stroked: boolean;
+  }
+}
+
+type Command = IDrawCommand
+  | IWriteCommand | ILineCommand | IEraseCommand
+  | IRectangleCommand | IEllipseCommand;
 type EventQueue = Command[];
 type UndoStack = EventQueue;
 

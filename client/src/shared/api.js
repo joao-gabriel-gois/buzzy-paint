@@ -88,6 +88,7 @@ function BuzzyPaintAPI(dependencies = deps) {
           storage.setItem(`${user_id}@${tabsDataStorageKey}`, data);
         }
         else {
+          console.log(currentTabsDataState);
           const latestState = currentTabsDataState.timestamp > data.timestamp ? currentTabsDataState : data;
           storage.setItem(`${user_id}@${tabsDataStorageKey}`, latestState);
         }
@@ -95,7 +96,6 @@ function BuzzyPaintAPI(dependencies = deps) {
       return router('/home', currentUserId);
     } catch (error) {
       console.error('Not able to fetch draws. Error:', error);
-      // throw new Error('Not able to fetch draws. Error:', error);
     }
   }
   

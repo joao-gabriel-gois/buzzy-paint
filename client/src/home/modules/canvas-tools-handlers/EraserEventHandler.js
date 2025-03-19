@@ -27,9 +27,7 @@ export class Eraser extends ToolEventHandler {
     super.handleOnMouseDown(event);
     this.context.fillStyle = getStyle(this.canvas).backgroundColor;
     const [x, y] = getRelativeCursorPos(event, this.canvas);
-    this.currentEraseSequence.push({
-      position: [x, y],
-    });
+    this.currentEraseSequence.push([x, y]);
   }
 
   handleOnMouseMove(event) {
@@ -37,9 +35,7 @@ export class Eraser extends ToolEventHandler {
     
     const [x, y] = getRelativeCursorPos(event, this.canvas);    
     
-    this.currentEraseSequence.push({
-      position: [x, y],
-    });
+    this.currentEraseSequence.push([x, y]);
     const size = this.currentStyle.eraserSize;
     // super.dispacthToolEvent(this.createEraseEvent());
     this.context.fillRect(x - size / 2, y - size / 2, size, size)
@@ -50,9 +46,7 @@ export class Eraser extends ToolEventHandler {
     const [x, y] = getRelativeCursorPos(event, this.canvas);    
     
     const size = this.currentStyle.eraserSize;
-    this.currentEraseSequence.push({
-      position: [x, y],
-    });
+    this.currentEraseSequence.push([x, y]);
 
     super.dispacthToolEvent(this.createEraseEvent());
     this.context.fillRect(x - size / 2, y - size / 2, size, size)

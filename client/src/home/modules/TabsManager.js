@@ -323,8 +323,8 @@ export class TabsManager {
 
   getCurrentTabsDataState() {
     this.tabsData = this.tabs.map(tab => {
-      const rawTabName = tab.tabButton.innerText;
-      const tabName = rawTabName.slice(0, rawTabName.length - 1);
+      // removing both line break and closing button 'x' char
+      const tabName = tab.tabButton.innerText.split('\n')[0]; 
       const {
         eventQueue,
         undoStack

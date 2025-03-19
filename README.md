@@ -266,7 +266,7 @@ ___
 **Client**
 
 (1st milestone)
-- [ ] Ellipse drawing tool (becoming circle when keeping ctrl pressed, just like Rectangle/Square current feature)
+- [x] Ellipse drawing tool (becoming circle when keeping ctrl pressed, just like Rectangle/Square current feature)
 - [ ] Figure Out how to apply fill with collision / closed shapes detection (just like MS Classic Win98 Paint App)
 
 (2nd milestone)

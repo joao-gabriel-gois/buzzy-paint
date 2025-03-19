@@ -60,13 +60,13 @@ import { Ellipser } from "./modules/canvas-tools-handlers/EllipseEventHandler.js
     const rectangler = new Rectangler({
       canvas: '#canvas-wrapper canvas',
       styleSwitcher: '#rectangle-options',
-      checkBoxReactiveContainers: ['stroke', 'fill']
+      checkBoxReactiveContainers: ['rectStroke', 'rectFill']
     });
 
     const ellipser = new Ellipser({
       canvas: '#canvas-wrapper canvas',
       styleSwitcher: '#ellipse-options',
-      checkBoxReactiveContainers: ['stroke', 'fill']
+      checkBoxReactiveContainers: ['ellipseStroke', 'ellipseFill']
     });
 
     toolbarClickListener.subscribe(drawer);

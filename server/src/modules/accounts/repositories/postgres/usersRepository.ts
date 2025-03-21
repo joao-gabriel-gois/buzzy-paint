@@ -1,4 +1,4 @@
-import { pool } from '@shared/infra/postgres/config.ts';
+import { pool } from "@shared/infra/postgres/config.ts";
 import { hash, checkHash } from "@utils/hash.ts";
 import { DatabaseTransactionError, NotFoundError } from "@shared/errors/ApplicationError.ts";
 import { User } from "@modules/accounts/models/User.ts";
@@ -19,18 +19,18 @@ class UserRepository implements IUsersRepository {
     
     password = await hash(password);
 
-    const query = 'INSERT INTO users (id, email, username, password, firstName, lastName) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *';
+    const query = "INSERT INTO users (id, email, username, password, firstName, lastName) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *";
     const values = [id, email, username, password, firstName, lastName];
     let result;
     try {
       result = await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new DatabaseTransactionError('usersRepository.create: Database Transaction for creating user has failed');
+      const dbError = new DatabaseTransactionError("usersRepository.create: Database Transaction for creating user has failed");
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError}) Query has failed ⮷\n`,
-        dbError.message + ':\n\t',
+        dbError.message + ":\n\t",
         error
       );
       throw dbError;
@@ -40,18 +40,18 @@ class UserRepository implements IUsersRepository {
   }
 
   async findById(id: UUID) {
-    const query = 'SELECT * FROM users WHERE id = $1';
+    const query = "SELECT * FROM users WHERE id = $1";
     const values = [id];
     let result;
     try {
       result = await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new DatabaseTransactionError('usersRepository.findById: Database Transaction for finding user by `id` has failed');
+      const dbError = new DatabaseTransactionError("usersRepository.findById: Database Transaction for finding user by `id` has failed");
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError}) Query has failed ⮷\n`,
-        dbError.message + ':\n\t',
+        dbError.message + ":\n\t",
         error
       );
       throw dbError;
@@ -61,18 +61,18 @@ class UserRepository implements IUsersRepository {
   }
 
   async findByEmail(email: string) {
-    const query = 'SELECT * FROM users WHERE email = $1';
+    const query = "SELECT * FROM users WHERE email = $1";
     const values = [email];
     let result;
     try {
       result = await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new DatabaseTransactionError('usersRepository.findByEmail: Database Transaction for finding user by `email` has failed');
+      const dbError = new DatabaseTransactionError("usersRepository.findByEmail: Database Transaction for finding user by `email` has failed");
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError.name}) Query has failed ⮷\n`,
-        dbError.message + ':\n\t',
+        dbError.message + ":\n\t",
         error
       );
       throw dbError;
@@ -82,18 +82,18 @@ class UserRepository implements IUsersRepository {
   }
 
   async findByUsername(username: string) {
-    const query = 'SELECT * FROM users WHERE username = $1';
+    const query = "SELECT * FROM users WHERE username = $1";
     const values = [username];
     let result;
     try {
       result = await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new DatabaseTransactionError('usersRepository.findByUsername: Database Transaction for finding user by `username` has failed');
+      const dbError = new DatabaseTransactionError("usersRepository.findByUsername: Database Transaction for finding user by `username` has failed");
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError.name}) Query has failed ⮷\n`,
-        dbError.message + ':\n\t',
+        dbError.message + ":\n\t",
         error
       );
       throw dbError;
@@ -104,7 +104,7 @@ class UserRepository implements IUsersRepository {
 
   async update(user: IUpdateUserDTO) {
     const currentUser = await this.findById(user.id);
-    if (!currentUser) throw new NotFoundError('usersRepository.update: User not found');
+    if (!currentUser) throw new NotFoundError("usersRepository.update: User not found");
   
     const updates: string[] = [];
     const values: (UUID | string | number)[] = [];
@@ -143,7 +143,7 @@ class UserRepository implements IUsersRepository {
       return currentUser; // No changes
     }
     // Creating dynamic query in order to update only the real changed values
-    const query = `UPDATE users SET ${updates.join(', ')} WHERE id = $${index} RETURNING *`;
+    const query = `UPDATE users SET ${updates.join(", ")} WHERE id = $${index} RETURNING *`;
     values.push(user.id);
   
     let result;
@@ -151,11 +151,11 @@ class UserRepository implements IUsersRepository {
       result = await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new NotFoundError('usersRepository.update: Database Transaction for updating user has failed');
+      const dbError = new NotFoundError("usersRepository.update: Database Transaction for updating user has failed");
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError.name}) Query has failed ⮷\n`,
-        dbError.message + ':\n\t',
+        dbError.message + ":\n\t",
         error
       );
       throw dbError;
@@ -166,18 +166,18 @@ class UserRepository implements IUsersRepository {
   }
   
   async delete(id: UUID) {
-    const query = 'DELETE FROM users WHERE id = $1 RETURNING *';
+    const query = "DELETE FROM users WHERE id = $1 RETURNING *";
     const values = [id];
     let result;
     try {
       result = await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new NotFoundError('usersRepository.delete: User intended to be deleted was not found');
+      const dbError = new NotFoundError("usersRepository.delete: User intended to be deleted was not found");
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError.name}) Query has failed ⮷\n`,
-        dbError.message + ':\n\t',
+        dbError.message + ":\n\t",
         error
       );
       throw dbError;

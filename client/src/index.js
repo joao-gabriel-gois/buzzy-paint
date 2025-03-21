@@ -1,7 +1,7 @@
-import { handleTabsDataFetching } from './shared/api.js';
+import { handleTabsDataFetching } from "./shared/api.js";
 
-document.addEventListener('DOMContentLoaded', async () => {
-  animateLoadingText('#bottom-side p');
+document.addEventListener("DOMContentLoaded", async () => {
+  animateLoadingText("#bottom-side p");
   handleTabsDataFetching();
 });
 
@@ -12,7 +12,7 @@ function animateLoadingText(textSelector) {
   let margin = 0;
   setInterval(() => {
     if (p.innerText.length < text.length + 3) {
-      p.innerText += '.';
+      p.innerText += ".";
       margin += 0.7;
       p.style.marginRight = `-${margin}rem`
       return;

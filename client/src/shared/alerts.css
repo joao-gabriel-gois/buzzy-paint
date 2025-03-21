@@ -30,6 +30,7 @@
   flex-direction: column;
   border-radius: 9px;
   opacity: 0.94;
+  text-align: center;
 }
 
 #alert button {
@@ -98,6 +99,7 @@
   flex-direction: column;
   gap: 0.1em;
   margin: 1em 0;
+  padding: 0 -4em;
 }
 
 #content p, #content label {
@@ -143,12 +145,18 @@
   margin-right: 1em;
 }
 
-
 #alert #buttons > :last-child {
   background-color: #f12e2e;
   color: #FFF;
 }
 
+.warning #alert #buttons > :first-child {
+  background-color: #6bab27dd;
+}
+
+.warning #alert #buttons > :last-child {
+  background-color: #fb593d;
+}
 #content button, #alert #buttons > button {
   display: flex;
   align-items: center;
@@ -201,10 +209,10 @@ body header, body main, body aside {
 }
 
 .warning #alert {
-  background-color: #b18619;
+  background-color: #dbac36;
 }
 .warning #content button {
-  color: #b18619;
+  color: #dbac36;
 }
 
 .info #alert {

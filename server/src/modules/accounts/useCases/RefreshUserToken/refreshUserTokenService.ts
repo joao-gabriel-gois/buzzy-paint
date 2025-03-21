@@ -1,7 +1,7 @@
-import { sign, verify } from 'npm:jsonwebtoken';
+import { sign, verify } from "npm:jsonwebtoken";
 import auth from "@config/auth.ts"
 import { InvalidParameterError, NotFoundError } from "@shared/errors/ApplicationError.ts";
-import IUsersTokensRepository from "@modules/accounts/repositories/IUsersTokensRepository.ts";
+import { IUsersTokensRepository } from "@modules/accounts/repositories/IUsersTokensRepository.ts";
 import { usersTokensRepository } from "@modules/accounts/repositories/postgres/usersTokensRepository.ts";
 import { expiryDateMapper } from "@utils/expiryDateMapper.ts";
 import { UserTokens } from "@modules/accounts/models/UserTokens.ts";
@@ -16,6 +16,9 @@ interface IRefreshAuthResponse {
   refresh_token: string;
 }
 
+// class is exportable only for unit tests.
+// Do not import it anywhere else to keep all
+// services as singletons.
 export class RefreshTokenService {
   constructor(
     private usersTokensRepository: IUsersTokensRepository,
@@ -30,7 +33,7 @@ export class RefreshTokenService {
     } = auth;
 
     if (!(token_secret || token_expires_in || refresh_token_secret || refresh_token_expires_in)) {
-      throw new InvalidParameterError('Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!');
+      throw new InvalidParameterError("Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!");
     }
 
     let userToken: UserTokens | undefined;
@@ -44,11 +47,11 @@ export class RefreshTokenService {
         .findUniqueByRefreshTokenAndUserId(refresh_token, user_id as UUID);
     }
     catch (_) {
-      throw new NotFoundError('Refresh Token Mismatch! Token informed was not found for this user');
+      throw new NotFoundError("Refresh Token Mismatch! Token informed was not found for this user");
     }
 
     if (!userToken) {
-      throw new NotFoundError('Refresh Token Mismatch! Token informed was not found for this user');
+      throw new NotFoundError("Refresh Token Mismatch! Token informed was not found for this user");
     }
     
     await this.usersTokensRepository.deleteById(userToken.id);
@@ -58,7 +61,7 @@ export class RefreshTokenService {
       expiresIn: refresh_token_expires_in,
     });
 
-    const expiration_date = new Date(Date.now() + expiryDateMapper('2d')).toISOString(); // 2 days from now
+    const expiration_date = new Date(Date.now() + expiryDateMapper("2d")).toISOString(); // 2 days from now
 
     await this.usersTokensRepository.create({
       user_id: user_id as UUID,

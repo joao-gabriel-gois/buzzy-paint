@@ -1,4 +1,4 @@
-import IUsersTokensRepository from "@modules/accounts/repositories/IUsersTokensRepository.ts";
+import { IUsersTokensRepository } from "@modules/accounts/repositories/IUsersTokensRepository.ts";
 import { ICreateUserTokensDTO } from "../../DTOs/CreateUserTokensDTO.ts";
 import { UserTokens } from "../../models/UserTokens.ts";
 import { DatabaseTransactionError } from "@shared/errors/ApplicationError.ts";
@@ -13,7 +13,7 @@ export class UsersTokensRepositoryInMemory implements IUsersTokensRepository {
       
       return await new Promise((resolve, _) => setTimeout(() => resolve(userToken), 100));
     } catch (_) {
-      throw new DatabaseTransactionError('Database Transaction for creating token for this user has failed');
+      throw new DatabaseTransactionError("Database Transaction for creating token for this user has failed");
     }
   }
 
@@ -23,7 +23,7 @@ export class UsersTokensRepositoryInMemory implements IUsersTokensRepository {
 
       return await new Promise((resolve, _) => setTimeout(() => resolve(tokens.length > 0 ? tokens : undefined), 100));
     } catch (_) {
-      throw new DatabaseTransactionError('Database Transaction for finding Tokens for a certain user_id has failed.');
+      throw new DatabaseTransactionError("Database Transaction for finding Tokens for a certain user_id has failed.");
     }
   }
 
@@ -36,7 +36,7 @@ export class UsersTokensRepositoryInMemory implements IUsersTokensRepository {
       return await new Promise((resolve, _) => setTimeout(() => resolve(token), 100));
     } catch (_) {
       throw new DatabaseTransactionError(
-        'Database Transaction for finding Token by refresh_token and user_id has failed.'
+        "Database Transaction for finding Token by refresh_token and user_id has failed."
       );
     }
   }
@@ -50,7 +50,7 @@ export class UsersTokensRepositoryInMemory implements IUsersTokensRepository {
       }
     } catch (_) {
       throw new DatabaseTransactionError(
-        'Database Transaction for deleting token for this user has failed'
+        "Database Transaction for deleting token for this user has failed"
       );
     }
   }
@@ -71,7 +71,7 @@ export class UsersTokensRepositoryInMemory implements IUsersTokensRepository {
       ), 100));
     } catch (_) {
       throw new DatabaseTransactionError(
-        'Database Transaction for deleting all expired refresh tokens has failed'
+        "Database Transaction for deleting all expired refresh tokens has failed"
       );
     }
   }

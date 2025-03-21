@@ -8,4 +8,5 @@ export interface IUsersRepository {
   findByUsername: (username: string) => Promise<ManageableUser | undefined>;
   update: (user: IUpdateUserDTO) => Promise<ManageableUser>;
   delete: (id: UUID) => Promise<ManageableUser | undefined>;
+  clear?(): void; // Only for inMemory unit test based repos
 }

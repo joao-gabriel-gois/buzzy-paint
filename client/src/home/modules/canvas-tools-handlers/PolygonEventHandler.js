@@ -83,7 +83,6 @@ export class Polygoner extends ToolEventHandler {
     if (event.ctrlKey && event.key === 'z') {
       this.undoStackedLastLines.push(this.currentLine);
       if (this.previousLines.length === 0) {
-        console.log('empty now');
         return this.resetCurrentState();
       }
       this.currentLine = this.previousLines.pop();

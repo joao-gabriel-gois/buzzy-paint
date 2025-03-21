@@ -15,7 +15,7 @@ export interface IMongoConnection {
 
 const MongoConnection = (url: string): IMongoConnection => {
   if (!(user && password && url)) {
-    throw new InvalidParameterError('Not able to acces .env variables. Contact Admin Immediately!');
+    throw new InvalidParameterError("Not able to acces .env variables. Contact Admin Immediately!");
   }
   let client: MongoClient | null = null; 
   let db: Db | null = null;
@@ -24,7 +24,7 @@ const MongoConnection = (url: string): IMongoConnection => {
     if (!client) client = new MongoClient(url);
     try {
       await client.connect();
-      db = client.db('admin');
+      db = client.db("admin");
       return client;
     } catch(error) {
       throw new ApplicationError("MongoDB (getClient): Not able to get client", 500, error as Error);
@@ -34,7 +34,7 @@ const MongoConnection = (url: string): IMongoConnection => {
   const getDb = async () => {
     try {
       if (!db) await getClient();
-      return !db || !client ? null : client.db('admin');
+      return !db || !client ? null : client.db("admin");
     } catch(error) {
       throw new ApplicationError("MongoDB (getDb): Not able to get DB", 500, error as Error);
     }

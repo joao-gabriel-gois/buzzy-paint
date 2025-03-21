@@ -32,7 +32,7 @@ export class UsersRepositoryInMemory implements IUsersRepository {
       )) {
         reject(
           new DatabaseTransactionError(
-            'Database Transaction for creating user has failed'
+            "Database Transaction for creating user has failed"
           ));
       }
       this.users.push(user);
@@ -91,32 +91,37 @@ export class UsersRepositoryInMemory implements IUsersRepository {
   async update(userDTO: IUpdateUserDTO): Promise<ManageableUser> {
     const currentUser = await this.findById(userDTO.id) as User;
     if (!currentUser) 
-      throw new NotFoundError('this.usersRepository.update: User not found');
+      throw new NotFoundError("this.usersRepository.update: User not found");
   
     let hashedPassword: string;
     if (userDTO.email && userDTO.email !== currentUser.email) {
-      userDTO.email = currentUser.email;
+      currentUser.email = userDTO.email;
     }
     if (userDTO.firstName && userDTO.firstName !== currentUser.firstname) {
-      userDTO.firstName = currentUser.firstname;
+      currentUser.firstname = userDTO.firstName;
     }
     if (userDTO.lastName && userDTO.lastName !== currentUser.lastname) {
-      userDTO.lastName = currentUser.lastname;
+      currentUser.lastname = userDTO.lastName;
     }
     if (userDTO.password && !checkHash(userDTO.password, currentUser.password)) {
       hashedPassword = await hash(userDTO.password);
     }
+    if (userDTO.draws_mongo_id && userDTO.draws_mongo_id !== currentUser.draws_mongo_id) {
+      currentUser.draws_mongo_id = userDTO.draws_mongo_id;
+    }
     return await new Promise((resolve, reject) => {
       const currentUserIndex = this.users.findIndex(user => user.id === currentUser.id);
-      if (currentUserIndex === -1)
+      if (currentUserIndex === -1) {
         reject(new NotFoundError(
-          'this.usersRepository.update: Database Transaction for updating user has failed')
+          "this.usersRepository.update: Database Transaction for updating user has failed")
         );
+      }
       this.users[currentUserIndex] = {
-        ...userDTO,
+        ...currentUser,
        username: currentUser.username,
        password: hashedPassword ? hashedPassword : currentUser.password
       } as User;
+      
       setTimeout(() => {
         resolve(this.users[currentUserIndex] as ManageableUser);
       }, 100);
@@ -127,7 +132,7 @@ export class UsersRepositoryInMemory implements IUsersRepository {
   async delete(id: UUID): Promise<ManageableUser | undefined> {
     return await new Promise((resolve, reject) => {
       const currentUserIndex = this.users.findIndex(currentUser => id === currentUser.id);
-      if (currentUserIndex === -1) reject(new NotFoundError('this.usersRepository.delete: User intended to be deleted was not found'));
+      if (currentUserIndex === -1) reject(new NotFoundError("this.usersRepository.delete: User intended to be deleted was not found"));
       const currentUser = this.users[currentUserIndex];
       
       this.users = [
@@ -140,4 +145,7 @@ export class UsersRepositoryInMemory implements IUsersRepository {
     });
   };
 
+  clear(): void {
+    this.users = [];
+  }
 }

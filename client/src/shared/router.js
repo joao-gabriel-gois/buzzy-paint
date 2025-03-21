@@ -1,5 +1,4 @@
 import { objectToBase32Like } from '../utils/encodingUtils.js';
-import { objectToBase64 } from '../utils/encodingUtils.js';
 import { handleLogout, checkLogin } from './api.js';
 import { location } from './global.js';
 

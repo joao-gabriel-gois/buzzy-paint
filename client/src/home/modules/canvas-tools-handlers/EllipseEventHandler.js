@@ -9,17 +9,16 @@ import { createAndRenderAlert, createAndRenderConfirm } from '../../../shared/al
   4) testar tudo
 */
 export class Ellipser extends ToolEventHandler {
-  constructor(elements, alert = createAndRenderAlert, confirm = createAndRenderConfirm) {
+  constructor(elements, alert = createAndRenderAlert) {
     super(elements);
     super.currentStyle = {
       ellipseThickness: 1,
       ellipseOutlineColor: '#000',
       ellipseFillColor: getStyle(this.canvas).backgroundColor,
-      filled: false,
-      stroked: true,
+      ellipseFilled: false,
+      ellipseStroked: true,
     }
     this.alert = alert;
-    this.confirm = confirm;
     this.checkboxReactiveInputContainers = elements
       .checkBoxReactiveContainers
       .map(id => document.getElementById(id));
@@ -32,7 +31,8 @@ export class Ellipser extends ToolEventHandler {
   }
 
   initOptionsInputHandler() {
-    const [strokeCheck, fillCheck] = this.styleSwitcher.querySelectorAll('[type="checkbox"]');
+    const strokeCheck = this.styleSwitcher.querySelector('#ellipseStroked');
+    const fillCheck = this.styleSwitcher.querySelector('#ellipseFilled');
     const [strokeWrapper, fillWrapper] = this.checkboxReactiveInputContainers;
     
     const ellipseFillColorInput = this.styleSwitcher.querySelector('#ellipseFillColor');
@@ -47,6 +47,7 @@ export class Ellipser extends ToolEventHandler {
 
     fillCheck.addEventListener('click', (_) => {
       if (!fillCheck.checked) {
+        console.log(strokeCheck, fillCheck);
         fillWrapper.style.display = 'none';
         if (!strokeCheck.checked) strokeCheck.click();
       }
@@ -109,7 +110,7 @@ export class Ellipser extends ToolEventHandler {
     super.startRenderCall(); // clear for real time lining, overwriting with latest line state
     this.updateContextToCurrentStyle();
     
-    const { filled, stroked } = this.currentStyle;
+    const { ellipseFilled, ellipseStroked } = this.currentStyle;
     let {
       x: startX,
       y: startY,
@@ -125,13 +126,13 @@ export class Ellipser extends ToolEventHandler {
     }   
     Object.assign(this.currentEllipse, { radiusWidth, radiusHeight });
 
-    if (filled) {
+    if (ellipseFilled) {
       this.context.beginPath();
       this.context.ellipse(startX, startY, radiusWidth, radiusHeight, 0, 0, 2 * Math.PI);
       this.context.fill();
       this.context.closePath();
     }
-    if (stroked) {
+    if (ellipseStroked) {
       this.context.beginPath();
       this.context.ellipse(startX, startY, radiusWidth, radiusHeight, 0, 0, 2 * Math.PI);
       this.context.stroke();
@@ -142,7 +143,7 @@ export class Ellipser extends ToolEventHandler {
   handleOnMouseUp(event) {
     this.cursorStyle = 'default';
     super.handleOnMouseUp(event);
-    super.dispacthToolEvent(this.createEllipseEvent()); // real and final rect is saved
+    super.dispacthToolEvent(this.createEllipseEvent()); // real and final ellipse is saved
     this.currentEllipse = {};
   }
 

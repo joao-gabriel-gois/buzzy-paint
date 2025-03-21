@@ -5,8 +5,10 @@ import { BusinessLogicError, NotFoundError } from "@shared/errors/ApplicationErr
 import { drawsRepository } from "@modules/draws/repositories/mongo/drawsRepository.ts";
 import { usersRepository } from "@modules/accounts/repositories/postgres/usersRepository.ts";
 
-
-class UpdateDrawsService {
+// class is exportable only for unit tests.
+// Do not import it anywhere else to keep all
+// services as singletons.
+export class UpdateDrawsService {
   private drawsRepository: IDrawsRepository;
   private usersRepository: IUsersRepository;
 
@@ -20,13 +22,13 @@ class UpdateDrawsService {
     if (!user) {
       throw new NotFoundError("(UpdateDrawService): There is no User with this ID.");
     }
-    const mongoId = user.draws_mongo_id;
-    if (!mongoId) {
-      throw new BusinessLogicError('(UpdateDrawService): This user doesn\'t have an assigned Draw.');
+    const draws_mongo_id = user.draws_mongo_id;
+    if (!draws_mongo_id) {
+      throw new BusinessLogicError("(UpdateDrawService): This user doesn't have an assigned Draw.");
     }
     
     await this.drawsRepository.update({
-      id: mongoId,
+      id: draws_mongo_id,
       data: tabsDTOs
     });
   }

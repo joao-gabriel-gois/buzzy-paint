@@ -1,6 +1,6 @@
 import { storage as strg, sleep } from "./global.js";
 import { router as rtr} from "./router.js";
-import { createAndRenderAlert } from '../../shared/alerts.js';
+import { createAndRenderAlert } from "./alerts.js";
 import { addCSSClass } from "../utils/cssUtils.js";
 
 const BASE_URL = 'http://127.0.0.1:3333';
@@ -43,7 +43,7 @@ function BuzzyPaintAPI(dependencies = deps) {
     path = path.split('/').find(str => str !== '');
     method = method.toUpperCase();
 
-    return fetch(`${host}/${path}`, {
+    return await fetch(`${host}/${path}`, {
       method: method.toUpperCase(),
       ...options
     });
@@ -65,7 +65,6 @@ function BuzzyPaintAPI(dependencies = deps) {
       if (resp.status === 401) {
         const refreshed = await handleTokenRefresh();
         if (!refreshed) {
-          console.log('not refreshed, edge case!');
           return router('/logout');
         }
         if (attempt < retriesLimit) {
@@ -78,7 +77,7 @@ function BuzzyPaintAPI(dependencies = deps) {
       }
       else if (resp.status === 404) {
         // Render Error message
-        console.log('Draws not found for this users')
+        console.error('Draws not found for this users')
       }
       else if (resp.status === 200) {
         const { user_id, data } = await resp.json();
@@ -87,10 +86,19 @@ function BuzzyPaintAPI(dependencies = deps) {
         if (!currentTabsDataState) {
           storage.setItem(`${user_id}@${tabsDataStorageKey}`, data);
         }
-        else {
-          console.log(currentTabsDataState);
+        else if (data && data.timestamp && currentTabsDataState.timestamp) {
           const latestState = currentTabsDataState.timestamp > data.timestamp ? currentTabsDataState : data;
           storage.setItem(`${user_id}@${tabsDataStorageKey}`, latestState);
+        }
+        else {
+          return createAndRenderAlert(
+            {
+              type: 'error',
+              title: 'Something went wrong!',
+              message: 'An unexpected error happened. Server is probably unavailable.'
+            },
+            () => router('/logout')
+          );
         }
       }
       return router('/home', currentUserId);
@@ -306,7 +314,7 @@ function BuzzyPaintAPI(dependencies = deps) {
         });
 
         renderValidationErrorFromResponse(data.error);
-        console.log("ERROR: ", data.error);
+        console.error("ERROR: ", data.error);
       }
     }
     catch (error) {

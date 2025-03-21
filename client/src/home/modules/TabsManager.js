@@ -2,10 +2,10 @@ import {
   addCSSClass,
   removeCSSClass
 } from '../../utils/cssUtils.js'
-import { CanvasEventListener } from "./CanvasEventListener.js";
 import { storage as strg } from '../../shared/global.js';
 import { handleTabsDataSaving } from '../../shared/api.js';
-import { createAndRenderAlert, createAndRenderPrompt } from '../../shared/alerts.js';
+import { createAndRenderAlert, createAndRenderPrompt, createAndRenderConfirm } from '../../shared/alerts.js';
+import { CanvasEventListener } from "./CanvasEventListener.js";
 
 export class TabsManager {
   constructor(
@@ -132,13 +132,37 @@ export class TabsManager {
       else
         closeTab(e);
     });
-    canvasTabButton.addEventListener('dblclick', changeTabName);
+    canvasTabButton.addEventListener('dblclick', (event) => {
+      if (event.target.id === closeTabButton.id) return;
+      changeTabName(event);
+    });
     canvasTabButton.append(closeTabButton);
 
     return canvasTabButton;
 
     // closure event handlers
     function closeTab(event) {
+      if (this.tabs.length === 1) {
+        createAndRenderConfirm({
+          type: "warning",
+          title: "Not possible!",
+          message: "You need at least one active tab.<br>"
+            + "Do you want to clear all this tab drawings?<br>"
+            + "<br><strong> You can't undo it after saving."
+            + "<br><br><sub><i>You can click <u>no</u> now, save this"
+            + " state (with `ctrl + s`), then finally clear it.<br>"
+            + "By doing so you can recover it with `ctrl + r` after"
+            + " cleaning it.</i></sub></strong>"
+        }).then(confirmed => {
+          if (confirmed) {
+            const listener = this.tabs[0].canvasListener;
+            listener.eventQueue = [];
+            listener.undoStack = [];
+            listener.renderCurrentState();
+          }
+        });
+        return;
+      }
       const index = this.getCurrentTargetIndex(event);
       event.preventDefault();
       const lastIndex = this.tabs.length - 1;

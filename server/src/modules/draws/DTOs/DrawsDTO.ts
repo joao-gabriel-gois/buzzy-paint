@@ -1,7 +1,7 @@
 type Point = [number, number];
 
 interface IDrawCommand {
-  type: 'DRAW';
+  type: "DRAW";
   sequence: Point[];
   style: {
     drawThickness: number;
@@ -10,7 +10,7 @@ interface IDrawCommand {
 }
 
 interface ILineCommand {
-  type: 'LINE';
+  type: "LINE";
   line: {
     start: Point;
     end: Point;
@@ -22,7 +22,7 @@ interface ILineCommand {
 }
 
 interface IWriteCommand {
-  type: 'WRITE';
+  type: "WRITE";
   position: Point;
   style: {
     textColor: string;
@@ -33,14 +33,14 @@ interface IWriteCommand {
 }
 
 interface IEraseCommand {
-  type: 'ERASE';
+  type: "ERASE";
   sequence: Point[];
   eraserSize: number;
 }
 
 
 interface IRectangleCommand {
-  type: 'RECT';
+  type: "RECT";
   rect: {
     x: number,
     y: number,
@@ -57,7 +57,7 @@ interface IRectangleCommand {
 }
 
 interface IEllipseCommand {
-  type: 'ELLIPSE';
+  type: "ELLIPSE";
   ellipse: {
     x: number,
     y: number,
@@ -76,7 +76,7 @@ interface IEllipseCommand {
 type Command = IDrawCommand
   | IWriteCommand | ILineCommand | IEraseCommand
   | IRectangleCommand | IEllipseCommand;
-type EventQueue = Command[];
+type EventQueue = Omit<Command, 'type'>[];
 type UndoStack = EventQueue;
 
 export interface IDrawsDTO {
@@ -90,7 +90,28 @@ export interface ITabsDTO {
   timestamp: number;
 }
 
-export interface IDrawsMongoDocumentDTO {
+// PREVIOUS IMPL BACKUP BEFORE TESTS
+// export interface IDrawsMongoDocumentDTO {
+//   id: string;
+//   data: ITabsDTO;
+// }
+
+// NEW ONES TO BE TESTED
+export interface IOperationResult {
+  success: boolean;
+  count?: number;
+}
+
+export interface IUpdateResult extends IOperationResult {
+  modifiedCount: number;
+  matchedCount: number;
+}
+
+export interface IDeleteResult extends IOperationResult {
+  deletedCount: number;
+}
+
+export interface IDrawDocument {
   id: string;
   data: ITabsDTO;
 }

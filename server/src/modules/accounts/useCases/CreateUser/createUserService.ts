@@ -4,7 +4,8 @@ import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
 import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts";
 
 // class is exportable only for unit tests.
-// Do not import it anywhere else.
+// Do not import it anywhere else to keep all
+// services as singletons.
 export class CreateUserService {
   private usersRepository: IUsersRepository;
   constructor(usersRepository: IUsersRepository) {
@@ -14,9 +15,9 @@ export class CreateUserService {
   async execute({email, username, firstName, lastName, password }: ICreateUserDTO): Promise<ExposableUser> {
     // check if either user with same email or username already exists (business rule)
     let existentUser = await this.usersRepository.findByEmail(email);
-    if (existentUser) throw new BusinessLogicError('User with this email already exists');
+    if (existentUser) throw new BusinessLogicError("User with this email already exists");
     existentUser = await this.usersRepository.findByUsername(username);
-    if (existentUser) throw new BusinessLogicError('User with this username already exists');
+    if (existentUser) throw new BusinessLogicError("User with this username already exists");
 
     const createdUser = await this.usersRepository.create({
       email,

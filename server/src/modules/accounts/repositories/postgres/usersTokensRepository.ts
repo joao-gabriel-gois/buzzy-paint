@@ -2,7 +2,7 @@ import { DatabaseTransactionError } from "@shared/errors/ApplicationError.ts";
 import { pool } from "@shared/infra/postgres/config.ts";
 import { ICreateUserTokensDTO } from "@modules/accounts/DTOs/CreateUserTokensDTO.ts";
 import { UserTokens } from "@modules/accounts/models/UserTokens.ts";
-import IUsersTokensRepository from "@modules/accounts/repositories/IUsersTokensRepository.ts";
+import { IUsersTokensRepository } from "@modules/accounts/repositories/IUsersTokensRepository.ts";
 
 
 class UsersTokensRepository implements IUsersTokensRepository {

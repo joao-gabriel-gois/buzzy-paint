@@ -11,8 +11,8 @@ export class Rectangler extends ToolEventHandler {
       rectThickness: 1,
       rectOutlineColor: '#000',
       rectFillColor: getStyle(this.canvas).backgroundColor,
-      filled: false,
-      stroked: true,
+      rectFilled: false,
+      rectStroked: true,
     }
     this.alert = alert;
     this.confirm = confirm;
@@ -31,7 +31,8 @@ export class Rectangler extends ToolEventHandler {
   }
 
   initOptionsInputHandler() {
-    const [strokeCheck, fillCheck] = this.styleSwitcher.querySelectorAll('[type="checkbox"]');
+    const strokeCheck = this.styleSwitcher.querySelector('#rectStroked');
+    const fillCheck = this.styleSwitcher.querySelector('#rectFilled');
     const [strokeWrapper, fillWrapper] = this.checkboxReactiveInputContainers;
     
     const rectFillColorInput = this.styleSwitcher.querySelector('#rectFillColor');
@@ -108,7 +109,7 @@ export class Rectangler extends ToolEventHandler {
     super.startRenderCall(); // clear for real time lining, overwriting with latest line state
     this.updateContextToCurrentStyle();
     
-    const { filled, stroked } = this.currentStyle;
+    const { rectFilled, rectStroked } = this.currentStyle;
     let {
       x: startX,
       y: startY,
@@ -128,10 +129,10 @@ export class Rectangler extends ToolEventHandler {
       Object.assign(this.currentRect, { width, height });
     }
 
-    if (filled) {
+    if (rectFilled) {
       this.context.fillRect(startX, startY, width, height);
     }
-    if (stroked) {
+    if (rectStroked) {
       this.context.strokeRect(startX, startY, width, height);
     }
   }

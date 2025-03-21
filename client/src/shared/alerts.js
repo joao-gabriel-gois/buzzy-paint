@@ -228,7 +228,6 @@ export const createAndRenderPrompt = ({ type, title, message, checkboxTitle = nu
 
 
 function onKeyDown(e) {
-  console.log('triggered')
   if (e.key === 'Escape') {
     fadeAlertOut(e.currentTarget);
   }

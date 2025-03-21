@@ -80,6 +80,7 @@ ___
 ### Project Structure:
 
 ```
+
 ├── LICENSE
 ├── README.md
 ├── client
@@ -88,6 +89,8 @@ ___
 │       │   ├── 404.png
 │       │   ├── back.svg
 │       │   ├── bg.svg
+│       │   ├── bg_transparent.svg
+│       │   ├── ellipser.svg
 │       │   ├── eraser.svg
 │       │   ├── error.png
 │       │   ├── info.png
@@ -107,11 +110,12 @@ ___
 │       │   ├── modules
 │       │   │   ├── CanvasEventListener.js
 │       │   │   ├── canvas-tools-handlers
-│       │   │   │   ├── parent
-│       │   │   │   │   └── ToolEventHandler.js
 │       │   │   │   ├── DrawerEventHandler.js
+│       │   │   │   ├── EllipseEventHandler.js
 │       │   │   │   ├── EraserEventHandler.js
 │       │   │   │   ├── LinerEventHandler.js
+│       │   │   │   ├── parent
+│       │   │   │   │   └── ToolEventHandler.js
 │       │   │   │   ├── PolygonEventHandler.js
 │       │   │   │   ├── RectangleEventHandler.js
 │       │   │   │   ├── WritterEventHandler.js
@@ -143,11 +147,9 @@ ___
 │           ├── addJSONImportEvent.js
 │           ├── cssUtils.js
 │           ├── encodingUtils.js
-│           ├── eventUtils.js
-│           ├── exportAsImage.js
-│           ├── Exporter.js
 │           ├── fromRGBtoHex.js
-│           ├── localeUtils.js
+│           ├── getRelativeCursorPos.js
+│           ├── handleImageDownload.js
 │           └── smoothlyFadeoutElement.js
 └── server
     ├── deno.json
@@ -169,7 +171,8 @@ ___
         │   │   │   └── User.ts
         │   │   ├── repositories
         │   │   │   ├── in-memory
-        │   │   │   │   └── usersRepository.ts
+        │   │   │   │   ├── usersRepository.ts
+        │   │   │   │   └── usersTokensRepository.ts
         │   │   │   ├── IUsersRepository.ts
         │   │   │   ├── IUsersTokensRepository.ts
         │   │   │   └── postgres
@@ -178,33 +181,50 @@ ___
         │   │   └── useCases
         │   │       ├── AuthenticateUser
         │   │       │   ├── authenticateUserController.ts
-        │   │       │   └── authenticateUserService.ts
+        │   │       │   ├── authenticateUserService.ts
+        │   │       │   └── tests
+        │   │       │       └── authenticateUserService_test.ts
         │   │       ├── CreateUser
         │   │       │   ├── createUserController.ts
-        │   │       │   └── createUserService.ts
+        │   │       │   ├── createUserService.ts
+        │   │       │   └── tests
+        │   │       │       └── createUserService_test.ts
         │   │       ├── RefreshUserToken
         │   │       │   ├── refreshUserTokenController.ts
-        │   │       │   └── refreshUserTokenService.ts
+        │   │       │   ├── refreshUserTokenService.ts
+        │   │       │   └── tests
+        │   │       │       └── refreshTokenService_test.ts
         │   │       └── UpdateUser
+        │   │           ├── tests
+        │   │           │   └── updateUserService_test.ts
         │   │           ├── updateUserController.ts
         │   │           └── updateUserService.ts
         │   └── draws
         │       ├── DTOs
-        │       │   └── DrawsDTO.ts
+        │       │   ├── DrawsDTO.ts
+        │       │   └── isDrawsDTO.ts
         │       ├── repositories
         │       │   ├── IDrawsRepository.ts
         │       │   ├── in-memory
+        │       │   │   └── drawsRepository.ts
         │       │   └── mongo
         │       │       └── drawsRepository.ts
         │       ├── types.d.ts
         │       └── useCases
         │           ├── CreateDraws
         │           │   ├── createDrawsController.ts
-        │           │   └── createDrawsService.ts
+        │           │   ├── createDrawsService.ts
+        │           │   └── tests
+        │           │       └── createDrawsService_test.ts
         │           ├── GetDraws
         │           │   ├── getDrawsController.ts
-        │           │   └── getDrawsService.ts
+        │           │   ├── getDrawsService.ts
+        │           │   └── tests
+        │           │       └── getDrawsService_test.ts
+        │           ├── tabsDTOTestSample.ts
         │           └── UpdateDraws
+        │               ├── tests
+        │               │   └── updateDrawsService_test.ts
         │               ├── updateDrawsController.ts
         │               └── updateDrawsService.ts
         ├── shared
@@ -240,9 +260,10 @@ ___
         │   └── global.d.ts
         └── utils
             ├── expiryDateMapper.ts
-            └── hash.ts
+            ├── hash.ts
+            └── sleep.ts
 
-49 directories, 112 files
+57 directories, 125 files
 ```
 ___
 
@@ -251,11 +272,12 @@ ___
 **Server**:
 
 (1st milestone)
-- [x] Update Draw Types and Create Validation for them
-- [ ] Add unit tests after changes
-- [ ] Implement CI/CD, separate properly dev from prod env and deploy
+- [x] <s>Add UpdateDraw Usecase Typying and Create Validation for them</s>
+- [x] <s>Add unit tests after changes</s>
+- [ ] <b>Implement CI/CD</b>
 
 (2nd milestone)
+- [ ] Prepare first deploy after finishing both backend and frontend 1st milestones
 - [ ] Password Recovery provider (for both dev/test and prod envs)
 - [ ] Token management (review invalid tokens deletion after refreshing and frequent cleanup of the ones with expired refresh-token)
 - [ ] OAuth (google/facebook/github)
@@ -266,11 +288,11 @@ ___
 **Client**
 
 (1st milestone)
-- [x] Ellipse drawing tool (becoming circle when keeping ctrl pressed, just like Rectangle/Square current feature)
+- [x] <s>Ellipse drawing tool (becoming circle when keeping ctrl pressed, just like Rectangle/Square current feature)</s>
+- [ ] <b>Crop/Move selected areas</b>
 - [ ] Figure Out how to apply fill with collision / closed shapes detection (just like MS Classic Win98 Paint App)
 
 (2nd milestone)
-- [ ] Crop/Move slected areas
 - [ ] Recover Password Screen
 - [ ] User config screen (update details), consuming from backend apis
 

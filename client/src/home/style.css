@@ -367,12 +367,12 @@ h3 {
   width: 100%;  
 }
 
-#rectangle-options #check-settings, #ellipse-options #check-settings {
+#rectangle-options #rect-check-settings, #ellipse-options #ellipse-check-settings {
   width: 100%;  
   margin-bottom: 1em;
 }
 
-#rectangle-options #check-settings > div, #ellipse-options #check-settings > div {
+#rectangle-options #rect-check-settings > div, #ellipse-options #ellipse-check-settings > div {
   display: flex;
   align-items: center;
   flex-direction: row;

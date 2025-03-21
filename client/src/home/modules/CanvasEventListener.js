@@ -15,7 +15,6 @@ export class CanvasEventListener {
     this.zoomPreviousRate = 1;
     this.isZoomActive = false;
 
-    // Bindings
     this.onCanvasEvent = this.onCanvasEvent.bind(this);
     this.onZoom = this.onZoom.bind(this);
     this.renderCurrentState = this.renderCurrentState.bind(this);
@@ -67,7 +66,7 @@ export class CanvasEventListener {
 
     this.context.fillStyle = textColor;
     this.context.font = `${fontSize}pt ${
-      !!fontFamily ? fontFamily : 'Arial'
+      fontFamily ? fontFamily : 'Arial'
     }`;
     
     this.context.fillText(innerText, ...position);
@@ -80,11 +79,11 @@ export class CanvasEventListener {
     } = event;
     const { x, y, width, height } = rect;
 
-    if (style.filled) {
-      this.context.fillStyle = style.fillColor;
+    if (style.rectFilled) {
+      this.context.fillStyle = style.rectFillColor;
       this.context.fillRect(x, y, width, height);
     }
-    if (style.stroked) {
+    if (style.rectStroked) {
       this.context.strokeStyle = style.rectOutlineColor;
       this.context.lineWidth = style.rectThickness;
       this.context.strokeRect(x, y, width, height);
@@ -98,13 +97,13 @@ export class CanvasEventListener {
     } = event;
     const { x, y, radiusWidth, radiusHeight } = ellipse;
 
-    if (style.filled) {
+    if (style.ellipseFilled) {
       this.context.fillStyle = style.ellipseFillColor;
       this.context.beginPath();
       this.context.ellipse(x, y, radiusWidth, radiusHeight, 0, 0, 2 * Math.PI);
       this.context.fill();
     }
-    if (style.stroked) {
+    if (style.ellipseStroked) {
       this.context.strokeStyle = style.ellipseOutlineColor;
       this.context.lineWidth = style.ellipseThickness;
       this.context.beginPath();
@@ -215,11 +214,9 @@ export class CanvasEventListener {
 
   onKeyDown(event) {
     if (event.ctrlKey && event.key === 'z') {
-      console.log('undo')
       this.undo();
     }
     else if (event.ctrlKey && event.key === 'y') {
-      console.log('redo')
       this.redo();
     }
   } 

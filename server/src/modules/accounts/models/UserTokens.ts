@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'npm:uuid';
+import { v4 as uuid } from "npm:uuid";
 import { ICreateUserTokensDTO } from "@modules/accounts/DTOs/CreateUserTokensDTO.ts";
 
 

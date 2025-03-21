@@ -1,12 +1,12 @@
 import { checkHash } from "@utils/hash.ts";
-import { sign } from 'npm:jsonwebtoken';
+import { sign } from "npm:jsonwebtoken";
 import { InvalidParameterError, BadRequestError, BusinessLogicError } from "@shared/errors/ApplicationError.ts";
 import { usersRepository } from "@modules/accounts/repositories/postgres/usersRepository.ts";
 import auth from "@config/auth.ts";
 import { usersTokensRepository } from "@modules/accounts/repositories/postgres/usersTokensRepository.ts";
 import { expiryDateMapper, pgsqlDateAdapter } from "@utils/expiryDateMapper.ts";
 import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts";
-import IUsersTokensRepository from "@modules/accounts/repositories/IUsersTokensRepository.ts";
+import { IUsersTokensRepository } from "@modules/accounts/repositories/IUsersTokensRepository.ts";
 
 export interface IAuthRequest {
   email: string;
@@ -24,8 +24,10 @@ export interface IAuthResponse {
   refresh_token: string;
 }
 
+
 // class is exportable only for unit tests.
-// Do not import it anywhere else.
+// Do not import it anywhere else to keep all
+// services as singletons.
 export class AuthenticateUserService {
   constructor(
     private usersTokensRepository: IUsersTokensRepository,
@@ -35,7 +37,7 @@ export class AuthenticateUserService {
   async execute({ email, password }: IAuthRequest): Promise<IAuthResponse> {
     const user = await this.usersRepository.findByEmail(email);
     if (!user || !user!.id) {
-      throw new BadRequestError('Incorrect Email or password!');
+      throw new BadRequestError("Incorrect Email or password!");
     }
 
     const  {
@@ -46,12 +48,12 @@ export class AuthenticateUserService {
     } = auth;
 
     if (!(token_secret || token_expires_in || refresh_token_secret || refresh_token_expires_in)) {
-      throw new InvalidParameterError('Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!');
+      throw new InvalidParameterError("Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!");
     }
 
     const passwordMatch = await checkHash(password, user.password!); // Password is manageable to get deleteable, but it will be surely returned
     if (!passwordMatch) {
-      throw new BusinessLogicError('Incorrect Email or password!');
+      throw new BusinessLogicError("Incorrect Email or password!");
     }
 
     const token = sign({}, token_secret , {

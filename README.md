@@ -251,9 +251,7 @@ ___
 **Server**:
 
 (1st milestone)
-- [ ] Update Draw Types and Create Validation for them
-- [ ] Totally remove MongoDB and change to Postgres JSONB
-  - [ ] Keep a separated Draws Entity to be able to create shared drawing workspace (websockets) for more than one user in future (one or many users for zero or many drawings) 
+- [x] Update Draw Types and Create Validation for them
 - [ ] Add unit tests after changes
 - [ ] Implement CI/CD, separate properly dev from prod env and deploy
 
@@ -262,6 +260,8 @@ ___
 - [ ] Token management (review invalid tokens deletion after refreshing and frequent cleanup of the ones with expired refresh-token)
 - [ ] OAuth (google/facebook/github)
 - [ ] Set proper routes, controllers and services for future User config screen
+- [ ] Totally remove MongoDB and change to Postgres JSONB
+  - [ ] Keep a separated Draws Entity to be able to create shared drawing workspace (websockets) for more than one user in future (one or many users for zero or many drawings) 
 
 **Client**
 

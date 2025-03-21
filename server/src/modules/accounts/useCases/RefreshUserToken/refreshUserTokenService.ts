@@ -4,23 +4,24 @@ import { InvalidParameterError, NotFoundError } from "@shared/errors/Application
 import IUsersTokensRepository from "@modules/accounts/repositories/IUsersTokensRepository.ts";
 import { usersTokensRepository } from "@modules/accounts/repositories/postgres/usersTokensRepository.ts";
 import { expiryDateMapper } from "@utils/expiryDateMapper.ts";
+import { UserTokens } from "@modules/accounts/models/UserTokens.ts";
 
-interface IPayload {
+interface IRefreshAuthRequest {
   sub: string;
   email: string;
 }
 
-interface ITokenResponse {
+interface IRefreshAuthResponse {
   token: string;
   refresh_token: string;
 }
 
-export default class RefreshTokenService {
+export class RefreshTokenService {
   constructor(
     private usersTokensRepository: IUsersTokensRepository,
   ) {};
   
-  async execute(refresh_token: string): Promise<ITokenResponse> {
+  async execute(refresh_token: string): Promise<IRefreshAuthResponse> {
     const {
       refresh_token_secret,
       refresh_token_expires_in,
@@ -31,15 +32,25 @@ export default class RefreshTokenService {
     if (!(token_secret || token_expires_in || refresh_token_secret || refresh_token_expires_in)) {
       throw new InvalidParameterError('Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!');
     }
-    const { email, sub: user_id } = verify(refresh_token, refresh_token_secret) as IPayload;
 
-    const userToken = await this.usersTokensRepository
-      .findUniqueByRefreshTokenAndUserId(refresh_token, user_id as UUID);
-
-    if (!userToken) {
-      throw new NotFoundError('Refresh Token Mismatch! Token informed was not found for this user')
+    let userToken: UserTokens | undefined;
+    let email: string;
+    let user_id: string;
+    try {
+      const verifyResponse = verify(refresh_token, refresh_token_secret) as IRefreshAuthRequest;
+      email = verifyResponse.email;
+      user_id = verifyResponse.sub;
+      userToken = await this.usersTokensRepository
+        .findUniqueByRefreshTokenAndUserId(refresh_token, user_id as UUID);
+    }
+    catch (_) {
+      throw new NotFoundError('Refresh Token Mismatch! Token informed was not found for this user');
     }
 
+    if (!userToken) {
+      throw new NotFoundError('Refresh Token Mismatch! Token informed was not found for this user');
+    }
+    
     await this.usersTokensRepository.deleteById(userToken.id);
 
     const new_refresh_token = sign({ email }, refresh_token_secret, {
@@ -62,7 +73,7 @@ export default class RefreshTokenService {
 
     return {
       token: newToken,
-      refresh_token,
+      refresh_token: new_refresh_token,
     };
   }
 }

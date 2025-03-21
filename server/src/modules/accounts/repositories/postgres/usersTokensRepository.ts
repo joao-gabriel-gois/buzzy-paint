@@ -6,7 +6,6 @@ import IUsersTokensRepository from "@modules/accounts/repositories/IUsersTokensR
 
 
 class UsersTokensRepository implements IUsersTokensRepository {
-
   async create(createUserDTO: ICreateUserTokensDTO): Promise<UserTokens> {
     const {
       id,

@@ -8,12 +8,12 @@ import { expiryDateMapper, pgsqlDateAdapter } from "@utils/expiryDateMapper.ts";
 import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts";
 import IUsersTokensRepository from "@modules/accounts/repositories/IUsersTokensRepository.ts";
 
-interface IRequest {
+export interface IAuthRequest {
   email: string;
   password: string;
 }
 
-interface IResponse {
+export interface IAuthResponse {
   user: {
     firstName: string;
     lastName: string;
@@ -24,15 +24,16 @@ interface IResponse {
   refresh_token: string;
 }
 
-class AuthenticateUserService {
+// class is exportable only for unit tests.
+// Do not import it anywhere else.
+export class AuthenticateUserService {
   constructor(
     private usersTokensRepository: IUsersTokensRepository,
     private usersRepository: IUsersRepository,
   ) {};
 
-  async execute({ email, password }: IRequest): Promise<IResponse> {
+  async execute({ email, password }: IAuthRequest): Promise<IAuthResponse> {
     const user = await this.usersRepository.findByEmail(email);
-
     if (!user || !user!.id) {
       throw new BadRequestError('Incorrect Email or password!');
     }
@@ -49,7 +50,6 @@ class AuthenticateUserService {
     }
 
     const passwordMatch = await checkHash(password, user.password!); // Password is manageable to get deleteable, but it will be surely returned
-
     if (!passwordMatch) {
       throw new BusinessLogicError('Incorrect Email or password!');
     }

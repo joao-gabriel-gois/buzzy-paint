@@ -1,9 +1,3 @@
-import { Router } from 'npm:express';
-// import { updateUserController } from "@modules/accounts/useCases/UpdateUser/updateUserController.ts"
-import { createUserController } from "@modules/accounts/useCases/CreateUser/createUserController.ts";
-// import { ensureAuthentication } from "@shared/infra/http/middlewares/ensureAuthentication.ts";
-
-const userRoutes = Router();
 /*
   WARNING:
   Despite the fact that this was exposed by a route in the previous,
@@ -15,7 +9,3 @@ const userRoutes = Router();
   the rout that calls it until everything regarding it is not done yet
   and I've also added this comment in all it's related implementations
 */
-// userRoutes.put('/users', ensureAuthentication, updateUserController);
-userRoutes.post('/users', createUserController);
-
-export { userRoutes };

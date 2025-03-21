@@ -26,7 +26,7 @@ class UserRepository implements IUsersRepository {
       result = await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new DatabaseTransactionError('Database Transaction for creating user has failed');
+      const dbError = new DatabaseTransactionError('usersRepository.create: Database Transaction for creating user has failed');
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError}) Query has failed ⮷\n`,
@@ -47,7 +47,7 @@ class UserRepository implements IUsersRepository {
       result = await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new DatabaseTransactionError('Database Transaction for finding user by `id` has failed');
+      const dbError = new DatabaseTransactionError('usersRepository.findById: Database Transaction for finding user by `id` has failed');
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError}) Query has failed ⮷\n`,
@@ -68,7 +68,7 @@ class UserRepository implements IUsersRepository {
       result = await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new DatabaseTransactionError('Database Transaction for finding user by `email` has failed');
+      const dbError = new DatabaseTransactionError('usersRepository.findByEmail: Database Transaction for finding user by `email` has failed');
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError.name}) Query has failed ⮷\n`,
@@ -89,7 +89,7 @@ class UserRepository implements IUsersRepository {
       result = await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new DatabaseTransactionError('Database Transaction for finding user by `username` has failed');
+      const dbError = new DatabaseTransactionError('usersRepository.findByUsername: Database Transaction for finding user by `username` has failed');
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError.name}) Query has failed ⮷\n`,
@@ -104,7 +104,7 @@ class UserRepository implements IUsersRepository {
 
   async update(user: IUpdateUserDTO) {
     const currentUser = await this.findById(user.id);
-    if (!currentUser) throw new NotFoundError('User not found');
+    if (!currentUser) throw new NotFoundError('usersRepository.update: User not found');
   
     const updates: string[] = [];
     const values: (UUID | string | number)[] = [];
@@ -151,7 +151,7 @@ class UserRepository implements IUsersRepository {
       result = await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new NotFoundError('User intended to be updated was not found');
+      const dbError = new NotFoundError('usersRepository.update: Database Transaction for updating user has failed');
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError.name}) Query has failed ⮷\n`,
@@ -173,7 +173,7 @@ class UserRepository implements IUsersRepository {
       result = await pool.query(query, values);
     }
     catch(error) {
-      const dbError = new NotFoundError('User intended to be deleted was not found');
+      const dbError = new NotFoundError('usersRepository.delete: User intended to be deleted was not found');
       console.error(
         `[${new Date().toISOString()}]:`,
         `(${dbError.name}) Query has failed ⮷\n`,

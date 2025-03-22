@@ -11,8 +11,8 @@ import { Eraser } from './modules/canvas-tools-handlers/EraserEventHandler.js';
 import { Rectangler } from './modules/canvas-tools-handlers/RectangleEventHandler.js';
 import { getDataFromURLHash } from "../shared/global.js";
 import { addJSONImportEvent } from "../utils/addJSONImportEvent.js";
-import { Exporter } from "../utils/Exporter.js";
-import { exportAsImage } from "../utils/exportAsImage.js";
+import { handleImageDownload } from "../utils/handleImageDownload.js";
+import { Ellipser } from "./modules/canvas-tools-handlers/EllipseEventHandler.js";
 
 (() => {
   document.addEventListener('DOMContentLoaded', () => {
@@ -21,7 +21,6 @@ import { exportAsImage } from "../utils/exportAsImage.js";
       console.error('Something went hugely wrong!');
       return router('/logout');
     }
-
 
     const toolbarClickListener = new ToolbarClickListener(
       '#tools ul',
@@ -61,37 +60,47 @@ import { exportAsImage } from "../utils/exportAsImage.js";
     const rectangler = new Rectangler({
       canvas: '#canvas-wrapper canvas',
       styleSwitcher: '#rectangle-options',
-      checkBoxReactiveContainers: ['stroke', 'fill']
+      checkBoxReactiveContainers: ['rectStroke', 'rectFill']
+    });
+
+    const ellipser = new Ellipser({
+      canvas: '#canvas-wrapper canvas',
+      styleSwitcher: '#ellipse-options',
+      checkBoxReactiveContainers: ['ellipseStroke', 'ellipseFill']
     });
 
     toolbarClickListener.subscribe(drawer);
     toolbarClickListener.subscribe(liner);
     toolbarClickListener.subscribe(polygoner);
     toolbarClickListener.subscribe(rectangler);
+    toolbarClickListener.subscribe(ellipser);
     toolbarClickListener.subscribe(eraser);
     toolbarClickListener.subscribe(writter);
     toolbarClickListener.subscribe(zoomer);
-
     toolbarClickListener.init();
-
-    // need to change exporter approach, it is mandatory to be instantiated before tabs manager init!
-    const exporter = new Exporter();
     
     const tabsManager =  new TabsManager(
       '#canvas-wrapper',
       'canvas',
-      '#tab-buttons-wrapper',
+      '#tabs-wrapper',
+      '#add-tab',
       `${user_id}@tabsData`
     );
     
     tabsManager.init();
     
-    const [ saveItem, importItem, exportItem, downloadItem] = document.querySelectorAll('header nav ul li');
-    
+    const [
+      saveItem,
+      importItem,
+      exportItem,
+      downloadItem
+    ] = document.querySelectorAll('header nav ul li');
+    const fileInput = importItem.firstElementChild;
+
     saveItem.addEventListener('click', (e) => tabsManager.saveTabsData());
-    addJSONImportEvent(importItem.firstElementChild); // file input must be passed as argument
-    exportItem.addEventListener('click', (e) => exporter.start()); 
-    downloadItem.addEventListener('click', (e) => exportAsImage()); 
+    addJSONImportEvent(fileInput); 
+    exportItem.addEventListener('click', (e) => tabsManager.onExportCall()); 
+    downloadItem.addEventListener('click', (e) => handleImageDownload()); 
     
     const logoutButton = document.querySelector('header nav button');
     logoutButton.addEventListener('click', (e) => {
@@ -125,8 +134,8 @@ function startInputOptionsReactiveBackground() {
   bgColorReactionForActiveItens();
 
   function bgColorReactionForActiveItens() {
-    const aside = document.getElementById('options');
-    const listItems = aside.querySelectorAll('ul > li');
+    const ul = document.getElementById('options').firstElementChild;
+    const listItems = ul.querySelectorAll('li');
     let hasActiveTab = false;
   
     listItems.forEach((li) => {
@@ -136,9 +145,16 @@ function startInputOptionsReactiveBackground() {
     });
   
     if (hasActiveTab) {
-      aside.style.backgroundColor = 'rgba(71, 61, 139, 0.25)'; 
+      ul.style.backgroundColor = '#A37CD189'; 
+      ul.style.borderWidth = '5px 3px 1px 1px';
+      ul.style.borderColor = "#352B71";
+      ul.style.borderStyle = "solid";
+      // ul.style.borderBottom = '4px #201946 solid';
+      // ul.style.borderLeft = '3px #201946 solid';
+      ul.style.borderRadius = '5px';
     } else {
-      aside.style.backgroundColor = 'transparent';
+      ul.style.backgroundColor = 'transparent';
+      ul.style.border = 'none';
     }
   }
 }

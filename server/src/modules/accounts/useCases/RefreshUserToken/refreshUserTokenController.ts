@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'npm:@types/express';
+import { Request, Response, NextFunction } from "npm:@types/express";
 
 import auth from "@config/auth.ts";
 import { expiryDateMapper } from "@utils/expiryDateMapper.ts";
@@ -11,13 +11,13 @@ export const refreshUserTokenController = async (request: Request, response: Res
   } = request.cookies;
 
   if (!refresh_token) {
-    return next(new BadRequestError('Refresh token doesn\'t exists for this user. User will need to login again!'));
+    return next(new BadRequestError("Refresh token doesn't exists for this user. User will need to login again!"));
   }
-  // refresh_token = refresh_token.split('=')[1].split(';')[0];
+  // refresh_token = refresh_token.split("=")[1].split(";")[0];
   
   const { refresh_token_expires_in } = auth;
   if (!refresh_token_expires_in) {
-    throw new InvalidParameterError('Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!');
+    throw new InvalidParameterError("Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!");
   }
   let refreshedSessionInfo;
   try {
@@ -27,22 +27,22 @@ export const refreshUserTokenController = async (request: Request, response: Res
     if (error instanceof ApplicationError) {
       return next(error);
     }
-    return next(new ApplicationError('Refresh User Token: Unknown error!', 500, error as Error));
+    return next(new ApplicationError("Refresh User Token: Unknown error!", 500, error as Error));
   }
    
   if (!refreshedSessionInfo) {
-    throw new NotFoundError('Session for this user was not found, after token refresh, aborting!');
+    throw new NotFoundError("Session for this user was not found, after token refresh, aborting!");
   }
   
   const { refresh_token: newRefreshToken, token } = refreshedSessionInfo;
   
   const maxAge = expiryDateMapper(refresh_token_expires_in!);
-  response.cookie('refresh_token', newRefreshToken, {
+  response.cookie("refresh_token", newRefreshToken, {
     httpOnly: true,  // prevents JS access
     maxAge,
     // disabling bellow options for testing
     // secure: true,    // only HTTPS, turn it on in prod
-    // sameSite: 'strict', // avoid CSRF
+    // sameSite: "strict", // avoid CSRF
   });
 
   return response.json({

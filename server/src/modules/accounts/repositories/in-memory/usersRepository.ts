@@ -5,112 +5,147 @@ import { IUpdateUserDTO } from "@modules/accounts/DTOs/UpdateUserDTO.ts";
 import { User } from "@modules/accounts/models/User.ts";
 import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts"
 
-let users: User[] = [];
 
-// Since in-memory impl is actualy sync and we need to simulate async
-//   in order to correctly implement IUsersRepository naturally there
-//   is a difference in the possible returning errors
-// So future unit tests will not be 100% loyal to the real async
-//   scenario in case it mocks from the class bellow
+export class UsersRepositoryInMemory implements IUsersRepository {
+  private users: User[] = [];
 
-class UsersRepositoryInMemory implements IUsersRepository {
-  async createUser(userDTO: ICreateUserDTO): Promise<ManageableUser> {
-    userDTO.password = await hash(userDTO.password); 
+  async create(userDTO: ICreateUserDTO): Promise<ManageableUser> {
+    // DON'T HASH THE DTO PASSWORD DIRECTLY, JS RECEIVE OBJS ARGS
+    // BY REFERENCE AND THE UNIT TESTS WERE FAILING DUE TO THAT FACT!
+    const hashedPassword = await hash(userDTO.password);
+    const user = new User(userDTO);
+    user.password = hashedPassword;
+
+    const {
+      id,
+      username,
+      email,
+      password,
+      firstname: firstName,
+      lastname: lastName,
+    } = user;
+
     return await new Promise((resolve, reject) => {
-      const user = new User(userDTO);
       if (!(
-        user.email && user.firstname
-          && user.lastname && user.password
-      )) reject(
-        new DatabaseTransactionError(
-          'Query for creating user has failed!'
-        ));
+        id && username && email 
+          && password && firstName && lastName  
+      )) {
+        reject(
+          new DatabaseTransactionError(
+            "Database Transaction for creating user has failed"
+          ));
+      }
+      this.users.push(user);
+      setTimeout(() => {
+        resolve(user as ManageableUser);        
+      }, 100);
+    });
+  };
+
+  async findById(id: UUID): Promise<ManageableUser | undefined>{
+    return await new Promise((resolve, reject) => {
+      try {
+        const user = this.users.find(user => user.id === id) as ManageableUser;
+        // delete user?.password;
+        setTimeout(() => {
+          resolve(user);
+        }, 100);
+      }
+      catch(error) {
+        reject(error);
+      }
+    });
+  }
+
+  async findByEmail(email: string): Promise<ManageableUser | undefined>{
+    return await new Promise((resolve, reject) => {
+      try {
+        const user = this.users.find(user => user.email === email) as ManageableUser;
+        // delete user?.password;
+        setTimeout(() => {
+          resolve(user);
+        }, 100);
+      }
+      catch(error) {
+        reject(error);
+      }
+    });
+  }
+
+  async findByUsername(username: string): Promise<ManageableUser | undefined>{
+    return await new Promise((resolve, reject) => {
+      try {
+        const user = this.users.find(user => user.username === username) as ManageableUser;
+        // delete user?.password;
+        setTimeout(() => {
+          resolve(user);
+        }, 100);
+
+      }
+      catch(error) {
+        reject(error);
+      }
+    });
+  };
+
+  async update(userDTO: IUpdateUserDTO): Promise<ManageableUser> {
+    const currentUser = await this.findById(userDTO.id) as User;
+    if (!currentUser) 
+      throw new NotFoundError("this.usersRepository.update: User not found");
+  
+    let hashedPassword: string;
+    if (userDTO.email && userDTO.email !== currentUser.email) {
+      currentUser.email = userDTO.email;
+    }
+    if (userDTO.firstName && userDTO.firstName !== currentUser.firstname) {
+      currentUser.firstname = userDTO.firstName;
+    }
+    if (userDTO.lastName && userDTO.lastName !== currentUser.lastname) {
+      currentUser.lastname = userDTO.lastName;
+    }
+    if (userDTO.password && !checkHash(userDTO.password, currentUser.password)) {
+      hashedPassword = await hash(userDTO.password);
+    }
+    if (userDTO.draws_mongo_id && userDTO.draws_mongo_id !== currentUser.draws_mongo_id) {
+      currentUser.draws_mongo_id = userDTO.draws_mongo_id;
+    }
+    return await new Promise((resolve, reject) => {
+      const currentUserIndex = this.users.findIndex(user => user.id === currentUser.id);
+      if (currentUserIndex === -1) {
+        reject(new NotFoundError(
+          "this.usersRepository.update: Database Transaction for updating user has failed")
+        );
+      }
+      this.users[currentUserIndex] = {
+        ...currentUser,
+       username: currentUser.username,
+       password: hashedPassword ? hashedPassword : currentUser.password
+      } as User;
       
-      users.push(user);
-      resolve(user as ManageableUser);
-    });
-  };
-
-  async getUserById(id: UUID): Promise<ManageableUser | undefined>{
-    return await new Promise((resolve, reject) => {
-      try {
-        const user = users.find(user => user.id === id) as ManageableUser;
-        // delete user?.password;
-        resolve(user);
-      }
-      catch(error) {
-        reject(error);
-      }
-    });
-  }
-
-  async getUserByEmail(email: string): Promise<ManageableUser | undefined>{
-    return await new Promise((resolve, reject) => {
-      try {
-        const user = users.find(user => user.email === email) as ManageableUser;
-        // delete user?.password;
-        resolve(user);
-      }
-      catch(error) {
-        reject(error);
-      }
-    });
-  }
-
-  async getUserByUsername(username: string): Promise<ManageableUser | undefined>{
-    return await new Promise((resolve, reject) => {
-      try {
-        const user = users.find(user => user.username === username) as ManageableUser;
-        // delete user?.password;
-        resolve(user);
-      }
-      catch(error) {
-        reject(error);
-      }
-    });
-  };
-
-  async updateUser(user: IUpdateUserDTO): Promise<ManageableUser> {
-    const currentUser = await this.getUserById(user.id) as User;
-    if (!currentUser) throw new NotFoundError('User not found');
-
-    if (user.email && user.email !== currentUser.email) {
-      user.email = currentUser.email;
-    }
-    if (user.firstName && user.firstName !== currentUser.firstname) {
-      user.firstName = currentUser.firstname;
-    }
-    if (user.lastName && user.lastName !== currentUser.lastname) {
-      user.lastName = currentUser.lastname;
-    }
-    if (user.password && !checkHash(currentUser.password, user.password)) {
-      user.password = await hash(user.password);
-    }
-
-    return await new Promise((resolve, reject) => {
-      const currentUserIndex = users.findIndex(user => user.id === currentUser.id);
-      if (currentUserIndex === -1) reject(new NotFoundError('User not found'));
-      users[currentUserIndex] = {...user, username: currentUser.username } as User;
-      resolve(users[currentUserIndex] as ManageableUser);
+      setTimeout(() => {
+        resolve(this.users[currentUserIndex] as ManageableUser);
+      }, 100);
     });
     
   };
 
-  async deleteUser(id: UUID): Promise<ManageableUser> {
+  async delete(id: UUID): Promise<ManageableUser | undefined> {
     return await new Promise((resolve, reject) => {
-      const currentUserIndex = users.findIndex(currentUser => id === currentUser.id);
-      if (currentUserIndex === -1) reject(new NotFoundError('User not found'));
-      const currentUser = users[currentUserIndex];
+      const currentUserIndex = this.users.findIndex(currentUser => id === currentUser.id);
+      if (currentUserIndex === -1) reject(new NotFoundError("this.usersRepository.delete: User intended to be deleted was not found"));
+      const currentUser = this.users[currentUserIndex];
       
-      users = [
-        ...users.slice(0, currentUserIndex),
-        ...users.slice(currentUserIndex + 1, users.length)
+      this.users = [
+        ...this.users.slice(0, currentUserIndex),
+        ...this.users.slice(currentUserIndex + 1, this.users.length)
       ];
-
-      resolve(currentUser as ManageableUser);
+      setTimeout(() => {
+        resolve(currentUser as ManageableUser);
+      }, 100);
     });
   };
 
+  clear(): void {
+    this.users = [];
+  }
 }
-
-export const usersRepository = new UsersRepositoryInMemory();

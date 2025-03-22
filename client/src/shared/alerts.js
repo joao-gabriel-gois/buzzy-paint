@@ -50,6 +50,7 @@ export const createAndRenderAlert = ({ type, title, message }, closeCallback) =>
   for (const button of buttons) {
     button.addEventListener('click', (_) => fadeAlertOut(wrapper, closeCallback));
   }
+  wrapper.addEventListener('keydown', onKeyDown);
 
   if (renderedAlerts === 0) {
     const siblings = [...document.body.children]
@@ -63,18 +64,15 @@ export const createAndRenderAlert = ({ type, title, message }, closeCallback) =>
   }
 
   document.body.appendChild(wrapper);
+  buttons[1].focus();
   renderedAlerts++;
 }
 
-// Confirm:
-// example:
-  // setTimeout(() => {
-  //   createAndRenderConfirm({
-  //     type: 'info',
-  //     title: 'Do you accept?',
-  //     message: 'Details bla bla bla, accept!?'
-  //   }).then(console.log);
-  // }, 1000);
+// createAndRenderConfirm({
+//   type: 'info',
+//   title: 'Do you accept?',
+//   message: 'Details bla bla bla, accept!?'
+// }).then(console.log);
 export const createAndRenderConfirm = ({ type, title, message }) => {
   type = type.toLowerCase();
   if (!ALERT_TYPES.hasOwnProperty(type)) {
@@ -107,16 +105,20 @@ export const createAndRenderConfirm = ({ type, title, message }) => {
   wrapper.innerHTML = alertContent;
   const closeButton = wrapper.querySelector('#close');
   closeButton.addEventListener('click', (_) => fadeAlertOut(wrapper));
-  
-  const siblings = [...document.body.children]
-    .filter(el => el.id !== 'alert-wrapper');
-  siblings.forEach(sib => sib.classList.add('content-bellow'));
-  ;
-  document.body.appendChild(wrapper);
+  wrapper.addEventListener('keydown', onKeyDown);
 
+  if (renderedAlerts === 0) {
+    const siblings = [...document.body.children]
+      .filter(el => el.id !== 'alert-wrapper');
+    siblings.forEach(sib => sib.classList.add('content-bellow'));
+  }
+
+  document.body.appendChild(wrapper);
+  const [ confirm, deny ] = [...wrapper.querySelector('#buttons').children];
+  confirm.focus();
+  renderedAlerts++;
 
   return new Promise((resolve, reject) => {
-    const [ confirm, deny ] = [...wrapper.querySelector('#buttons').children];
     try {
       confirm.addEventListener('click', () => {
         fadeAlertOut(wrapper);
@@ -133,13 +135,11 @@ export const createAndRenderConfirm = ({ type, title, message }) => {
   });
 }
 
-// setTimeout(() => {
-//   createAndRenderPrompt({
-//     type: 'info',
-//     title: 'Do you accept?',
-//     message: 'Details bla bla bla, please fill it and confirm:'
-//   }).then(console.log);
-// }, 1000);
+// createAndRenderPrompt({
+//   type: 'info',
+//   title: 'Do you accept?',
+//   message: 'Details bla bla bla, please fill it and confirm:'
+// }).then(console.log);
 export const createAndRenderPrompt = ({ type, title, message, checkboxTitle = null }) => { // confirm the string if user sent it, otherwise send false;
   type = type.toLowerCase();
   if (!ALERT_TYPES.hasOwnProperty(type)) {
@@ -170,7 +170,6 @@ export const createAndRenderPrompt = ({ type, title, message, checkboxTitle = nu
             </div>`
           : ''
         }
-      </div>
         <div id="buttons">
           <button>Confirm</button>
           <button>Cancel</button>
@@ -180,13 +179,15 @@ export const createAndRenderPrompt = ({ type, title, message, checkboxTitle = nu
   `;
 
   wrapper.innerHTML = alertContent;
-  console.log(wrapper);
   const closeButton = wrapper.querySelector('#close');
   closeButton.addEventListener('click', (_) => fadeAlertOut(wrapper));
+  wrapper.addEventListener('keydown', onKeyDown);
   
-  const siblings = [...document.body.children]
-    .filter(el => el.id !== 'alert-wrapper');
-  siblings.forEach(sib => sib.classList.add('content-bellow'));
+  if (renderedAlerts === 0) {
+    const siblings = [...document.body.children]
+      .filter(el => el.id !== 'alert-wrapper');
+    siblings.forEach(sib => sib.classList.add('content-bellow'));
+  }
   
   const [ confirm, cancel ] = [...wrapper.querySelector('#buttons').children];
   confirm.setAttribute('disabled', true);
@@ -197,8 +198,10 @@ export const createAndRenderPrompt = ({ type, title, message, checkboxTitle = nu
     if (input.value.length > 0) confirm.removeAttribute('disabled');
     else confirm.setAttribute('disabled', true);
   });
-  document.body.appendChild(wrapper);
 
+  document.body.appendChild(wrapper);
+  input.focus();
+  renderedAlerts++;
 
   return new Promise((resolve, reject) => {
     confirm.addEventListener('click', () => {
@@ -221,6 +224,13 @@ export const createAndRenderPrompt = ({ type, title, message, checkboxTitle = nu
       return resolve(false)
     });
   });
+}
+
+
+function onKeyDown(e) {
+  if (e.key === 'Escape') {
+    fadeAlertOut(e.currentTarget);
+  }
 }
 
 function fadeAlertOut(wrapper, confirmationCallback, siblings = [...document.body.children]) {

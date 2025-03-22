@@ -1,11 +1,14 @@
 import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts";
 import { IDrawsRepository } from "@modules/draws/repositories/IDrawsRepository.ts";
-import { BadRequestError, BusinessLogicError, NotFoundError } from "@shared/errors/ApplicationError.ts";
+import { NotFoundError } from "@shared/errors/ApplicationError.ts";
 import { drawsRepository } from "@modules/draws/repositories/mongo/drawsRepository.ts";
 import { usersRepository } from "@modules/accounts/repositories/postgres/usersRepository.ts";
+import { ITabsDTO } from "@modules/draws/DTOs/DrawsDTO.ts";
 
-
-class GetDrawsService {
+// class is exportable only for unit tests.
+// Do not import it anywhere else to keep all
+// services as singletons.
+export class GetDrawsService {
   private drawsRepository: IDrawsRepository;
   private usersRepository: IUsersRepository;
 
@@ -14,10 +17,10 @@ class GetDrawsService {
     this.usersRepository = usersRepository;
   }
 
-  async execute(user_id: UUID) {
+  async execute(user_id: UUID): Promise<ITabsDTO | null> {
     const user = await this.usersRepository.findById(user_id);
     if (!user) {
-      throw new BadRequestError("(GetDrawService): There is no User with this ID.");
+      throw new NotFoundError("(GetDrawService): There is no User with this ID.");
     }
     if (!user.draws_mongo_id) {
       // now draw assigned yet, clean state on client side once data is null
@@ -25,7 +28,7 @@ class GetDrawsService {
     }
     const document = await this.drawsRepository.findById(user.draws_mongo_id);
     if (!document) {
-      throw new NotFoundError('(GetDrawService)[MongoDB]: Failed to get a Mongo DB Document for user\'s draws');
+      throw new NotFoundError("(GetDrawService): Failed to get a Mongo DB Document for user's draws");
     }
     return document.data;
   }

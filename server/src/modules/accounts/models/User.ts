@@ -1,5 +1,5 @@
 import { ICreateUserDTO } from "../DTOs/CreateUserDTO.ts";
-import { v4 as uuid } from 'npm:uuid';
+import { v4 as uuid } from "npm:uuid";
 
 export class User {
   public id: UUID;

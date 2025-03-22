@@ -1,9 +1,6 @@
 import { base64ToObject, objectToBase64, base32LikeToObject} from '../utils/encodingUtils.js';
 import { createAndRenderAlert } from '../shared/alerts.js';
-// const { localStorage, navigator, screen } = window;
-// if (
-//   !(localStorage && location && navigator && screen)
-// ) throw new Error("Browser not supported!");
+
 const { localStorage, location, btoa, atob } = window;
 if (
   !(localStorage && location && btoa && atob)
@@ -90,9 +87,6 @@ export {
   getDataFromURLHash,
   sleep
 };
-
-
-
 
 // Old approach to include unique identifier
 // and assign it to the storage key... Useless for

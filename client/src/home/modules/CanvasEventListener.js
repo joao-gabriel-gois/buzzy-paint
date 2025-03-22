@@ -1,4 +1,3 @@
-import { getInstanceName } from '../../utils/eventUtils.js'
 import { getStyle } from '../../utils/cssUtils.js';
 
 export class CanvasEventListener {
@@ -16,16 +15,9 @@ export class CanvasEventListener {
     this.zoomPreviousRate = 1;
     this.isZoomActive = false;
 
-    // Bindings
-    // this.onDraw = this.onDraw.bind(this);
     this.onCanvasEvent = this.onCanvasEvent.bind(this);
-    // this.onLine = this.onLine.bind(this);
-    // this.onWrite = this.onWrite.bind(this);
-    // this.onDrawRectangle = this.onDrawRectangle.bind(this);
-    // this.onErase = this.onErase.bind(this);
     this.onZoom = this.onZoom.bind(this);
     this.renderCurrentState = this.renderCurrentState.bind(this);
-
     this.onKeyDown = this.onKeyDown.bind(this);
     this.paintBackground = this.paintBackground.bind(this);
   }
@@ -74,7 +66,7 @@ export class CanvasEventListener {
 
     this.context.fillStyle = textColor;
     this.context.font = `${fontSize}pt ${
-      !!fontFamily ? fontFamily : 'Arial'
+      fontFamily ? fontFamily : 'Arial'
     }`;
     
     this.context.fillText(innerText, ...position);
@@ -87,14 +79,36 @@ export class CanvasEventListener {
     } = event;
     const { x, y, width, height } = rect;
 
-    if (style.filled) {
-      this.context.fillStyle = style.fillColor;
+    if (style.rectFilled) {
+      this.context.fillStyle = style.rectFillColor;
       this.context.fillRect(x, y, width, height);
     }
-    if (style.stroked) {
+    if (style.rectStroked) {
       this.context.strokeStyle = style.rectOutlineColor;
       this.context.lineWidth = style.rectThickness;
       this.context.strokeRect(x, y, width, height);
+    }
+  }
+
+  redrawEllipse(event) {
+    const {
+      ellipse,
+      style,
+    } = event;
+    const { x, y, radiusWidth, radiusHeight } = ellipse;
+
+    if (style.ellipseFilled) {
+      this.context.fillStyle = style.ellipseFillColor;
+      this.context.beginPath();
+      this.context.ellipse(x, y, radiusWidth, radiusHeight, 0, 0, 2 * Math.PI);
+      this.context.fill();
+    }
+    if (style.ellipseStroked) {
+      this.context.strokeStyle = style.ellipseOutlineColor;
+      this.context.lineWidth = style.ellipseThickness;
+      this.context.beginPath();
+      this.context.ellipse(x, y, radiusWidth, radiusHeight, 0, 0, 2 * Math.PI);
+      this.context.stroke();
     }
   }
 
@@ -130,24 +144,21 @@ export class CanvasEventListener {
     this.context.beginPath();
     if (event.isPng) {
       event.sequence.forEach(point => {
-        const { position } = point;
-        this.context.clearRect(position[0] - size / 2, position[1] - size / 2, size, size);
+        this.context.clearRect(point[0] - size / 2, point[1] - size / 2, size, size);
       });
       this.context.closePath();
       return;
     }
 
     event.sequence.forEach(point => {
-      const { position } = point;
         this.context.fillStyle = getStyle(this.canvas).backgroundColor;
-        this.context.fillRect(position[0] - size / 2, position[1] - size / 2, size, size);
+        this.context.fillRect(point[0] - size / 2, point[1] - size / 2, size, size);
     });
     this.context.closePath();
   }
 
   renderCurrentState(cb) {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    
     // JPG case for exporting images, cb shoud paintBackground before exporting
     if (cb && !(cb instanceof Event)) cb();
 
@@ -168,6 +179,9 @@ export class CanvasEventListener {
         case 'RECT':
           this.redrawRectangle(event);
           break;
+        case 'ELLIPSE':
+          this.redrawEllipse(event);
+          break;
         case 'ERASE': 
           event = {
             ...event,
@@ -182,8 +196,7 @@ export class CanvasEventListener {
   undo() {
     if (this.undoStack.length > 60) {
       this.undoStack = [];
-    }
-    
+    } 
     const removedEvent = this.eventQueue.pop();
     if (removedEvent) {
       this.undoStack.push(removedEvent);
@@ -213,6 +226,7 @@ export class CanvasEventListener {
     type = type.toUpperCase();
     Object.assign(detail, { type });
     this.eventQueue.push(detail);
+    this.undoStack = [];
   }
 
   onZoom(event) {
@@ -231,6 +245,7 @@ export class CanvasEventListener {
     this.canvas.addEventListener('line', this.onCanvasEvent);
     this.canvas.addEventListener('write', this.onCanvasEvent);
     this.canvas.addEventListener('rect', this.onCanvasEvent);
+    this.canvas.addEventListener('ellipse', this.onCanvasEvent);
     this.canvas.addEventListener('zoom', this.onZoom);
     this.canvas.addEventListener('erase', this.onCanvasEvent);
     this.canvas.addEventListener('render-call', this.renderCurrentState);
@@ -243,6 +258,7 @@ export class CanvasEventListener {
     this.canvas.removeEventListener('write', this.onCanvasEvent);
     this.canvas.removeEventListener('zoom', this.onZoom);
     this.canvas.removeEventListener('rect', this.onCanvasEvent);
+    this.canvas.removeEventListener('ellipse', this.onCanvasEvent);
     this.canvas.removeEventListener('erase', this.onCanvasEvent);
     this.canvas.removeEventListener('render-call', this.renderCurrentState);
     document.removeEventListener('keydown', this.onKeyDown);

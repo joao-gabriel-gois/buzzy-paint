@@ -1,7 +1,7 @@
 import { ICreateUserTokensDTO } from "@modules/accounts/DTOs/CreateUserTokensDTO.ts";
 import { UserTokens } from "@modules/accounts/models/UserTokens.ts";
 
-export default interface IUsersTokensRepository {
+export interface IUsersTokensRepository {
    create({ user_id, expiration_date, refresh_token}: ICreateUserTokensDTO): Promise<UserTokens>;
    deleteById(id: string): Promise<void>;
    findAllByUserId(token: string): Promise<UserTokens[] | undefined>;

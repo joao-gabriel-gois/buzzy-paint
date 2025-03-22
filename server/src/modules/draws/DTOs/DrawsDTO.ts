@@ -1,12 +1,8 @@
 type Point = [number, number];
-type Position = {
-  position: Point
-}
 
-// By adjusting the frontend later, we can fix this typing
 interface IDrawCommand {
-  type: 'DRAW';
-  sequence: Position[];
+  type: "DRAW";
+  sequence: Point[];
   style: {
     drawThickness: number;
     drawColor: string;
@@ -14,7 +10,7 @@ interface IDrawCommand {
 }
 
 interface ILineCommand {
-  type: 'LINE';
+  type: "LINE";
   line: {
     start: Point;
     end: Point;
@@ -26,7 +22,7 @@ interface ILineCommand {
 }
 
 interface IWriteCommand {
-  type: 'WRITE';
+  type: "WRITE";
   position: Point;
   style: {
     textColor: string;
@@ -37,13 +33,50 @@ interface IWriteCommand {
 }
 
 interface IEraseCommand {
-  type: 'ERASE';
-  sequence: Position[];
+  type: "ERASE";
+  sequence: Point[];
   eraserSize: number;
 }
 
-type Command = IDrawCommand | IWriteCommand  | ILineCommand | IEraseCommand;
-type EventQueue = Command[];
+
+interface IRectangleCommand {
+  type: "RECT";
+  rect: {
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  },
+  style: {
+    rectThickness: number;
+    rectOutlineColor: string;
+    rectFillColor: string;
+    filled: boolean;
+    stroked: boolean;
+  }
+}
+
+interface IEllipseCommand {
+  type: "ELLIPSE";
+  ellipse: {
+    x: number,
+    y: number,
+    radiusWidth: number,
+    radiusHeight: number
+  },
+  style: {
+    ellipseThickness: number;
+    ellipseOutlineColor: string;
+    ellipseFillColor: string;
+    filled: boolean;
+    stroked: boolean;
+  }
+}
+
+type Command = IDrawCommand
+  | IWriteCommand | ILineCommand | IEraseCommand
+  | IRectangleCommand | IEllipseCommand;
+type EventQueue = Omit<Command, 'type'>[];
 type UndoStack = EventQueue;
 
 export interface IDrawsDTO {
@@ -57,7 +90,28 @@ export interface ITabsDTO {
   timestamp: number;
 }
 
-export interface IDrawsMongoDocumentDTO {
+// PREVIOUS IMPL BACKUP BEFORE TESTS
+// export interface IDrawsMongoDocumentDTO {
+//   id: string;
+//   data: ITabsDTO;
+// }
+
+// NEW ONES TO BE TESTED
+export interface IOperationResult {
+  success: boolean;
+  count?: number;
+}
+
+export interface IUpdateResult extends IOperationResult {
+  modifiedCount: number;
+  matchedCount: number;
+}
+
+export interface IDeleteResult extends IOperationResult {
+  deletedCount: number;
+}
+
+export interface IDrawDocument {
   id: string;
   data: ITabsDTO;
 }

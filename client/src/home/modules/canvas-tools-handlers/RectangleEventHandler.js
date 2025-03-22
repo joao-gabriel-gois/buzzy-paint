@@ -1,25 +1,18 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
-import { getRelativeCursorPos } from '../../../utils/eventUtils.js'
+import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
 import { getStyle } from '../../../utils/cssUtils.js';
 import { fromRGBtoHex } from '../../../utils/fromRGBtoHex.js';
 import { createAndRenderAlert, createAndRenderConfirm } from '../../../shared/alerts.js';
 
-/*
-  TODO:
-  1) atualizar todos os casos de estilo / inputs e reagir as mudanças com onchange
-  2) ouvir o event do lado do canvasListener para registrar os eventos de retangulo na fila de eventos
-  3) incluir uma método de renderização para o caso do retangulo
-  4) testar tudo
-*/
 export class Rectangler extends ToolEventHandler {
   constructor(elements, alert = createAndRenderAlert, confirm = createAndRenderConfirm) {
     super(elements);
     super.currentStyle = {
       rectThickness: 1,
       rectOutlineColor: '#000',
-      fillColor: getStyle(this.canvas).backgroundColor,
-      filled: false,
-      stroked: true,
+      rectFillColor: getStyle(this.canvas).backgroundColor,
+      rectFilled: false,
+      rectStroked: true,
     }
     this.alert = alert;
     this.confirm = confirm;
@@ -38,11 +31,12 @@ export class Rectangler extends ToolEventHandler {
   }
 
   initOptionsInputHandler() {
-    const [strokeCheck, fillCheck] = this.styleSwitcher.querySelectorAll('[type="checkbox"]');
+    const strokeCheck = this.styleSwitcher.querySelector('#rectStroked');
+    const fillCheck = this.styleSwitcher.querySelector('#rectFilled');
     const [strokeWrapper, fillWrapper] = this.checkboxReactiveInputContainers;
     
-    const fillColorInput = this.styleSwitcher.querySelector('#fillColor');
-    fillColorInput.value = fromRGBtoHex(this.currentStyle.fillColor);
+    const rectFillColorInput = this.styleSwitcher.querySelector('#rectFillColor');
+    rectFillColorInput.value = fromRGBtoHex(this.currentStyle.rectFillColor);
 
     const display = {
       fill: getStyle(fillWrapper).display,
@@ -115,7 +109,7 @@ export class Rectangler extends ToolEventHandler {
     super.startRenderCall(); // clear for real time lining, overwriting with latest line state
     this.updateContextToCurrentStyle();
     
-    const { filled, stroked } = this.currentStyle;
+    const { rectFilled, rectStroked } = this.currentStyle;
     let {
       x: startX,
       y: startY,
@@ -135,10 +129,10 @@ export class Rectangler extends ToolEventHandler {
       Object.assign(this.currentRect, { width, height });
     }
 
-    if (filled) {
+    if (rectFilled) {
       this.context.fillRect(startX, startY, width, height);
     }
-    if (stroked) {
+    if (rectStroked) {
       this.context.strokeRect(startX, startY, width, height);
     }
   }
@@ -174,11 +168,11 @@ export class Rectangler extends ToolEventHandler {
     const {
       rectOutlineColor,
       rectThickness,
-      fillColor,
+      rectFillColor,
     } = this.currentStyle;
 
     this.context.strokeStyle = rectOutlineColor;
-    this.context.fillStyle = fillColor;
+    this.context.fillStyle = rectFillColor;
     this.context.lineWidth = rectThickness;
   }
 

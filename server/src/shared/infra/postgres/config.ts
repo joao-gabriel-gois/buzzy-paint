@@ -1,4 +1,4 @@
-import pg from 'npm:pg';
+import pg from "npm:pg";
 const { Pool } = pg;
 
 const {

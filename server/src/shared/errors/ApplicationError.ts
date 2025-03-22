@@ -1,4 +1,4 @@
-import * as zod from 'npm:zod';
+import * as zod from "npm:zod";
 
 class ApplicationError extends Error {
   public readonly statusCode: number;
@@ -23,7 +23,7 @@ class ApplicationError extends Error {
 }
 
 class BadRequestError extends ApplicationError {
-  constructor(message = 'Bad Request', status = 400, error?: Error) {
+  constructor(message = "Bad Request", status = 400, error?: Error) {
     super(message, status, error);
     super.name = "Bad Request";
   }
@@ -33,20 +33,20 @@ class ValidationError extends ApplicationError {
   public error;
   constructor(message = "Invalid Input", status = 400, error: zod.ZodError) {
     super(message, status, error);
-    super.name = 'Validation Error';
+    super.name = "Validation Error";
     this.error = error;
   }
 }
 
 class BusinessLogicError extends ApplicationError {
-  constructor(message = 'Business Logic Error', status = 422, error?: Error) {
+  constructor(message = "Business Logic Error", status = 422, error?: Error) {
     super(message, status, error);
     super.name = "Business Logic Error";
   }
 }
 
 class DatabaseTransactionError extends ApplicationError {
-  constructor(message = 'Query has failed!', status = 503, error?: Error) {
+  constructor(message = "Query has failed!", status = 503, error?: Error) {
     super(message, status, error);
     super.name = "Database Transaction Error";
   }
@@ -60,16 +60,16 @@ class InvalidParameterError extends ApplicationError {
 }
 
 class UnauthorizedError extends ApplicationError {
-  constructor(message = 'Unauthorized', status = 401, error?: Error) {
+  constructor(message = "Unauthorized", status = 401, error?: Error) {
     super(message, status, error);
-    super.name = 'Unauthorized';
+    super.name = "Unauthorized";
   }
 }
 
 class NotFoundError extends ApplicationError {
-  constructor(message = 'Not Found', status = 404, error?: Error) {
+  constructor(message = "Not Found", status = 404, error?: Error) {
     super(message, status, error);
-    super.name = 'Not Found';
+    super.name = "Not Found";
   }
 }
 

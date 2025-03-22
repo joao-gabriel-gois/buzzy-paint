@@ -32,6 +32,7 @@
         <li><img src="../assets/line.svg" /></li>
         <li><img src="../assets/polygon.svg" /></li>
         <li><img src="../assets/rectangler.svg" /></li>
+        <li><img src="../assets/ellipser.svg" /></li>
         <li><img src="../assets/eraser.svg" /></li>
         <li><img src="../assets/text.svg" /></li>
         <li><img src="../assets/zoom-in.svg" /></li>
@@ -40,6 +41,7 @@
 
     <div id="canvas-wrapper">
       <div id="tab-buttons-wrapper">
+        <div id="tabs-wrapper"></div>
         <button id="add-tab">+</button>
       </div>
       <canvas width="1280" height="720"></canvas>
@@ -92,7 +94,7 @@
           <form id="polygon-line-options">
             <div>
               <label for="lineColor" name="LineColor">
-                Cor:
+                Color:
               </label>
               <div class="color-input-container">
                 <input type="color" id="lineColor" />
@@ -110,25 +112,25 @@
         <li>
           <h3>Rectangle</h3>
           <form id="rectangle-options">
-            <div id="check-settings">
+            <div id="rect-check-settings">
               <div>
-                <label for="stroked" name="stroked">
+                <label for="rectStroked" name="rectStroked">
                   Outline:
                 </label>
                 <div class="rectangle-input-container">
-                  <input type="checkbox" id="stroked" />
+                  <input type="checkbox" id="rectStroked" />
                 </div>
               </div>
               <div>
-                <label for="filled" name="filled">
+                <label for="rectFilled" name="rectFilled">
                   Fill:
                 </label>
                 <div class="rectangle-input-container">
-                  <input type="checkbox" id="filled" />
+                  <input type="checkbox" id="rectFilled" />
                 </div>
               </div>
             </div>
-            <div id="stroke">
+            <div id="rectStroke">
               <div class="number-container">
                 <label for="rectThickness" name="rectThickness">
                   Outline Width:
@@ -146,12 +148,62 @@
                 </div>
               </div>
             </div>
-            <div id="fill">
-              <label for="fillColor" name="fillColor">
+            <div id="rectFill">
+              <label for="rectFillColor" name="rectFillColor">
                 Fill Color
               </label>
               <div class="color-input-container">
-                <input type="color" id="fillColor" />
+                <input type="color" id="rectFillColor" />
+              </div>
+            </div>
+          </form>
+        </li>
+
+        <li>
+          <h3>Ellipse</h3>
+          <form id="ellipse-options">
+            <div id="ellipse-check-settings">
+              <div>
+                <label for="ellipseStroked" name="ellipseStroked">
+                  Outline:
+                </label>
+                <div class="ellipse-input-container">
+                  <input type="checkbox" id="ellipseStroked" />
+                </div>
+              </div>
+              <div>
+                <label for="ellipseFilled" name="ellipseFilled">
+                  Fill:
+                </label>
+                <div class="ellipse-input-container">
+                  <input type="checkbox" id="ellipseFilled" />
+                </div>
+              </div>
+            </div>
+            <div id="ellipseStroke">
+              <div class="number-container">
+                <label for="ellipseThickness" name="ellipseThickness">
+                  Outline Width:
+                </label>
+                <div>
+                  <input type="number" class="number" id="ellipseThickness" />
+                </div>
+              </div>
+              <div>
+                <label for="ellipseOutlineColor" name="ellipseOutlineColor">
+                  Outline Color
+                </label>
+                <div class="color-input-container">
+                  <input type="color" id="ellipseOutlineColor" />
+                </div>
+              </div>
+            </div>
+            <div id="ellipseFill">
+              <label for="ellipseFillColor" name="ellipseFillColor">
+                Fill Color
+              </label>
+              <div class="color-input-container">
+                <input type="color" id="ellipseFillColor" />
               </div>
             </div>
           </form>
@@ -174,7 +226,7 @@
           <form id="text-options">
             <div>
               <label for="fontSize" name="FontSize">
-                Fonte Size:
+                Font Size:
               </label>
               <input type=number class="number" id="fontSize" />pt
             </div>
@@ -210,6 +262,7 @@
         </li>
 
       </ul>
+      <!-- <div></div> -->
     </aside>
   </main>
 </body>

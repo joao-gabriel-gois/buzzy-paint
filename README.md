@@ -273,8 +273,10 @@ ___
 
 (1st milestone)
 - [x] <s>Add UpdateDraw Usecase Typying and Create Validation for them</s>
-- [x] <s>Add unit tests after changes</s>
+- [x] <s>Add unit tests after changes (for services)</s>
 - [ ] <b>Implement CI/CD</b>
+- [ ] <s>Add unit tests for controllers</s>
+
 
 (2nd milestone)
 - [ ] Prepare first deploy after finishing both backend and frontend 1st milestones

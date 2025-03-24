@@ -131,10 +131,7 @@ export class Polygoner extends ToolEventHandler {
       lineColor,
       lineThickness
     } = this.currentStyle;
-    
-    // TODO - Create input for selecting line Cap on form
-    // this.context.lineCap = "round";
-    
+      
     this.context.strokeStyle = lineColor;
     this.context.lineWidth = lineThickness;
   }

@@ -7,10 +7,8 @@ import {
   IRectangleCommand,
   IEllipseCommand,
   Command,
-  EventQueue,
-  UndoStack,
   IDrawsDTO,
-  ITabsDTO
+  EventQueue,
 } from "./DrawsDTO.ts";
 
 
@@ -94,7 +92,7 @@ function isEraseCommand(value: unknown): value is IEraseCommand {
 function isRectangleCommand(value: unknown): value is IRectangleCommand {
   if (!value || typeof value !== "object") return false;
   
-  const candidate = value as any;
+  const candidate = value as Command;
   if (candidate.type !== "RECT") return false;
   
   const rect = candidate.rect;
@@ -113,14 +111,14 @@ function isRectangleCommand(value: unknown): value is IRectangleCommand {
   return typeof style.rectThickness === "number" && 
          typeof style.rectOutlineColor === "string" &&
          typeof style.rectFillColor === "string" &&  // This was rectFillColor in your interface
-         typeof style.filled === "boolean" &&
-         typeof style.stroked === "boolean";
+         typeof style.rectFilled === "boolean" &&
+         typeof style.rectStroked === "boolean";
 }
 
 function isEllipseCommand(value: unknown): value is IEllipseCommand {
   if (!value || typeof value !== "object") return false;
   
-  const candidate = value as any;
+  const candidate = value as Command;
   if (candidate.type !== "ELLIPSE") return false;
   
   const ellipse = candidate.ellipse;
@@ -139,8 +137,8 @@ function isEllipseCommand(value: unknown): value is IEllipseCommand {
   return typeof style.ellipseThickness === "number" && 
          typeof style.ellipseOutlineColor === "string" &&
          typeof style.ellipseFillColor === "string" &&
-         typeof style.filled === "boolean" &&
-         typeof style.stroked === "boolean";
+         typeof style.ellipseFilled === "boolean" &&
+         typeof style.ellipseStroked === "boolean";
 }
 
 function isCommand(value: unknown): value is Command {

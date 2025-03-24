@@ -4,10 +4,6 @@ import { getStyle } from '../../../utils/cssUtils.js';
 import { fromRGBtoHex } from '../../../utils/fromRGBtoHex.js';
 import { createAndRenderAlert, createAndRenderConfirm } from '../../../shared/alerts.js';
 
-/*
-  TODO:
-  4) testar tudo
-*/
 export class Ellipser extends ToolEventHandler {
   constructor(elements, alert = createAndRenderAlert) {
     super(elements);
@@ -26,8 +22,6 @@ export class Ellipser extends ToolEventHandler {
     this.initOptionsInputHandler();
     this.currentEllipse = {};
     this.ctrlKeyCapturing = this.ctrlKeyCapturing.bind(this);
-
-    this.keepConfirm = true;
   }
 
   initOptionsInputHandler() {

@@ -1,6 +1,6 @@
-type Point = [number, number];
+export type Point = [number, number];
 
-interface IDrawCommand {
+export interface IDrawCommand {
   type: "DRAW";
   sequence: Point[];
   style: {
@@ -9,7 +9,7 @@ interface IDrawCommand {
   }
 }
 
-interface ILineCommand {
+export interface ILineCommand {
   type: "LINE";
   line: {
     start: Point;
@@ -21,7 +21,7 @@ interface ILineCommand {
   }
 }
 
-interface IWriteCommand {
+export interface IWriteCommand {
   type: "WRITE";
   position: Point;
   style: {
@@ -32,14 +32,14 @@ interface IWriteCommand {
   }
 }
 
-interface IEraseCommand {
+export interface IEraseCommand {
   type: "ERASE";
   sequence: Point[];
   eraserSize: number;
 }
 
 
-interface IRectangleCommand {
+export interface IRectangleCommand {
   type: "RECT";
   rect: {
     x: number,
@@ -51,12 +51,12 @@ interface IRectangleCommand {
     rectThickness: number;
     rectOutlineColor: string;
     rectFillColor: string;
-    filled: boolean;
-    stroked: boolean;
+    rectFilled: boolean;
+    rectStroked: boolean;
   }
 }
 
-interface IEllipseCommand {
+export interface IEllipseCommand {
   type: "ELLIPSE";
   ellipse: {
     x: number,
@@ -68,16 +68,18 @@ interface IEllipseCommand {
     ellipseThickness: number;
     ellipseOutlineColor: string;
     ellipseFillColor: string;
-    filled: boolean;
-    stroked: boolean;
+    ellipseFilled: boolean;
+    ellipseStroked: boolean;
   }
 }
 
-type Command = IDrawCommand
+export type Command = IDrawCommand
   | IWriteCommand | ILineCommand | IEraseCommand
   | IRectangleCommand | IEllipseCommand;
-type EventQueue = Omit<Command, 'type'>[];
-type UndoStack = EventQueue;
+
+export type EventQueue = Omit<Command, 'type'>[];
+
+export type UndoStack = EventQueue;
 
 export interface IDrawsDTO {
   tabName: string;
@@ -90,13 +92,6 @@ export interface ITabsDTO {
   timestamp: number;
 }
 
-// PREVIOUS IMPL BACKUP BEFORE TESTS
-// export interface IDrawsMongoDocumentDTO {
-//   id: string;
-//   data: ITabsDTO;
-// }
-
-// NEW ONES TO BE TESTED
 export interface IOperationResult {
   success: boolean;
   count?: number;

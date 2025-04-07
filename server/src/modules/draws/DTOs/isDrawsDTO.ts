@@ -9,6 +9,8 @@ import {
   Command,
   IDrawsDTO,
   EventQueue,
+  ICropAndMoveCommand,
+  Rectangle,
 } from "./DrawsDTO.ts";
 
 
@@ -19,6 +21,17 @@ function isPoint(value: unknown): value is Point {
          typeof value[1] === "number";
 }
 
+function isRectangle(value: unknown): value is Rectangle {
+  if (!value || typeof value !== "object") return false;
+  const rectangleCandidate = value as Partial<Rectangle>;
+  if (typeof rectangleCandidate.x !== "number" || 
+      typeof rectangleCandidate.y !== "number" || 
+      typeof rectangleCandidate.width !== "number" || 
+      typeof rectangleCandidate.height !== "number") {
+    return false;
+  }
+  return true;
+}
 function isDrawCommand(value: unknown): value is IDrawCommand {
   if (!value || typeof value !== "object") return false;
   
@@ -95,16 +108,8 @@ function isRectangleCommand(value: unknown): value is IRectangleCommand {
   const candidate = value as Command;
   if (candidate.type !== "RECT") return false;
   
-  const rect = candidate.rect;
-  if (!rect || typeof rect !== "object") return false;
-  
-  if (typeof rect.x !== "number" || 
-      typeof rect.y !== "number" || 
-      typeof rect.width !== "number" || 
-      typeof rect.height !== "number") {
-    return false;
-  }
-  
+  if (!isRectangle(candidate.rect)) return false;
+
   const style = candidate.style;
   if (!style || typeof style !== "object") return false;
   
@@ -141,6 +146,33 @@ function isEllipseCommand(value: unknown): value is IEllipseCommand {
          typeof style.ellipseStroked === "boolean";
 }
 
+function isCropAndMoveCommand(value: unknown): value is ICropAndMoveCommand {
+  if (!value || typeof value !== "object") return false;
+
+  const candidate = value as Partial<ICropAndMoveCommand>;  
+  const {
+    type,
+    firstSelection,
+    dataPosition,
+    stillSelected,
+    style
+  } = candidate;
+  
+  if (type !== "CROP-AND-MOVE") return false;
+  
+  else if (!isRectangle(firstSelection)) return false;
+ 
+  else if (!Array.isArray(dataPosition)) return false;
+  
+  else if (!isPoint(dataPosition)) return false;
+  
+  else if (typeof stillSelected !== "boolean") return false;
+
+  else if (!style || typeof style !== "object") return false;
+  
+  return typeof style.rotationDegree === "number";
+}
+
 function isCommand(value: unknown): value is Command {
   if (!value || typeof value !== "object") return false;
 
@@ -160,6 +192,8 @@ function isCommand(value: unknown): value is Command {
       return isRectangleCommand(value);
     case "ELLIPSE":
       return isEllipseCommand(value);
+    case "CROP-AND-MOVE":
+      return isCropAndMoveCommand(value);
     default:
       return false;
   }

@@ -72,12 +72,6 @@ export class Drawer extends ToolEventHandler {
   }
 
   // 2.a) - Private Class Utils:
-  getPreviousInputValue(event) {
-    const currentInput = `${event.target.getAttribute('id')}`;
-    
-    return this.cursorStyle[currentInput];
-  }
-
   handleThicknessChange(event) {
     super.handleStyleSwitch(event);
     this.updateContextToCurrentStyle();

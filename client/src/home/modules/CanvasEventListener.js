@@ -1,15 +1,26 @@
+// import { createAndRenderAlert } from '../../shared/alerts.js';
 import { getStyle } from '../../utils/cssUtils.js';
+
+// const MAX_UNDO_STACK_SIZE = 120;
 
 export class CanvasEventListener {
   static #instancesCount = 0;
 
-  constructor(canvasReference, data = { eventQueue: [], undoStack: [] })  {
+  constructor(
+    canvasReference,
+    data = {
+      eventQueue: [],
+      undoStack: []
+    },
+    // alert = createAndRenderAlert
+  ) {
     CanvasEventListener.#instancesCount++;
     this.canvas = document.querySelector(canvasReference);
-    this.context = this.canvas.getContext('2d');
+    this.context = this.canvas.getContext('2d', { willReadFrequently: true });
     
     this.eventQueue = data.eventQueue;
     this.undoStack = data.undoStack;
+    // this.alert = alert;
 
     this.zoomCurrentRate = 1;
     this.zoomPreviousRate = 1;
@@ -111,14 +122,79 @@ export class CanvasEventListener {
       this.context.stroke();
     }
   }
+  
+  cropAndMove(event) {
+    const {
+      x, y,
+      width,
+      height
+    } = event.firstSelection;
+    const {
+      dataPosition,
+      // TODO: Update rotation degree style in the final state as well
+      // style
+    } = event;
+
+    // The logic bellow is: Get the image, clear its first selection 
+    // and them move it. It's important to keep this order to avoid
+    // unexpected behavior. Also,  we are saving the previous data in
+    // the position that user is currently moving the image to
+    // (dataBeforePutImage and its Position), so once its moved again
+    // to another place we can recover it and keep a dynamic state that
+    // keeps the undo/redo feature working as expected.
+    if (!event.stillSelected) {
+      this.imageData = this.context.getImageData(x, y, width, height);
+      this.context.clearRect(x, y, width, height);
+    }
+    else {
+      this.context.putImageData(this.dataBeforePutImage, ...this.dataBeforePutImagePos)
+    }
+    this.dataBeforePutImage = this.context.getImageData(...dataPosition, width, height);
+    this.dataBeforePutImagePos = [...dataPosition];
+    // this.context.save(); // (???) guess for handling user input
+    this.context.putImageData(this.imageData, ...dataPosition);
+    // this.context.rotate(style.rotationDegree*Math.PI/180); // (???) guess for handling user input
+    // this.context.restore(); // (???) guess for handling user input
+
+    // const { rotationDegree } = style;
+    // if (rotationDegree === 0) {
+    //   this.context.putImageData(this.imageData, ...dataPosition);
+    //   return;
+    // }
+    
+    // const angle = rotationDegree * Math.PI / 180;
+    
+    // console.log('rotation applied:', angle, rotationDegree)
+    // const centerX = dataPosition[0] + width / 2;
+    // const centerY = dataPosition[1] + height / 2;
+    
+    // this.context.save();
+    
+    // this.context.translate(centerX, centerY);
+    
+    // this.context.rotate(angle);
+    
+    // const offscreenCanvas = document.createElement('canvas');
+    // offscreenCanvas.width = width;
+    // offscreenCanvas.height = height;
+    // const offCtx = offscreenCanvas.getContext('2d');
+    
+    // offCtx.putImageData(this.imageData, 0, 0);
+    
+    // this.context.drawImage(
+    //   offscreenCanvas,
+    //   -width / 2, -height / 2,
+    //   width, height
+    // );
+    
+    // this.context.restore();
+  }
 
   applyZoom() {
     const invertedPreviousZoomRate = 1 / this.zoomPreviousRate;
     const zoomfactor = this.zoomCurrentRate;
     const { width, height } = this.canvas;
-
     // I'm using tranform this way in order to get a centered zoom
-    // scale does not provide this possibily
 
     // First we invert whatever other zoom might happened here before
     this.context.transform(
@@ -182,6 +258,9 @@ export class CanvasEventListener {
         case 'ELLIPSE':
           this.redrawEllipse(event);
           break;
+        case 'CROP-AND-MOVE':
+          this.cropAndMove(event);
+          break;
         case 'ERASE': 
           event = {
             ...event,
@@ -194,9 +273,15 @@ export class CanvasEventListener {
   }
 
   undo() {
-    if (this.undoStack.length > 60) {
-      this.undoStack = [];
-    } 
+    // if (this.undoStack.length > MAX_UNDO_STACK_SIZE) {
+    //   this.alert({
+    //     type: "warning",
+    //     title: "Max UndoStack Size Reached",
+    //     message: "You've typed `ctrl + z` several times and reached the limit."
+    //       + " Cleaning all the previous commands (you can't revover it anymore!)." 
+    //   });
+    //   this.undoStack = [];
+    // } 
     const removedEvent = this.eventQueue.pop();
     if (removedEvent) {
       this.undoStack.push(removedEvent);
@@ -248,6 +333,9 @@ export class CanvasEventListener {
     this.canvas.addEventListener('ellipse', this.onCanvasEvent);
     this.canvas.addEventListener('zoom', this.onZoom);
     this.canvas.addEventListener('erase', this.onCanvasEvent);
+    this.canvas.addEventListener('crop-and-move', this.onCanvasEvent);
+    // this.canvas.addEventListener('create-crop-and-move', this.onCanvasEvent);
+    // this.canvas.addEventListener('update-crop-and-move', this.onCanvasEvent);
     this.canvas.addEventListener('render-call', this.renderCurrentState);
     document.addEventListener('keydown', this.onKeyDown);
   }
@@ -260,6 +348,9 @@ export class CanvasEventListener {
     this.canvas.removeEventListener('rect', this.onCanvasEvent);
     this.canvas.removeEventListener('ellipse', this.onCanvasEvent);
     this.canvas.removeEventListener('erase', this.onCanvasEvent);
+    this.canvas.removeEventListener('crop-and-move', this.onCanvasEvent);
+    // this.canvas.removeEventListener('create-crop-and-move', this.onCanvasEvent);
+    // this.canvas.removeEventListener('update-crop-and-move', this.onCanvasEvent);
     this.canvas.removeEventListener('render-call', this.renderCurrentState);
     document.removeEventListener('keydown', this.onKeyDown);
   }

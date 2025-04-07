@@ -1,4 +1,11 @@
-export type Point = [number, number];
+export type Point = [number, number]; // [x, y];
+
+export type Rectangle = {
+  x: number,
+  y: number,
+  width: number,
+  height: number
+}
 
 export interface IDrawCommand {
   type: "DRAW";
@@ -6,7 +13,7 @@ export interface IDrawCommand {
   style: {
     drawThickness: number;
     drawColor: string;
-  }
+  };
 }
 
 export interface ILineCommand {
@@ -14,11 +21,11 @@ export interface ILineCommand {
   line: {
     start: Point;
     end: Point;
-  }
+  };
   style: {
     lineThickness: number;
     lineColor: string;
-  }
+  };
 }
 
 export interface IWriteCommand {
@@ -41,19 +48,14 @@ export interface IEraseCommand {
 
 export interface IRectangleCommand {
   type: "RECT";
-  rect: {
-    x: number,
-    y: number,
-    width: number,
-    height: number
-  },
+  rect: Rectangle;
   style: {
     rectThickness: number;
     rectOutlineColor: string;
     rectFillColor: string;
     rectFilled: boolean;
     rectStroked: boolean;
-  }
+  };
 }
 
 export interface IEllipseCommand {
@@ -63,7 +65,7 @@ export interface IEllipseCommand {
     y: number,
     radiusWidth: number,
     radiusHeight: number
-  },
+  };
   style: {
     ellipseThickness: number;
     ellipseOutlineColor: string;
@@ -73,9 +75,19 @@ export interface IEllipseCommand {
   }
 }
 
+export interface ICropAndMoveCommand {
+  type: "CROP-AND-MOVE";
+  firstSelection: Rectangle;
+  dataPosition: Point;
+  stillSelected: boolean;
+  style: {
+    rotationDegree: number;
+  };
+}
+
 export type Command = IDrawCommand
   | IWriteCommand | ILineCommand | IEraseCommand
-  | IRectangleCommand | IEllipseCommand;
+  | IRectangleCommand | IEllipseCommand | ICropAndMoveCommand;
 
 export type EventQueue = Omit<Command, 'type'>[];
 

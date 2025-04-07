@@ -24,7 +24,7 @@ export class Zoomer extends ToolEventHandler {
   // 1) Utils
   resetZoomState() {
     super.dispacthToolEvent(this.createZoomEvent(1))
-    super.startRenderCall();
+    super.renderLatestState();
   }
 
   handleStyleSwitch(event) {
@@ -74,7 +74,7 @@ export class Zoomer extends ToolEventHandler {
 
   handleOnMouseUp(event) {
     super.handleOnMouseUp(event);
-    super.startRenderCall();
+    super.renderLatestState();
   }
 
   setActiveState(state) {
@@ -85,7 +85,7 @@ export class Zoomer extends ToolEventHandler {
   start() {
     this.updateCursorStyle('help');
     super.start();
-    super.startRenderCall();
+    super.renderLatestState();
   }
 
   stop() {

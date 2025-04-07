@@ -13,6 +13,7 @@ import { getDataFromURLHash } from "../shared/global.js";
 import { addJSONImportEvent } from "../utils/addJSONImportEvent.js";
 import { handleImageDownload } from "../utils/handleImageDownload.js";
 import { Ellipser } from "./modules/canvas-tools-handlers/EllipseEventHandler.js";
+import { CropperAndMover } from "./modules/canvas-tools-handlers/CropAndMoveEventHandler.js";
 
 (() => {
   document.addEventListener('DOMContentLoaded', () => {
@@ -46,6 +47,11 @@ import { Ellipser } from "./modules/canvas-tools-handlers/EllipseEventHandler.js
       canvas: '#canvas-wrapper canvas',
       styleSwitcher: '#text-options',
     });
+
+    const cropTransformer = new CropperAndMover({
+      canvas: '#canvas-wrapper canvas',
+      styleSwitcher: '#crop-transform-and-move-options',
+    });
     
     const zoomer = new Zoomer({
       canvas: '#canvas-wrapper canvas',
@@ -75,6 +81,7 @@ import { Ellipser } from "./modules/canvas-tools-handlers/EllipseEventHandler.js
     toolbarClickListener.subscribe(rectangler);
     toolbarClickListener.subscribe(ellipser);
     toolbarClickListener.subscribe(eraser);
+    toolbarClickListener.subscribe(cropTransformer);
     toolbarClickListener.subscribe(writter);
     toolbarClickListener.subscribe(zoomer);
     toolbarClickListener.init();

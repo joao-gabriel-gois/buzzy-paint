@@ -1,7 +1,7 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
 import { getStyle } from '../../../utils/cssUtils.js';
-import { fromRGBtoHex } from '../../../utils/fromRGBtoHex.js';
+import { fromRGBtoHex } from '../../../utils/colorUtils.js';
 import { createAndRenderAlert, createAndRenderConfirm } from '../../../shared/alerts.js';
 
 export class Rectangler extends ToolEventHandler {
@@ -103,7 +103,7 @@ export class Rectangler extends ToolEventHandler {
       height: y - this.currentRect.y,
     });
     
-    super.startRenderCall(); // clear for real time lining, overwriting with latest line state
+    super.renderLatestState(); // clear for real time lining, overwriting with latest line state
     this.updateContextToCurrentStyle();
     
     const { rectFilled, rectStroked } = this.currentStyle;
@@ -151,11 +151,6 @@ export class Rectangler extends ToolEventHandler {
   }
 
   // 2.a) - Private Class Utils:
-  getPreviousInputValue(event) {
-    const currentInput = `${event.target.getAttribute('id')}`;
-    return this.cursorStyle[currentInput];
-  }
-
   handleThicknessChange(event) {
     super.handleStyleSwitch(event);
     this.updateContextToCurrentStyle();

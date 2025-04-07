@@ -29,7 +29,7 @@ export class Polygoner extends ToolEventHandler {
   }
 
   strokeLineAtCurrentPosition() {
-    super.startRenderCall(); // clear for real time lining, overwriting with latest line state
+    super.renderLatestState(); // clear for real time lining, overwriting with latest line state
     this.updateContextToCurrentStyle();
     this.context.beginPath();
     this.context.moveTo(...this.currentLine.start);
@@ -114,11 +114,6 @@ export class Polygoner extends ToolEventHandler {
       super.handleStyleSwitch(event);
       this.updateContextToCurrentStyle();
     } 
-  }
-
-  getPreviousInputValue(event) {
-    const currentInput = `${event.target.getAttribute('id')}`;
-    return this.cursorStyle[currentInput];
   }
 
   handleThicknessChange(event) {

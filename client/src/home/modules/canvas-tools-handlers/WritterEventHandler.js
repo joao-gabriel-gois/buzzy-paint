@@ -39,7 +39,7 @@ export class Writter extends ToolEventHandler {
 
   handleOnMouseMove(event) {
     super.handleOnMouseMove(event);
-    super.startRenderCall();
+    super.renderLatestState();
     
     this.updateCurrentFrame(event);
   }

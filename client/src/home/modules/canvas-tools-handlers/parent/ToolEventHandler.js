@@ -1,11 +1,10 @@
-// Main Class (creating yet), current drawer, writter and zoomer will be extensions from this one
 export default class ToolEventHandler {
   constructor(elements) {
     // Elements
     this.canvas = document.querySelector(elements.canvas);
     this.styleSwitcher = document.querySelector(elements.styleSwitcher);
     
-    this.context = this.canvas.getContext('2d');
+    this.context = this.canvas.getContext('2d', { willReadFrequently: true });
     this.context.lineJoin = 'round';
     this.context.lineCap = 'round';
     this.context.imageSmoothingEnabled = true;
@@ -18,13 +17,15 @@ export default class ToolEventHandler {
     // _related to subject, triggered by ToolbarListener
     this.activeCounter = 0;
     this.activeState = false;
+    
+    this.outsideCanvasMouseUp = false;
 
-    //Callbacks Bindings
+    // Callbacks Bindings
     this.handleOnMouseDown = this.handleOnMouseDown.bind(this);
     this.handleOnMouseMove = this.handleOnMouseMove.bind(this);
     this.handleOnMouseUp = this.handleOnMouseUp.bind(this);
     this.handleStyleSwitch = this.handleStyleSwitch.bind(this);
-
+    this.handleGlobalMouseUpTracker = this.handleGlobalMouseUpTracker.bind(this);
     this.renderCallEvent = new Event('render-call');
   }
   
@@ -41,7 +42,7 @@ export default class ToolEventHandler {
     this.canvas.dispatchEvent(toolEvent);
   }
 
-  startRenderCall() {
+  renderLatestState() {
     this.canvas.dispatchEvent(this.renderCallEvent);
   }
 
@@ -82,19 +83,25 @@ export default class ToolEventHandler {
     return this.currentStyle;
   }
 
-  getCurrentStylePropsNamesArray() {
-    return [...this.styleSwitcher.children].map(input => {
-      return input.getAttribute('id');
-    });
-  }
+  // getCurrentStylePropsNamesArray() {
+  //   return [...this.styleSwitcher.children].map(input => {
+  //     return input.getAttribute('id');
+  //   });
+  // }
 
+  handleGlobalMouseUpTracker(e) {
+    if (e.target.tagName === "LI" || e.target.tagName === "IMG" || e.target.tagName === "BUTTON") return;
+    this.outsideCanvasMouseUp = e.target !== this.canvas;
+  };
   // 3.a) - ToolbarListener Subject update handler
   setActiveState(state) {
     this.activeState = Boolean(state);
     if (Boolean(state)) {
       this.canvas.addEventListener('mousedown', this.handleOnMouseDown);
+      document.addEventListener('mouseup', this.handleGlobalMouseUpTracker);
     } else {
       this.canvas.removeEventListener('mousedown', this.handleOnMouseDown);
+      document.removeEventListener('mouseup', this.handleGlobalMouseUpTracker);
     }
   }
   // 3.b) - ToolbarListener Subject public interface

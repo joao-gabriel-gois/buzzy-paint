@@ -41,7 +41,7 @@ export class Liner extends ToolEventHandler {
       end: position,
     });  
     
-    super.startRenderCall(); // clear for real time lining, overwriting with latest line state
+    super.renderLatestState(); // clear for real time lining, overwriting with latest line state
     this.updateContextToCurrentStyle();
     this.context.beginPath();
     this.context.moveTo(...this.currentLine.start);
@@ -73,12 +73,6 @@ export class Liner extends ToolEventHandler {
   }
 
   // 2.a) - Private Class Utils:
-  getPreviousInputValue(event) {
-    const currentInput = `${event.target.getAttribute('id')}`;
-    
-    return this.cursorStyle[currentInput];
-  }
-
   handleThicknessChange(event) {
     super.handleStyleSwitch(event);
     this.updateContextToCurrentStyle();

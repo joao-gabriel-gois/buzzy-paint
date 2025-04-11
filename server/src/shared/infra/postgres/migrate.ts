@@ -12,7 +12,7 @@ async function executeSqlFile(filePath: string, counter: number) {
     await pool.query(query);
     // await pool.query("COMMIT");
     // logger.info("Migration", res); // for debugging put "await pool.query();" calls inside a variable
-    logger.info(`(migrate.ts script): Migration ${counter} has been executed successfully`);
+    logger.info(`(migrate.ts script): Migration ${counter}\n\t(file: ${filePath}) has been executed successfully`);
   } catch (err) {
     await pool.query("ROLLBACK");
     logger.error(`(migrate.ts script): Error executing ${filePath}:`, err);
@@ -22,7 +22,12 @@ async function executeSqlFile(filePath: string, counter: number) {
 // Recursive function to read directories and find SQL files
 async function traverseDirectories(dirPath: string) {
   let counter: number = 0;
-  for await (const entry of Deno.readDir(dirPath)) {
+  // Sorting the migration files in the proper order
+  const sqlFiles = (await Array.fromAsync(Deno.readDir(dirPath)))
+    .filter(entry => entry.isFile && entry.name.endsWith(".sql"))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  for await (const entry of sqlFiles) {
     const entryPath = join(dirPath, entry.name);
     if (entry.isDirectory) {
       await traverseDirectories(entryPath);

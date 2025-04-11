@@ -1,13 +1,9 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
 import { getStyle } from '../../../utils/cssUtils.js';
-import { fromRGBtoHex } from '../../../utils/fromRGBtoHex.js';
-import { createAndRenderAlert, createAndRenderConfirm } from '../../../shared/alerts.js';
+import { fromRGBtoHex } from '../../../utils/colorUtils.js';
+import { createAndRenderAlert } from '../../../shared/alerts.js';
 
-/*
-  TODO:
-  4) testar tudo
-*/
 export class Ellipser extends ToolEventHandler {
   constructor(elements, alert = createAndRenderAlert) {
     super(elements);
@@ -26,8 +22,6 @@ export class Ellipser extends ToolEventHandler {
     this.initOptionsInputHandler();
     this.currentEllipse = {};
     this.ctrlKeyCapturing = this.ctrlKeyCapturing.bind(this);
-
-    this.keepConfirm = true;
   }
 
   initOptionsInputHandler() {
@@ -107,7 +101,7 @@ export class Ellipser extends ToolEventHandler {
       radiusHeight: y - this.currentEllipse.y,
     });
     
-    super.startRenderCall(); // clear for real time lining, overwriting with latest line state
+    super.renderLatestState(); // clear for real time lining, overwriting with latest line state
     this.updateContextToCurrentStyle();
     
     const { ellipseFilled, ellipseStroked } = this.currentStyle;
@@ -157,11 +151,6 @@ export class Ellipser extends ToolEventHandler {
   }
 
   // 2.a) - Private Class Utils:
-  getPreviousInputValue(event) {
-    const currentInput = `${event.target.getAttribute('id')}`;
-    return this.cursorStyle[currentInput];
-  }
-
   handleThicknessChange(event) {
     super.handleStyleSwitch(event);
     this.updateContextToCurrentStyle();

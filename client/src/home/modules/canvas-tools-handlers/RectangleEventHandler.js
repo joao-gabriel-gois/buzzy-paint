@@ -1,7 +1,7 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
 import { getStyle } from '../../../utils/cssUtils.js';
-import { fromRGBtoHex } from '../../../utils/fromRGBtoHex.js';
+import { fromRGBtoHex } from '../../../utils/colorUtils.js';
 import { createAndRenderAlert, createAndRenderConfirm } from '../../../shared/alerts.js';
 
 export class Rectangler extends ToolEventHandler {
@@ -21,13 +21,10 @@ export class Rectangler extends ToolEventHandler {
       .map(id => document.getElementById(id));
 
     this.initOptionsInputHandler();
-    // this.initOptionsInputHandler = this.initOptionsInputHandler.bind(this);
+
     // array of positions of current draw
     this.currentRect = {};
     this.ctrlKeyCapturing = this.ctrlKeyCapturing.bind(this);
-    // this.ctrlKeyCapturingCancel = this.ctrlKeyCapturingCancel.bind(this);
-
-    this.keepConfirm = true;
   }
 
   initOptionsInputHandler() {
@@ -106,7 +103,7 @@ export class Rectangler extends ToolEventHandler {
       height: y - this.currentRect.y,
     });
     
-    super.startRenderCall(); // clear for real time lining, overwriting with latest line state
+    super.renderLatestState(); // clear for real time lining, overwriting with latest line state
     this.updateContextToCurrentStyle();
     
     const { rectFilled, rectStroked } = this.currentStyle;
@@ -154,11 +151,6 @@ export class Rectangler extends ToolEventHandler {
   }
 
   // 2.a) - Private Class Utils:
-  getPreviousInputValue(event) {
-    const currentInput = `${event.target.getAttribute('id')}`;
-    return this.cursorStyle[currentInput];
-  }
-
   handleThicknessChange(event) {
     super.handleStyleSwitch(event);
     this.updateContextToCurrentStyle();
@@ -190,27 +182,11 @@ export class Rectangler extends ToolEventHandler {
     this.ctrlPressed = Boolean(event.ctrlKey);
   }
 
-  // ctrlKeyCapturingCancel(event) {
-  //   setTimeout(() => {
-  //     this.ctrlKeyCapturing(event)
-  //   }, 20);
-  // }
-
   setActiveState(state) {
     if (Boolean(state)) {
       this.updateContextToCurrentStyle();
       this.startCtrlKeyCapturing();
-      // if (this.keepConfirm) {
-      //   this.confirm({
-      //     type: 'info',
-      //     title: 'Feature Reminder',
-      //     message: 'You can also draw squares when keeping <strong>\'ctrl\''
-      //       + ' </strong>pressed.<br><br><strong style="display:flex;justify'
-      //       + '-self:center;">Do you want to cancel this reminder?</strong>'
-      //   }).then(cancel => {
-      //     this.keepConfirm = !cancel;
-      //   });
-      // }
+
       if (this.activeCounter === 0) {
         this.alert({
           type: 'info',

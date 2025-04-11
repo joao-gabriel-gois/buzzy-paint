@@ -18,7 +18,6 @@ export class Writter extends ToolEventHandler {
     this.lastPosition = [];
   }
 
-  // 1) Private Event Handler - Event Related Functions
   createWriteEvent() {
     const writeEvent = super.createToolEvent('write', {
         position: this.lastPosition,
@@ -52,14 +51,11 @@ export class Writter extends ToolEventHandler {
     super.dispacthToolEvent(this.createWriteEvent());
   }
 
-  // 2.a) Private Class Utils
   updateLastPosition(event) {
     const position = getRelativeCursorPos(event, this.canvas);
     this.lastPosition = position;
   }
 
-  // tentar substituir todos os momentos em que se move o texto por render calls
-  // atualizando sempre a ultima posição lá também e de lá de fato usar o context
   writeText(innerText, position = this.lastPosition) {
     this.updateContextToCurrentStyle();
     this.context.fillText(innerText, ...position);
@@ -89,29 +85,7 @@ export class Writter extends ToolEventHandler {
   }
 
   handleStyleSwitch(event) {
-    if (event.target.value === "") return;
-    const { 
-      fontSize,
-    } = this.currentStyle;
-    super.handleStyleSwitch(event);
-    
-    const updatedFontSize = Number(this.currentStyle.fontSize);
-    if (updatedFontSize === fontSize) {
-      return;
-    }
-    else if (isNaN(updatedFontSize)) {
-      this.cursorStyle.fontSize = fontSize;
-      console.log('fontSize is NaN:', event.target.value);
-      this.updateContextToCurrentStyle();
-      return;
-    }
-    
-    this.currentStyle.fontSize = (
-      updatedFontSize <= MIN_FONT_SIZE
-        ? MIN_FONT_SIZE
-        : updatedFontSize
-    );
-    event.target.value = this.currentStyle.fontSize;
+    super.handleStyleSwitch(event, MIN_FONT_SIZE);
     this.updateContextToCurrentStyle();
   }
 

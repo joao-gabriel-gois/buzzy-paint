@@ -96,7 +96,7 @@ export type UndoStack = EventQueue;
 export interface IDrawsDTO {
   tabName: string;
   eventQueue: EventQueue;
-  undoStack: UndoStack; // turn it in a tree later (/TODO on client side)
+  undoStack: UndoStack;
 }
 export interface ITabsDTO {
   activeIndex: number;

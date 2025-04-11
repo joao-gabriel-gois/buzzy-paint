@@ -4,8 +4,6 @@ import { getStyle } from '../../../utils/cssUtils.js';
 import { fromRGBtoHex } from '../../../utils/colorUtils.js';
 import { createAndRenderAlert, createAndRenderConfirm } from '../../../shared/alerts.js';
 
-const MIN_RECT_LINE_WIDTH = 1;
-
 export class Rectangler extends ToolEventHandler {
   constructor(elements, alert = createAndRenderAlert, confirm = createAndRenderConfirm) {
     super(elements);
@@ -24,7 +22,6 @@ export class Rectangler extends ToolEventHandler {
 
     this.initOptionsInputHandler();
 
-    // array of positions of current draw
     this.currentRect = {};
     this.ctrlKeyCapturing = this.ctrlKeyCapturing.bind(this);
   }
@@ -144,25 +141,7 @@ export class Rectangler extends ToolEventHandler {
   }
 
   handleStyleSwitch(event) {
-    if (event.target.value === "") return;
-    const { rectLineWidth } = this.currentStyle;
     super.handleStyleSwitch(event);
-    const updatedRectLineWidth = Number(this.currentStyle.rectLineWidth);
-    if (updatedRectLineWidth === rectLineWidth) {
-      return;
-    }
-    else if (isNaN(updatedRectLineWidth)) {
-      this.currentStyle.rectLineWidth = rectLineWidth;
-      console.log('rectLineWidth is NaN:', event.target.value);
-      this.updateContextToCurrentStyle();
-      return;
-    }
-    this.currentStyle.rectLineWidth = (
-      updatedRectLineWidth <= MIN_RECT_LINE_WIDTH
-        ? MIN_RECT_LINE_WIDTH
-        : updatedRectLineWidth
-    );
-    event.target.value = this.currentStyle.rectLineWidth;
     this.updateContextToCurrentStyle();
   }
 

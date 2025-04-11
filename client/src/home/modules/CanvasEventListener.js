@@ -3,6 +3,14 @@ import { getStyle } from '../../utils/cssUtils.js';
 
 // const MAX_UNDO_STACK_SIZE = 120;
 
+// TODO:
+// save last rendered state as imageData to avoid rendering from scratch
+// with several iterations. Only undo and redo will required rendering 
+// from scratch after pushing last event on eventQueue into undoStack.
+// For new events, just need to rendered the new one and update the
+// whole canvas image data. Adapt everything to the news approach and
+// test all the tools again after it.
+
 export class CanvasEventListener {
   static #instancesCount = 0;
 

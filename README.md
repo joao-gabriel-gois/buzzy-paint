@@ -284,8 +284,8 @@ ___
 (1st milestone)
 - [x] <s>Add UpdateDraw Usecase Typying and Create Validation for them</s>
 - [x] <s>Add unit tests after changes (for services)</s>
-- [ ] <b>Implement CI/CD</b>
-- [ ] <s>Add unit tests for controllers</s>
+- [ ] <b>Add unit tests for controllers</b>
+- [ ] Implement CI/CD
 
 
 (2nd milestone)
@@ -301,7 +301,9 @@ ___
 
 (1st milestone)
 - [x] <s>Ellipse drawing tool (becoming circle when keeping ctrl pressed, just like Rectangle/Square current feature)</s>
-- [x] <b>Crop/Move selected areas</b>
+- [x] <s>Crop to Move and/or rotate selected areas</s>
+- [x] <s>Optimize last state rendering</s>
+- [ ] Create text showing how to use each tool to be rendered alongside its options
 - [ ] Figure Out how to apply fill with collision / closed shapes detection (just like MS Classic Win98 Paint App)
 
 (2nd milestone)

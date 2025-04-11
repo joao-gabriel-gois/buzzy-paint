@@ -1,8 +1,6 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
 
-const MIN_DRAW_LINE_WIDTH = 1;
-
 export class Drawer extends ToolEventHandler {
   constructor(elements) {
     super(elements);
@@ -10,12 +8,14 @@ export class Drawer extends ToolEventHandler {
       drawLineWidth: 1,
       drawColor: '#000',
     }
-    
-    // array of positions of current draw
+    /**
+     * @typedef {[number, number]} Point
+     * @typedef {Point[]} Sequence
+     * @type {Sequence}
+    */
     this.currentDrawSequence = [];
   }
 
-  // 1) Private Event Handler - Event Related Functions
   createDrawEvent() {
     const drawEvent = super.createToolEvent('draw', {
       sequence: this.currentDrawSequence,
@@ -65,25 +65,7 @@ export class Drawer extends ToolEventHandler {
   }
 
   handleStyleSwitch(event) {
-    if (event.target.value === "") return;
-    const { drawLineWidth } = this.currentStyle;
     super.handleStyleSwitch(event);
-    const updatedDrawLineWidth = Number(this.currentStyle.drawLineWidth);
-    if (updatedDrawLineWidth === drawLineWidth) {
-      return;
-    }
-    else if (isNaN(updatedDrawLineWidth)) {
-      this.currentStyle.drawLineWidth = drawLineWidth;
-      console.log('drawLineWidth is NaN:', event.target.value);
-      this.updateContextToCurrentStyle();
-      return;
-    }
-    this.currentStyle.drawLineWidth = (
-      updatedDrawLineWidth <= MIN_DRAW_LINE_WIDTH
-        ? MIN_DRAW_LINE_WIDTH
-        : updatedDrawLineWidth
-    );
-    event.target.value = this.currentStyle.drawLineWidth;
     this.updateContextToCurrentStyle();
   }
 
@@ -97,7 +79,6 @@ export class Drawer extends ToolEventHandler {
     this.context.lineWidth = drawLineWidth;
   }
 
-  // 3) Public interfaces
   setActiveState(state) {
     if (Boolean(state)) this.context.strokeStyle = this.currentStyle.drawColor;
     super.setActiveState(state);

@@ -111,13 +111,7 @@ export class Eraser extends ToolEventHandler {
   }
 
   handleStyleSwitch(event) {
-    const eraserSize = Number(event.target.value);
-    if (isNaN(eraserSize)) {
-      console.log('eraserSize is NaN:', event.target.value);
-      return;
-    }
-    this.currentStyle.eraserSize = eraserSize <= MIN_ERASER_SIZE ? MIN_ERASER_SIZE : eraserSize;
-    event.target.value = this.currentStyle.eraserSize;
+    super.handleStyleSwitch(event, MIN_ERASER_SIZE);
   }
 
   start() {

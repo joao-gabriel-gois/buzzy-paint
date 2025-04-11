@@ -4,11 +4,13 @@ import { getStyle } from '../../../utils/cssUtils.js';
 import { fromRGBtoHex } from '../../../utils/colorUtils.js';
 import { createAndRenderAlert } from '../../../shared/alerts.js';
 
+const MIN_ELLIPSE_LINE_WIDTH = 1;
+
 export class Ellipser extends ToolEventHandler {
   constructor(elements, alert = createAndRenderAlert) {
     super(elements);
     super.currentStyle = {
-      ellipseThickness: 1,
+      ellipseLineWidth: 1,
       ellipseOutlineColor: '#000',
       ellipseFillColor: getStyle(this.canvas).backgroundColor,
       ellipseFilled: false,
@@ -142,30 +144,38 @@ export class Ellipser extends ToolEventHandler {
   }
 
   handleStyleSwitch(event) {
-    if (Number(event.target.value)) {
-      this.handleThicknessChange(event);
-    } else {   
-      super.handleStyleSwitch(event);
-      this.updateContextToCurrentStyle();
-    } 
-  }
-
-  // 2.a) - Private Class Utils:
-  handleThicknessChange(event) {
+    if (event.target.value === "") return;
+    const { ellipseLineWidth } = this.currentStyle;
     super.handleStyleSwitch(event);
+    const updatedEllipseLineWidth = Number(this.currentStyle.ellipseLineWidth);
+    if (updatedEllipseLineWidth === ellipseLineWidth) {
+      return;
+    }
+    else if (isNaN(updatedEllipseLineWidth)) {
+      this.currentStyle.ellipseLineWidth = ellipseLineWidth;
+      console.log('ellipseLineWidth is NaN:', event.target.value);
+      this.updateContextToCurrentStyle();
+      return;
+    }
+    this.currentStyle.ellipseLineWidth = (
+      updatedEllipseLineWidth <= MIN_ELLIPSE_LINE_WIDTH
+        ? MIN_ELLIPSE_LINE_WIDTH
+        : updatedEllipseLineWidth
+    );
+    event.target.value = this.currentStyle.ellipseLineWidth;
     this.updateContextToCurrentStyle();
   }
 
   updateContextToCurrentStyle() {
     const {
       ellipseOutlineColor,
-      ellipseThickness,
+      ellipseLineWidth,
       ellipseFillColor,
     } = this.currentStyle;
 
     this.context.strokeStyle = ellipseOutlineColor;
     this.context.fillStyle = ellipseFillColor;
-    this.context.lineWidth = ellipseThickness;
+    this.context.lineWidth = ellipseLineWidth;
   }
 
   startCtrlKeyCapturing() {

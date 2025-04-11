@@ -9,7 +9,7 @@ body {
   box-sizing: border-box;
   user-select: none;
   animation: show ease-out 0.666s;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 input:focus {

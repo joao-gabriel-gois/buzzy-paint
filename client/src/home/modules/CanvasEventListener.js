@@ -42,9 +42,9 @@ export class CanvasEventListener {
 
   redrawSequence(event) {
     const { sequence, style } = event;
-    const drawThicknessRate = 1 + style.drawThickness / 8;
-    this.context.strokeStyle = style.drawColor;
-    this.context.lineWidth = drawThicknessRate;
+    const { drawLineWidth, drawColor } = style;
+    this.context.strokeStyle = drawColor;
+    this.context.lineWidth = drawLineWidth;
 
     sequence.forEach((point, index) => {
       if (!index) {
@@ -62,7 +62,7 @@ export class CanvasEventListener {
   redrawLine(event) {
     const { line, style } = event;
     this.context.strokeStyle = style.lineColor;
-    this.context.lineWidth = style.lineThickness;
+    this.context.lineWidth = style.lineWidth;
     this.context.beginPath();
     this.context.moveTo(...line.start);
     this.context.lineTo(...line.end);
@@ -99,7 +99,7 @@ export class CanvasEventListener {
     }
     if (style.rectStroked) {
       this.context.strokeStyle = style.rectOutlineColor;
-      this.context.lineWidth = style.rectThickness;
+      this.context.lineWidth = style.rectLineWidth;
       this.context.strokeRect(x, y, width, height);
     }
   }
@@ -119,7 +119,7 @@ export class CanvasEventListener {
     }
     if (style.ellipseStroked) {
       this.context.strokeStyle = style.ellipseOutlineColor;
-      this.context.lineWidth = style.ellipseThickness;
+      this.context.lineWidth = style.ellipseLineWidth;
       this.context.beginPath();
       this.context.ellipse(x, y, radiusWidth, radiusHeight, 0, 0, 2 * Math.PI);
       this.context.stroke();

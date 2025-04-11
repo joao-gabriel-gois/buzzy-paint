@@ -1,10 +1,13 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
-import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
+import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js';
+
+const MIN_LINE_WIDTH = 1;
+
 export class Polygoner extends ToolEventHandler {
   constructor(elements) {
     super(elements);
     super.currentStyle = {
-      lineThickness: 1,
+      lineWidth: 1,
       lineColor: '#000',
     }
 
@@ -108,27 +111,47 @@ export class Polygoner extends ToolEventHandler {
   }
 
   handleStyleSwitch(event) {
-    if (Number(event.target.value)) {
-      this.handleThicknessChange(event);
-    } else {   
-      super.handleStyleSwitch(event);
-      this.updateContextToCurrentStyle();
-    } 
-  }
-
-  handleThicknessChange(event) {
+    if (event.target.value === "") return;
+    
     super.handleStyleSwitch(event);
+    const { 
+      lineWidth,
+      polygonLineWidth,
+      polygonLineColor
+    } = this.currentStyle;
+    if (polygonLineColor) this.currentStyle.lineColor = polygonLineColor;
+    delete this.currentStyle.polygonLineColor;
+    
+    const updatedLineWidth = Number(polygonLineWidth);
+    if (updatedLineWidth === lineWidth) {
+      delete this.currentStyle.polygonLineWidth;
+      return;
+    }
+    else if (isNaN(updatedLineWidth)) {
+      delete this.currentStyle.polygonLineWidth;
+      console.log('lineWidth is NaN:', event.target.value);
+      this.updateContextToCurrentStyle();
+      return;
+    }
+
+    this.currentStyle.lineWidth = (
+      updatedLineWidth <= MIN_LINE_WIDTH
+        ? MIN_LINE_WIDTH
+        : updatedLineWidth
+    );
+    event.target.value = this.currentStyle.lineWidth;
+    delete this.currentStyle.polygonLineWidth;
     this.updateContextToCurrentStyle();
   }
 
   updateContextToCurrentStyle() {
     const {
       lineColor,
-      lineThickness
+      lineWidth
     } = this.currentStyle;
       
     this.context.strokeStyle = lineColor;
-    this.context.lineWidth = lineThickness;
+    this.context.lineWidth = lineWidth;
   }
 
   setActiveState(state) {

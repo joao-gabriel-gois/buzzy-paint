@@ -1,11 +1,13 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
 
+const MIN_DRAW_LINE_WIDTH = 1;
+
 export class Drawer extends ToolEventHandler {
   constructor(elements) {
     super(elements);
     super.currentStyle = {
-      drawThickness: 1,
+      drawLineWidth: 1,
       drawColor: '#000',
     }
     
@@ -26,9 +28,9 @@ export class Drawer extends ToolEventHandler {
   handleOnMouseDown(event) {
     this.cursorStyle = 'crosshair';
     super.handleOnMouseDown(event);
-    const drawThicknessRate = 1 + this.currentStyle.drawThickness / 8;
-    this.context.strokeStyle = this.currentStyle.drawColor;
-    this.context.lineWidth = drawThicknessRate;
+    const { drawLineWidth, drawColor } = this.currentStyle;
+    this.context.strokeStyle = drawColor;
+    this.context.lineWidth = drawLineWidth;
     
     const position = getRelativeCursorPos(event, this.canvas);
     this.context.beginPath();
@@ -63,47 +65,41 @@ export class Drawer extends ToolEventHandler {
   }
 
   handleStyleSwitch(event) {
-    if (Number(event.target.value)) {
-      this.handleThicknessChange(event);
-    } else {   
-      super.handleStyleSwitch(event);
-      this.updateContextToCurrentStyle();
-    } 
-  }
-
-  // 2.a) - Private Class Utils:
-  handleThicknessChange(event) {
+    if (event.target.value === "") return;
+    const { drawLineWidth } = this.currentStyle;
     super.handleStyleSwitch(event);
+    const updatedDrawLineWidth = Number(this.currentStyle.drawLineWidth);
+    if (updatedDrawLineWidth === drawLineWidth) {
+      return;
+    }
+    else if (isNaN(updatedDrawLineWidth)) {
+      this.currentStyle.drawLineWidth = drawLineWidth;
+      console.log('drawLineWidth is NaN:', event.target.value);
+      this.updateContextToCurrentStyle();
+      return;
+    }
+    this.currentStyle.drawLineWidth = (
+      updatedDrawLineWidth <= MIN_DRAW_LINE_WIDTH
+        ? MIN_DRAW_LINE_WIDTH
+        : updatedDrawLineWidth
+    );
+    event.target.value = this.currentStyle.drawLineWidth;
     this.updateContextToCurrentStyle();
   }
 
-  // 2.b) Specific Util for this implementation (same format but specific for each event handler)
-
-  // Bellow method is only necessary for Tools such as Writter and Drawer
-  // because both classes needs to render while updating CanvasListener
-  // Data structure
   updateContextToCurrentStyle() {
     const {
       drawColor,
-      drawThickness
+      drawLineWidth
     } = this.currentStyle;
     
     this.context.strokeStyle = drawColor;
-    this.context.lineWidth = drawThickness;
+    this.context.lineWidth = drawLineWidth;
   }
 
   // 3) Public interfaces
-
   setActiveState(state) {
     if (Boolean(state)) this.context.strokeStyle = this.currentStyle.drawColor;
     super.setActiveState(state);
   }
-
-  // start() {
-  //   super.start();
-  // }
-
-  // stop() {
-  //   super.stop();
-  // }
 }

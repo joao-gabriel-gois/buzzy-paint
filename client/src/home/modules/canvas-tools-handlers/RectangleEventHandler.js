@@ -4,11 +4,13 @@ import { getStyle } from '../../../utils/cssUtils.js';
 import { fromRGBtoHex } from '../../../utils/colorUtils.js';
 import { createAndRenderAlert, createAndRenderConfirm } from '../../../shared/alerts.js';
 
+const MIN_RECT_LINE_WIDTH = 1;
+
 export class Rectangler extends ToolEventHandler {
   constructor(elements, alert = createAndRenderAlert, confirm = createAndRenderConfirm) {
     super(elements);
     super.currentStyle = {
-      rectThickness: 1,
+      rectLineWidth: 1,
       rectOutlineColor: '#000',
       rectFillColor: getStyle(this.canvas).backgroundColor,
       rectFilled: false,
@@ -142,30 +144,38 @@ export class Rectangler extends ToolEventHandler {
   }
 
   handleStyleSwitch(event) {
-    if (Number(event.target.value)) {
-      this.handleThicknessChange(event);
-    } else {   
-      super.handleStyleSwitch(event);
-      this.updateContextToCurrentStyle();
-    } 
-  }
-
-  // 2.a) - Private Class Utils:
-  handleThicknessChange(event) {
+    if (event.target.value === "") return;
+    const { rectLineWidth } = this.currentStyle;
     super.handleStyleSwitch(event);
+    const updatedRectLineWidth = Number(this.currentStyle.rectLineWidth);
+    if (updatedRectLineWidth === rectLineWidth) {
+      return;
+    }
+    else if (isNaN(updatedRectLineWidth)) {
+      this.currentStyle.rectLineWidth = rectLineWidth;
+      console.log('rectLineWidth is NaN:', event.target.value);
+      this.updateContextToCurrentStyle();
+      return;
+    }
+    this.currentStyle.rectLineWidth = (
+      updatedRectLineWidth <= MIN_RECT_LINE_WIDTH
+        ? MIN_RECT_LINE_WIDTH
+        : updatedRectLineWidth
+    );
+    event.target.value = this.currentStyle.rectLineWidth;
     this.updateContextToCurrentStyle();
   }
 
   updateContextToCurrentStyle() {
     const {
       rectOutlineColor,
-      rectThickness,
+      rectLineWidth,
       rectFillColor,
     } = this.currentStyle;
 
     this.context.strokeStyle = rectOutlineColor;
     this.context.fillStyle = rectFillColor;
-    this.context.lineWidth = rectThickness;
+    this.context.lineWidth = rectLineWidth;
   }
 
   startCtrlKeyCapturing() {

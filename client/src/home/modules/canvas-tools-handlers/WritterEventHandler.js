@@ -1,6 +1,7 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
 
+const MIN_FONT_SIZE = 4;
 
 // Tentar substituir todas as lógicas que lidam com o contexto ou com outra interface como no drawer
 // ou tentar o que lá deu problema de perfomance e ver se ocorre o mesmo
@@ -87,11 +88,33 @@ export class Writter extends ToolEventHandler {
     this.writeText(innerText);
   }
 
-  // 2.b) Specific Util for this implementation (same format but specific for each event handler)
+  handleStyleSwitch(event) {
+    if (event.target.value === "") return;
+    const { 
+      fontSize,
+    } = this.currentStyle;
+    super.handleStyleSwitch(event);
+    
+    const updatedFontSize = Number(this.currentStyle.fontSize);
+    if (updatedFontSize === fontSize) {
+      return;
+    }
+    else if (isNaN(updatedFontSize)) {
+      this.cursorStyle.fontSize = fontSize;
+      console.log('fontSize is NaN:', event.target.value);
+      this.updateContextToCurrentStyle();
+      return;
+    }
+    
+    this.currentStyle.fontSize = (
+      updatedFontSize <= MIN_FONT_SIZE
+        ? MIN_FONT_SIZE
+        : updatedFontSize
+    );
+    event.target.value = this.currentStyle.fontSize;
+    this.updateContextToCurrentStyle();
+  }
 
-  // Bellow method is only necessary for Tools such as Writter and Drawer
-  // because both classes needs to render while updating CanvasListener
-  // Data structure
   updateContextToCurrentStyle() {
     const {
       textColor,

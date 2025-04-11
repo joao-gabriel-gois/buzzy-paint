@@ -1,10 +1,13 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
+
+const MIN_LINE_WIDTH = 1;
+
 export class Liner extends ToolEventHandler {
   constructor(elements) {
     super(elements);
     super.currentStyle = {
-      lineThickness: 1,
+      lineWidth: 1,
       lineColor: '#000',
     }
     // array of positions of current draw
@@ -64,12 +67,26 @@ export class Liner extends ToolEventHandler {
   }
 
   handleStyleSwitch(event) {
-    if (Number(event.target.value)) {
-      this.handleThicknessChange(event);
-    } else {   
-      super.handleStyleSwitch(event);
+    if (event.target.value === "") return;
+    const { lineWidth } = this.currentStyle;
+    super.handleStyleSwitch(event);
+    const updatedLineWidth = Number(this.currentStyle.lineWidth);
+    if (updatedLineWidth === lineWidth) {
+      return;
+    }
+    else if (isNaN(updatedLineWidth)) {
+      this.currentStyle.lineWidth = lineWidth;
+      console.log('lineWidth is NaN:', event.target.value);
       this.updateContextToCurrentStyle();
-    } 
+      return;
+    }
+    this.currentStyle.lineWidth = (
+      updatedLineWidth <= MIN_LINE_WIDTH
+        ? MIN_LINE_WIDTH
+        : updatedLineWidth
+    );
+    event.target.value = this.currentStyle.lineWidth;
+    this.updateContextToCurrentStyle();
   }
 
   // 2.a) - Private Class Utils:
@@ -86,14 +103,14 @@ export class Liner extends ToolEventHandler {
   updateContextToCurrentStyle() {
     const {
       lineColor,
-      lineThickness
+      lineWidth
     } = this.currentStyle;
     
     // TODO - Create input for selecting line Cap on form
     // this.context.lineCap = "round";
     
     this.context.strokeStyle = lineColor;
-    this.context.lineWidth = lineThickness;
+    this.context.lineWidth = lineWidth;
   }
 
   // 3) Public interfaces

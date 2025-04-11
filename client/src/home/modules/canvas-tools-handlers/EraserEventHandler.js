@@ -2,6 +2,8 @@ import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
 import { getStyle } from '../../../utils/cssUtils.js'
 
+const MIN_ERASER_SIZE = 2;
+
 export class Eraser extends ToolEventHandler {
   constructor(elements) {
     super(elements);
@@ -52,7 +54,6 @@ export class Eraser extends ToolEventHandler {
     this.context.fillRect(x - size / 2, y - size / 2, size, size)
 
     this.currentEraseSequence = [];
-
   }
 
 
@@ -103,10 +104,20 @@ export class Eraser extends ToolEventHandler {
     this.tooltipDiv.style.width = `${sizeW - ratioW * border}px`;
     this.tooltipDiv.style.height = `${sizeH - ratioH * border}px`;
   }
-
+  
   removeEraserTooltip() {
     // this.tooltipDiv.setAttribute('style', 'display: none;');
     this.tooltipDiv.classList.remove('erase-tooltip-added');
+  }
+
+  handleStyleSwitch(event) {
+    let eraserSize = Number(event.target.value);
+    if (isNaN(eraserSize)) {
+      console.log('eraserSize is NaN:', event.target.value);
+      return;
+    }
+    this.currentStyle.eraserSize = eraserSize <= MIN_ERASER_SIZE ? MIN_ERASER_SIZE : eraserSize;
+    event.target.value = this.currentStyle.eraserSize;
   }
 
   start() {

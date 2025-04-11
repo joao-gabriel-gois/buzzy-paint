@@ -78,8 +78,8 @@ export interface IEllipseCommand {
 export interface ICropAndMoveCommand {
   type: "CROP-AND-MOVE";
   firstSelection: Rectangle;
-  dataPosition: Point;
-  stillSelected: boolean;
+  dataPosition: Point | [];
+  firstEventOfTheChain: boolean;
   style: {
     rotationDegree: number;
   };

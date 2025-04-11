@@ -22,6 +22,9 @@ export class CanvasEventListener {
     this.undoStack = data.undoStack;
     // this.alert = alert;
 
+    this.offscreenCanvas = document.createElement('canvas');
+    this.offscreenCanvasContext = null;
+
     this.zoomCurrentRate = 1;
     this.zoomPreviousRate = 1;
     this.isZoomActive = false;
@@ -125,69 +128,66 @@ export class CanvasEventListener {
   
   cropAndMove(event) {
     const {
-      x, y,
+      x: firstX,
+      y: firstY,
       width,
       height
     } = event.firstSelection;
+
     const {
       dataPosition,
-      // TODO: Update rotation degree style in the final state as well
-      // style
+      firstEventOfTheChain,
+      style
     } = event;
+    this.context.save();
 
-    // The logic bellow is: Get the image, clear its first selection 
-    // and them move it. It's important to keep this order to avoid
-    // unexpected behavior. Also,  we are saving the previous data in
-    // the position that user is currently moving the image to
-    // (dataBeforePutImage and its Position), so once its moved again
-    // to another place we can recover it and keep a dynamic state that
-    // keeps the undo/redo feature working as expected.
-    if (!event.stillSelected) {
-      this.imageData = this.context.getImageData(x, y, width, height);
-      this.context.clearRect(x, y, width, height);
+    if (firstEventOfTheChain) {
+      const imageDataParameters = [firstX, firstY, width, height];
+      this.cropSelectionData = this.context.getImageData(...imageDataParameters);
+      this.context.clearRect(...imageDataParameters, style.rotationDegree);
+      // saving canvas state to render it behind image moving later
+      this.wholeCanvasImageData = this.context.getImageData(
+        0, 0,
+        this.canvas.width,
+        this.canvas.height
+      );
     }
     else {
-      this.context.putImageData(this.dataBeforePutImage, ...this.dataBeforePutImagePos)
+      this.context.putImageData(this.wholeCanvasImageData, 0, 0);
     }
-    this.dataBeforePutImage = this.context.getImageData(...dataPosition, width, height);
-    this.dataBeforePutImagePos = [...dataPosition];
-    // this.context.save(); // (???) guess for handling user input
-    this.context.putImageData(this.imageData, ...dataPosition);
-    // this.context.rotate(style.rotationDegree*Math.PI/180); // (???) guess for handling user input
-    // this.context.restore(); // (???) guess for handling user input
 
-    // const { rotationDegree } = style;
-    // if (rotationDegree === 0) {
-    //   this.context.putImageData(this.imageData, ...dataPosition);
-    //   return;
-    // }
+    if (!this.cropSelectionData) {
+      console.error("(CanvasEventListener) Strange scenario, can't find selection data!");
+      return;
+    }
+
+    let [x, y] = dataPosition;
+    if (!(x && y)) {
+      x = firstX;
+      y = firstY;
+    }
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+    const angle = style.rotationDegree;
+
+    this.context.translate(centerX, centerY);
+    this.context.rotate(angle);
+
+    this.offscreenCanvas.width = width;
+    this.offscreenCanvas.height = height;
+    if (!this.offscreenCanvasContext) {
+      this.offscreenCanvasContext = this.offscreenCanvas.getContext('2d');
+    }
+    this.offscreenCanvasContext.clearRect(0, 0, width, height);
+    this.offscreenCanvasContext.putImageData(this.cropSelectionData, 0, 0);
+
+    this.context.drawImage(
+      this.offscreenCanvas, 
+      -width / 2, -height / 2, // centered around rotation point
+      width, height
+    );
     
-    // const angle = rotationDegree * Math.PI / 180;
-    
-    // console.log('rotation applied:', angle, rotationDegree)
-    // const centerX = dataPosition[0] + width / 2;
-    // const centerY = dataPosition[1] + height / 2;
-    
-    // this.context.save();
-    
-    // this.context.translate(centerX, centerY);
-    
-    // this.context.rotate(angle);
-    
-    // const offscreenCanvas = document.createElement('canvas');
-    // offscreenCanvas.width = width;
-    // offscreenCanvas.height = height;
-    // const offCtx = offscreenCanvas.getContext('2d');
-    
-    // offCtx.putImageData(this.imageData, 0, 0);
-    
-    // this.context.drawImage(
-    //   offscreenCanvas,
-    //   -width / 2, -height / 2,
-    //   width, height
-    // );
-    
-    // this.context.restore();
+    this.context.restore();
   }
 
   applyZoom() {
@@ -195,7 +195,6 @@ export class CanvasEventListener {
     const zoomfactor = this.zoomCurrentRate;
     const { width, height } = this.canvas;
     // I'm using tranform this way in order to get a centered zoom
-
     // First we invert whatever other zoom might happened here before
     this.context.transform(
       invertedPreviousZoomRate, 0, 0,
@@ -203,7 +202,6 @@ export class CanvasEventListener {
       -(invertedPreviousZoomRate - 1) * width / 2,
       -(invertedPreviousZoomRate - 1) * height / 2
     );
-    
     // Then we apply the new zoom
     this.context.transform(
       zoomfactor, 0, 0,
@@ -334,8 +332,6 @@ export class CanvasEventListener {
     this.canvas.addEventListener('zoom', this.onZoom);
     this.canvas.addEventListener('erase', this.onCanvasEvent);
     this.canvas.addEventListener('crop-and-move', this.onCanvasEvent);
-    // this.canvas.addEventListener('create-crop-and-move', this.onCanvasEvent);
-    // this.canvas.addEventListener('update-crop-and-move', this.onCanvasEvent);
     this.canvas.addEventListener('render-call', this.renderCurrentState);
     document.addEventListener('keydown', this.onKeyDown);
   }
@@ -349,8 +345,6 @@ export class CanvasEventListener {
     this.canvas.removeEventListener('ellipse', this.onCanvasEvent);
     this.canvas.removeEventListener('erase', this.onCanvasEvent);
     this.canvas.removeEventListener('crop-and-move', this.onCanvasEvent);
-    // this.canvas.removeEventListener('create-crop-and-move', this.onCanvasEvent);
-    // this.canvas.removeEventListener('update-crop-and-move', this.onCanvasEvent);
     this.canvas.removeEventListener('render-call', this.renderCurrentState);
     document.removeEventListener('keydown', this.onKeyDown);
   }

@@ -23,7 +23,9 @@ function isPoint(value: unknown): value is Point {
 
 function isRectangle(value: unknown): value is Rectangle {
   if (!value || typeof value !== "object") return false;
+  
   const rectangleCandidate = value as Partial<Rectangle>;
+  
   if (typeof rectangleCandidate.x !== "number" || 
       typeof rectangleCandidate.y !== "number" || 
       typeof rectangleCandidate.width !== "number" || 
@@ -32,56 +34,62 @@ function isRectangle(value: unknown): value is Rectangle {
   }
   return true;
 }
+
 function isDrawCommand(value: unknown): value is IDrawCommand {
   if (!value || typeof value !== "object") return false;
-  
+
   const candidate = value as Partial<IDrawCommand>;
-  if (candidate.type !== "DRAW") return false;
-  
-  if (!Array.isArray(candidate.sequence)) return false;
-  for (const pos of candidate.sequence) {
+  const { sequence, style, type } = candidate;
+
+  if (type !== "DRAW") return false;
+  if (!Array.isArray(sequence)) return false;
+  for (const pos of sequence) {
     if (!isPoint(pos)) return false;
   }
-  
-  const style = candidate.style;
   if (!style || typeof style !== "object") return false;
+
+  const {
+    drawThickness,
+    drawColor
+  } = style as Partial<IDrawCommand["style"]>;
   
-  const styleObj = style as Partial<IDrawCommand["style"]>;
-  return typeof styleObj.drawThickness === "number" && 
-         typeof styleObj.drawColor === "string";
+  return typeof drawThickness === "number" && 
+         typeof drawColor === "string";
 }
 
 function isLineCommand(value: unknown): value is ILineCommand {
   if (!value || typeof value !== "object") return false;
   
   const candidate = value as Partial<ILineCommand>;
-  if (candidate.type !== "LINE") return false;
-  
-  const line = candidate.line;
+  const { line, style, type } = candidate;
+
+  if (type !== "LINE") return false;
   if (!line || typeof line !== "object") return false;
-  
   const lineObj = line as Partial<ILineCommand["line"]>;
   if (!isPoint(lineObj.start) || !isPoint(lineObj.end)) return false;
-  
-  const style = candidate.style;
   if (!style || typeof style !== "object") return false;
-  
-  const styleObj = style as Partial<ILineCommand["style"]>;
-  return typeof styleObj.lineThickness === "number" && 
-         typeof styleObj.lineColor === "string";
+
+  const {
+    lineThickness,
+    lineColor
+  } = style as Partial<ILineCommand["style"]>;
+
+  return typeof lineThickness === "number" && 
+         typeof lineColor === "string";
 }
 
 function isWriteCommand(value: unknown): value is IWriteCommand {
   if (!value || typeof value !== "object") return false;
   
   const candidate = value as Partial<IWriteCommand>;
-  if (candidate.type !== "WRITE") return false;
-  if (!isPoint(candidate.position)) return false;
-  
-  const style = candidate.style;
+  const { position, style, type } = candidate;
+
+  if (type !== "WRITE") return false;
+  if (!isPoint(position)) return false;
   if (!style || typeof style !== "object") return false;
-  
+
   const styleObj = style as Partial<IWriteCommand["style"]>;
+
   return typeof styleObj.textColor === "string" && 
          typeof styleObj.fontSize === "number" &&
          typeof styleObj.fontFamily === "string" &&
@@ -90,27 +98,27 @@ function isWriteCommand(value: unknown): value is IWriteCommand {
 
 function isEraseCommand(value: unknown): value is IEraseCommand {
   if (!value || typeof value !== "object") return false;
-  
+
   const candidate = value as Partial<IEraseCommand>;
-  if (candidate.type !== "ERASE") return false;
-  
-  if (!Array.isArray(candidate.sequence)) return false;
-  for (const pos of candidate.sequence) {
+  const { sequence, eraserSize, type } = candidate;
+
+  if (type !== "ERASE") return false;
+  if (!Array.isArray(sequence)) return false;
+  for (const pos of sequence) {
     if (!isPoint(pos)) return false;
   }
   
-  return typeof candidate.eraserSize === "number";
+  return typeof eraserSize === "number";
 }
 
 function isRectangleCommand(value: unknown): value is IRectangleCommand {
   if (!value || typeof value !== "object") return false;
-  
-  const candidate = value as Command;
-  if (candidate.type !== "RECT") return false;
-  
-  if (!isRectangle(candidate.rect)) return false;
 
-  const style = candidate.style;
+  const candidate = value as Partial<IRectangleCommand>;
+  const { rect, style, type } = candidate;
+
+  if (type !== "RECT") return false;
+  if (!isRectangle(rect)) return false;
   if (!style || typeof style !== "object") return false;
   
   return typeof style.rectThickness === "number" && 
@@ -123,20 +131,17 @@ function isRectangleCommand(value: unknown): value is IRectangleCommand {
 function isEllipseCommand(value: unknown): value is IEllipseCommand {
   if (!value || typeof value !== "object") return false;
   
-  const candidate = value as Command;
-  if (candidate.type !== "ELLIPSE") return false;
+  const candidate = value as Partial<IEllipseCommand>;
+  const { ellipse, style, type } = candidate;
   
-  const ellipse = candidate.ellipse;
+  if (type !== "ELLIPSE") return false;  
   if (!ellipse || typeof ellipse !== "object") return false;
-  
   if (typeof ellipse.x !== "number" || 
       typeof ellipse.y !== "number" || 
       typeof ellipse.radiusWidth !== "number" || 
       typeof ellipse.radiusHeight !== "number") {
     return false;
-  }
-  
-  const style = candidate.style;
+  }  
   if (!style || typeof style !== "object") return false;
   
   return typeof style.ellipseThickness === "number" && 
@@ -154,22 +159,18 @@ function isCropAndMoveCommand(value: unknown): value is ICropAndMoveCommand {
     type,
     firstSelection,
     dataPosition,
-    stillSelected,
+    firstEventOfTheChain,
     style
   } = candidate;
   
   if (type !== "CROP-AND-MOVE") return false;
-  
   else if (!isRectangle(firstSelection)) return false;
- 
   else if (!Array.isArray(dataPosition)) return false;
-  
-  else if (!isPoint(dataPosition)) return false;
-  
-  else if (typeof stillSelected !== "boolean") return false;
-
+  // dataPoisiton type is `Point | []`
+  else if (dataPosition.length !== 0 && !isPoint(dataPosition)) return false;
+  else if (typeof firstEventOfTheChain !== "boolean") return false;
   else if (!style || typeof style !== "object") return false;
-  
+
   return typeof style.rotationDegree === "number";
 }
 
@@ -201,7 +202,7 @@ function isCommand(value: unknown): value is Command {
 
 function isEventQueue(value: unknown): value is EventQueue {
   if (!Array.isArray(value)) return false;
-  
+
   for (let i = 0; i < value.length; i++) {
     if (!isCommand(value[i])) {
       return false;
@@ -213,8 +214,8 @@ function isEventQueue(value: unknown): value is EventQueue {
 
 function isDrawsDTO(value: unknown): value is IDrawsDTO {
   if (!value || typeof value !== "object") return false;
-
   const candidate = value as Partial<IDrawsDTO>;
+
   if (typeof candidate.tabName !== "string") return false;
   if (!isEventQueue(candidate.eventQueue)) return false;
   if (!isEventQueue(candidate.undoStack)) return false;

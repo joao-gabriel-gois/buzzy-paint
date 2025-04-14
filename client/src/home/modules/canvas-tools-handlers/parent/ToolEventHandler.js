@@ -25,8 +25,6 @@ export default class ToolEventHandler {
     this.handleOnMouseMove = this.handleOnMouseMove.bind(this);
     this.handleOnMouseUp = this.handleOnMouseUp.bind(this);
     this.handleStyleSwitch = this.handleStyleSwitch.bind(this);
-    this.handleGlobalMouseUpTracker = this.handleGlobalMouseUpTracker.bind(this);
-    this.renderCallEvent = new Event('render-call');
   }
   
   createToolEvent(eventName, detail) {
@@ -41,8 +39,9 @@ export default class ToolEventHandler {
     this.canvas.dispatchEvent(toolEvent);
   }
 
-  renderLatestState() {
-    this.canvas.dispatchEvent(this.renderCallEvent);
+  renderLatestState(options) {
+    const renderCallEvent = new CustomEvent('render-call', { detail: options});
+    this.canvas.dispatchEvent(renderCallEvent);
   }
 
   handleOnMouseDown(event) {
@@ -74,6 +73,7 @@ export default class ToolEventHandler {
         : Number(value);
     }
     el.value = value;
+    
     return this.updateCurrentStyle({
       ...this.currentStyle,
       [`${el.getAttribute('id')}`]: value,
@@ -88,18 +88,13 @@ export default class ToolEventHandler {
 
     return this.currentStyle;
   }
-  // handleGlobalMouseUpTracker(e) {
-  //   if (e.target.tagName === "LI" || e.target.tagName === "IMG" || e.target.tagName === "BUTTON") return;
-  //   this.outsideCanvasMouseUp = e.target !== this.canvas;
-  // };
+
   setActiveState(state) {
     this.activeState = Boolean(state);
     if (Boolean(state)) {
       this.canvas.addEventListener('mousedown', this.handleOnMouseDown);
-      // document.addEventListener('mouseup', this.handleGlobalMouseUpTracker);
     } else {
       this.canvas.removeEventListener('mousedown', this.handleOnMouseDown);
-      // document.removeEventListener('mouseup', this.handleGlobalMouseUpTracker);
     }
   }
 

@@ -1,25 +1,18 @@
-import { beforeAll, describe, it } from "jsr:@std/testing/bdd";
+import { afterAll, beforeAll, describe, it } from "jsr:@std/testing/bdd";
 import { expect } from "jsr:@std/expect";
 import { unreachable } from "jsr:@std/assert";
+import { IAuthRequest, IAuthResponse } from "@modules/accounts/useCases/interfaces.ts";
 import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
-import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts";
-import { IUsersTokensRepository } from "@modules/accounts/repositories/IUsersTokensRepository.ts";
-import { UsersRepositoryInMemory } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
-import { BadRequestError, BusinessLogicError } from "@shared/errors/ApplicationError.ts";
-import { UsersTokensRepositoryInMemory } from "@modules/accounts/repositories/in-memory/usersTokensRepository.ts";
-import { AuthenticateUserService, IAuthRequest, IAuthResponse } from "@modules/accounts/useCases/AuthenticateUser/authenticateUserService.ts";
 import { User } from "@modules/accounts/models/User.ts";
+import { usersRepository } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
+import { authenticateUserService } from "@modules/accounts/useCases/AuthenticateUser/authenticateUserService.ts";
+import { BadRequestError, BusinessLogicError } from "@shared/errors/ApplicationError.ts";
 
-let usersRepository: IUsersRepository;
-let usersTokensRepository: IUsersTokensRepository;
-let authenticateUserService: AuthenticateUserService;
 let userRequestData: ICreateUserDTO
 let user: User;
 
 describe("Authenticate User Service", () => {
   beforeAll(async () => {
-    usersRepository = new UsersRepositoryInMemory();
-    usersTokensRepository = new UsersTokensRepositoryInMemory();
     userRequestData = {
       email: "anything@test.com",
       username: "anyone",
@@ -28,8 +21,12 @@ describe("Authenticate User Service", () => {
       password: "TestPsswd!123_"
     };
     user = await usersRepository.create(userRequestData) as User;
-    authenticateUserService = new AuthenticateUserService(usersTokensRepository, usersRepository);
   });
+
+  afterAll(() => {
+    usersRepository.clear();
+  });
+  
 
   it("should be able to authenticate an user", async () => {
     const authDTO: IAuthRequest = {
@@ -37,7 +34,7 @@ describe("Authenticate User Service", () => {
       password: userRequestData.password // plain-text password
     };
 
-    const authResponse: IAuthResponse = await authenticateUserService.execute(authDTO);
+    const authResponse: IAuthResponse = await authenticateUserService(authDTO);
 
     expect(authResponse).toHaveProperty("token");
     expect(authResponse).toHaveProperty("refresh_token");
@@ -55,7 +52,7 @@ describe("Authenticate User Service", () => {
     };
 
     try {
-      await authenticateUserService.execute(authDTO);
+      await authenticateUserService(authDTO);
       unreachable("Expected BadRequestError for Incorrect Email or Password was not thrown");
     }
     catch(error) {
@@ -75,7 +72,7 @@ describe("Authenticate User Service", () => {
     };
 
     try {
-      await authenticateUserService.execute(authDTO);
+      await authenticateUserService(authDTO);
       unreachable("Expected BussinessLogicError for Incorrect Email or Password was not thrown");
     }
     catch(error) {

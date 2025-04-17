@@ -6,7 +6,7 @@ import { User } from "@modules/accounts/models/User.ts";
 import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts"
 
 
-export class UsersRepositoryInMemory implements IUsersRepository {
+class UsersRepositoryInMemory implements IUsersRepository {
   private users: User[] = [];
 
   async create(userDTO: ICreateUserDTO): Promise<ManageableUser> {
@@ -149,3 +149,5 @@ export class UsersRepositoryInMemory implements IUsersRepository {
     this.users = [];
   }
 }
+
+export const usersRepository = new UsersRepositoryInMemory();

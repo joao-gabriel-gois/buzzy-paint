@@ -2,7 +2,7 @@ import { IDrawsRepository } from "@modules/draws/repositories/IDrawsRepository.t
 import { IDeleteResult, IDrawDocument, ITabsDTO, IUpdateResult } from "@modules/draws/DTOs/DrawsDTO.ts";
 import { ApplicationError } from "@shared/errors/ApplicationError.ts";
 
-export class DrawsRepositoryInMemory implements IDrawsRepository {
+class DrawsRepositoryInMemory implements IDrawsRepository {
   private draws: Map<string, IDrawDocument> = new Map();
   private idCounter: number = 1;
 
@@ -94,16 +94,14 @@ export class DrawsRepositoryInMemory implements IDrawsRepository {
     return id;
   }
 
-  clearAll(): void {
-    this.draws.clear();
-    this.idCounter = 1;
-  }
-
   getAllDraws(): IDrawDocument[] {
     return Array.from(this.draws.values());
   }
 
   clear(): void {
-    this.draws = new Map();;
+    this.draws = new Map();
+    this.idCounter = 1;
   }
 }
+
+export const drawsRepository = new DrawsRepositoryInMemory();

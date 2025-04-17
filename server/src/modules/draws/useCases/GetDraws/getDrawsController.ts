@@ -2,7 +2,6 @@ import { Response, NextFunction } from "npm:@types/express";
 import { UnauthorizedError } from "@shared/errors/ApplicationError.ts";
 import { getDrawsService } from "@modules/draws/useCases/GetDraws/getDrawsService.ts";
 
-
 export const getDrawsController = async (request: AuthRequest, response: Response, next: NextFunction) => {
   const { id } = request.user!;
   if (!id) {
@@ -10,7 +9,7 @@ export const getDrawsController = async (request: AuthRequest, response: Respons
   }
   let data = null;
   try {
-    data = await getDrawsService.execute(id);
+    data = await getDrawsService(id);
   }
   catch(error) {
     return next(error);

@@ -3,7 +3,7 @@ import { ICreateUserTokensDTO } from "../../DTOs/CreateUserTokensDTO.ts";
 import { UserTokens } from "../../models/UserTokens.ts";
 import { DatabaseTransactionError } from "@shared/errors/ApplicationError.ts";
 
-export class UsersTokensRepositoryInMemory implements IUsersTokensRepository {
+class UsersTokensRepositoryInMemory implements IUsersTokensRepository {
   private usersTokens: UserTokens[] = [];
 
   async create(createUserTokenDTO: ICreateUserTokensDTO): Promise<UserTokens> {
@@ -80,3 +80,6 @@ export class UsersTokensRepositoryInMemory implements IUsersTokensRepository {
     this.usersTokens = [];
   }
 }
+
+
+export const usersTokensRepository = new UsersTokensRepositoryInMemory();

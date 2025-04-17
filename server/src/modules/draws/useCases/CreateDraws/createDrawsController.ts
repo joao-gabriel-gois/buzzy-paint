@@ -24,7 +24,7 @@ export const createDrawsController = async (request: AuthRequest, response: Resp
   }
 
   try {
-    await createDrawsService.execute(id, { draws, activeIndex, timestamp } as ITabsDTO);
+    await createDrawsService(id, { draws, activeIndex, timestamp } as ITabsDTO);
   }
   catch (error) {
     return next(error);

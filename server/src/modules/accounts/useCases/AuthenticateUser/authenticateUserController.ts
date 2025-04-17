@@ -5,6 +5,7 @@ import auth from '@config/auth.ts';
 import { expiryDateMapper } from "@utils/expiryDateMapper.ts";
 import * as zod from 'npm:zod';
 
+
 export const authenticateUserController = async (request: Request, response: Response, next: NextFunction) => {
   const {
     email,
@@ -47,7 +48,7 @@ export const authenticateUserController = async (request: Request, response: Res
 
   let sessionInfo;
   try {
-    sessionInfo = await authenticateUserService.execute({
+    sessionInfo = await authenticateUserService({
       email,
       password,
     });

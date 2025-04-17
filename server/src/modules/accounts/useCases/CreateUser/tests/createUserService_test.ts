@@ -1,19 +1,15 @@
-import { beforeAll, describe, it } from "jsr:@std/testing/bdd";
+import { afterAll, describe, it } from "jsr:@std/testing/bdd";
 import { expect } from "jsr:@std/expect";
 import { unreachable } from "jsr:@std/assert";
-import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts";
-import { UsersRepositoryInMemory } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
-import { CreateUserService } from "@modules/accounts/useCases/CreateUser/createUserService.ts";
 import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
 import { BusinessLogicError } from "@shared/errors/ApplicationError.ts";
+import { createUserService } from "@modules/accounts/useCases/CreateUser/createUserService.ts";
+import { usersRepository } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
 
-let usersRepository: IUsersRepository;
-let createUserService: CreateUserService;
 
 describe("Create User Service", () => {
-  beforeAll(() => {
-    usersRepository = new UsersRepositoryInMemory();
-    createUserService = new CreateUserService(usersRepository);        
+  afterAll(() => {
+    usersRepository.clear();
   });
 
   it("should be able to create an user", async () => {
@@ -25,7 +21,7 @@ describe("Create User Service", () => {
       password: "TestPwd!123_"
     };
 
-    const newUser = await createUserService.execute(userRequestData);
+    const newUser = await createUserService(userRequestData);
 
     expect(newUser).toHaveProperty("id");
     expect(newUser).toHaveProperty("draws_mongo_id");
@@ -42,7 +38,7 @@ describe("Create User Service", () => {
     };
 
     try {
-      await createUserService.execute(userRequestData);
+      await createUserService(userRequestData);
       unreachable("Expected BusinessLogicError for repeated email was not thrown");
     }
     catch (error) {
@@ -65,7 +61,7 @@ describe("Create User Service", () => {
     };
 
     try {
-      await createUserService.execute(userRequestData);
+      await createUserService(userRequestData);
       unreachable("Expected BusinessLogicError for repeated username was not thrown");
     }
     catch (error) {

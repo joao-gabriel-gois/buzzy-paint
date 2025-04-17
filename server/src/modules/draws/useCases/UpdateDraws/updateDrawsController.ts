@@ -24,7 +24,7 @@ export const updateDrawsController = async (request: AuthRequest, response: Resp
   }
 
   try {
-    await updateDrawsService.execute(id, {activeIndex, draws, timestamp} as ITabsDTO);
+    await updateDrawsService(id, {activeIndex, draws, timestamp} as ITabsDTO);
   }
   catch(error) {
     return next(error);

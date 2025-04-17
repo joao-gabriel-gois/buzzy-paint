@@ -1,30 +1,22 @@
 import { v4 as uuid } from "npm:uuid";
-import { beforeAll, describe, it } from "jsr:@std/testing/bdd";
+import { afterAll, beforeAll, describe, it } from "jsr:@std/testing/bdd";
 import { expect } from "jsr:@std/expect";
 import { unreachable } from "@std/assert/unreachable";
+import { ITabsDTO } from "@modules/draws/DTOs/DrawsDTO.ts";
 import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
 import { IUpdateUserDTO } from "@modules/accounts/DTOs/UpdateUserDTO.ts";
 import { User } from "@modules/accounts/models/User.ts";
-import { ITabsDTO } from "@modules/draws/DTOs/DrawsDTO.ts";
-import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts";
-import { IDrawsRepository } from "@modules/draws/repositories/IDrawsRepository.ts";
-import { UsersRepositoryInMemory } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
-import { DrawsRepositoryInMemory } from "@modules/draws/repositories/in-memory/drawsRepository.ts";
-import { CreateDrawsService } from "@modules/draws/useCases/CreateDraws/createDrawsService.ts";
-import { BusinessLogicError, NotFoundError } from "@shared/errors/ApplicationError.ts";
+import { drawsRepository } from "@modules/draws/repositories/in-memory/drawsRepository.ts";
+import { usersRepository } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
+import { createDrawsService } from "@modules/draws/useCases/CreateDraws/createDrawsService.ts";
 import { tabsDTOTestSample } from "@modules/draws/useCases/tabsDTOTestSample.ts";
+import { BusinessLogicError, NotFoundError } from "@shared/errors/ApplicationError.ts";
 
 let userRequestData: ICreateUserDTO;
 let user: User;
-let usersRepository: IUsersRepository;
-let drawsRepository: IDrawsRepository;
-let createDrawsService: CreateDrawsService;
 
 describe("Create Draws Service", () => {
   beforeAll(async () => {
-    usersRepository = new UsersRepositoryInMemory();
-    drawsRepository = new DrawsRepositoryInMemory();
-    createDrawsService = new CreateDrawsService(drawsRepository, usersRepository);
     userRequestData = {
       email: "anything@test.com",
       username: "anyone",
@@ -35,8 +27,14 @@ describe("Create Draws Service", () => {
     user = await usersRepository.create(userRequestData) as User;
   });
 
+  afterAll(() => {
+    usersRepository.clear();
+    drawsRepository.clear();
+  });
+
+  
   it("should be able to create a draw", async () => {
-    await createDrawsService.execute(user.id, tabsDTOTestSample);
+    await createDrawsService(user.id, tabsDTOTestSample);
     expect(user.draws_mongo_id).not.toEqual(null);
 
     if (user.draws_mongo_id) {
@@ -47,7 +45,7 @@ describe("Create Draws Service", () => {
 
   it("should not be able to create a draw for a non-existent user", async () => {
     try {
-      await createDrawsService.execute(uuid() as UUID, tabsDTOTestSample);
+      await createDrawsService(uuid() as UUID, tabsDTOTestSample);
       unreachable("Expected NotFoundError was not thrown for not found user_id");
     }
     catch(error) {
@@ -62,7 +60,7 @@ describe("Create Draws Service", () => {
 
   it("should not be able to create a draw for an user that already created one", async () => {
     try {
-      await createDrawsService.execute(user.id, tabsDTOTestSample);
+      await createDrawsService(user.id, tabsDTOTestSample);
       unreachable("Expected BusinessLogicError was not thrown for already assigned Draw");
     }
     catch(error) {
@@ -88,7 +86,7 @@ describe("Create Draws Service", () => {
       await new Promise((resolve, _) => resolve(null));
 
     try {
-      await createDrawsService.execute(newUser.id, tabsDTOTestSample);
+      await createDrawsService(newUser.id, tabsDTOTestSample);
       unreachable("Expected NotFoundError was not thrown when MongoDB document creation fails");
     }
     catch(error) {
@@ -149,7 +147,7 @@ describe("Create Draws Service", () => {
     
     // actually testing
     try {
-      await createDrawsService.execute(cleanUser.id, tabsDTOTestSample);
+      await createDrawsService(cleanUser.id, tabsDTOTestSample);
       unreachable("Expected error was not thrown when PostgreSQL update fails");
     }
     catch(error) {

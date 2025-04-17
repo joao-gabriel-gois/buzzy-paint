@@ -6,4 +6,5 @@ const authRoutes = Router();
 
 authRoutes.post("/login", authenticateUserController);
 authRoutes.post("/refresh-session", refreshUserTokenController);
+
 export { authRoutes };

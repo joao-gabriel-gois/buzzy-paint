@@ -6,34 +6,35 @@ import { usersTokensRepository as prodUsersTokensRepository } from "@modules/acc
 import { usersTokensRepository as testUsersTokensRepository  } from "@modules/accounts/repositories/in-memory/usersTokensRepository.ts";
 import { usersRepository as prodUsersRepository } from "@modules/accounts/repositories/postgres/usersRepository.ts";
 import { usersRepository as testUsersRepository } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
-import { InvalidParameterError, BadRequestError, BusinessLogicError } from "@shared/errors/ApplicationError.ts";
+import { InvalidParameterError, UnauthorizedError } from "@shared/errors/ApplicationError.ts";
 import { expiryDateMapper, pgsqlDateAdapter } from "@utils/expiryDateMapper.ts";
 
 const ENV = Deno.env.get('ENV');
+const  {
+  refresh_token_secret,
+  refresh_token_expires_in: prod_refresh_token_expires_in,
+  refresh_token_test_expires_in: test_refresh_token_expires_in,
+  token_secret,
+  token_expires_in 
+} = auth;
+
 const usersTokensRepository = ENV === 'test' ? testUsersTokensRepository : prodUsersTokensRepository;
 const usersRepository = ENV === 'test' ? testUsersRepository : prodUsersRepository;
+const refresh_token_expires_in = ENV === 'test' ? test_refresh_token_expires_in : prod_refresh_token_expires_in;
 
+if (!(token_secret || token_expires_in || refresh_token_secret || refresh_token_expires_in)) {
+  throw new InvalidParameterError("Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!");
+}
 
 export async function authenticateUserService({ email, password }: IAuthRequest): Promise<IAuthResponse> {
   const user = await usersRepository.findByEmail(email);
   if (!user || !user!.id) {
-    throw new BadRequestError("Incorrect Email or password!");
-  }
-
-  const  {
-    token_secret,
-    token_expires_in,
-    refresh_token_secret,
-    refresh_token_expires_in
-  } = auth;
-
-  if (!(token_secret || token_expires_in || refresh_token_secret || refresh_token_expires_in)) {
-    throw new InvalidParameterError("Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!");
+    throw new UnauthorizedError("Incorrect email or password!");
   }
 
   const passwordMatch = await checkHash(password, user.password!); // Password is manageable to get deleteable, but it will be surely returned
   if (!passwordMatch) {
-    throw new BusinessLogicError("Incorrect Email or password!");
+    throw new UnauthorizedError("Incorrect email or password!");
   }
 
   const token = sign({}, token_secret , {

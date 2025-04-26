@@ -13,7 +13,7 @@ export const authenticateUserController = async (request: Request, response: Res
   } = request.body;
 
   if (!(email && password)) {
-    return next(new BadRequestError('Request body is missing information to authenticate this user!'));
+    return next(new BadRequestError("Request body is missing information to authenticate this user!"));
   }
 
   const passwordRuleString = '^(?=.*[A-Z])'
@@ -42,7 +42,7 @@ export const authenticateUserController = async (request: Request, response: Res
 
   const { refresh_token_expires_in } = auth;
   if (!refresh_token_expires_in) {
-    // yeah, it should crash in this case
+    // yeah, it should crash in this case, once something is wrong in the environment
     throw new InvalidParameterError('Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!');
   }
 
@@ -60,6 +60,8 @@ export const authenticateUserController = async (request: Request, response: Res
     return next(new ApplicationError('Authenticate User: Unknown error!', 500, error as Error));
   }
   
+  // this error has no unit test once it is expected either early 
+  // error return in case of the sessionInfo is undefined 
   if (!sessionInfo) {
     return next(new NotFoundError('Session for this user was not found.'));
   }

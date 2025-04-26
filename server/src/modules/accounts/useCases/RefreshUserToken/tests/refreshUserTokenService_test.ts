@@ -8,7 +8,7 @@ import { usersRepository } from "@modules/accounts/repositories/in-memory/usersR
 import { usersTokensRepository } from "@modules/accounts/repositories/in-memory/usersTokensRepository.ts";
 import { refreshUserTokenService } from "@modules/accounts/useCases/RefreshUserToken/refreshUserTokenService.ts";
 import { authenticateUserService } from "@modules/accounts/useCases/AuthenticateUser/authenticateUserService.ts";
-import { NotFoundError } from "@shared/errors/ApplicationError.ts";
+import { UnauthorizedError } from "@shared/errors/ApplicationError.ts";
 import { sleep } from "@utils/sleep.ts";
 
 // we need a time gap so 'iat' (issuedAt) of jwt will be actually
@@ -74,7 +74,7 @@ describe("Refresh Token Service", () => {
         unreachable("Caught value is not an instance of Error");
         return;
       }
-      expect(error).toBeInstanceOf(NotFoundError);
+      expect(error).toBeInstanceOf(UnauthorizedError);
       expect(error.message).toBe("Refresh Token Mismatch! Token informed was not found for this user");
     }
   });

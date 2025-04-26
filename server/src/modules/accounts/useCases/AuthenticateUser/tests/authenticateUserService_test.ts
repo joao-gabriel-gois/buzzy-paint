@@ -6,7 +6,7 @@ import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
 import { User } from "@modules/accounts/models/User.ts";
 import { usersRepository } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
 import { authenticateUserService } from "@modules/accounts/useCases/AuthenticateUser/authenticateUserService.ts";
-import { BadRequestError, BusinessLogicError } from "@shared/errors/ApplicationError.ts";
+import { UnauthorizedError } from "@shared/errors/ApplicationError.ts";
 
 let userRequestData: ICreateUserDTO
 let user: User;
@@ -60,8 +60,8 @@ describe("Authenticate User Service", () => {
         unreachable("Caught value is not an instance of Error");
         return;
       }
-      expect(error).toBeInstanceOf(BadRequestError);
-      expect(error.message).toBe("Incorrect Email or password!");
+      expect(error).toBeInstanceOf(UnauthorizedError);
+      expect(error.message).toBe("Incorrect email or password!");
     }
   });
 
@@ -80,8 +80,8 @@ describe("Authenticate User Service", () => {
         unreachable("Caught value is not Error");
         return;
       }
-      expect(error).toBeInstanceOf(BusinessLogicError);
-      expect(error.message).toBe("Incorrect Email or password!");
+      expect(error).toBeInstanceOf(UnauthorizedError);
+      expect(error.message).toBe("Incorrect email or password!");
     }
   });
 });

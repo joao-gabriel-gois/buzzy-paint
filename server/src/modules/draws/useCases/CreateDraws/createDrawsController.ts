@@ -17,9 +17,13 @@ export const createDrawsController = async (request: AuthRequest, response: Resp
     return next(new BadRequestError("Data is either not present or in the wrong format!"));
   }
   else if (!isDrawsDTOArray(draws)) {
-    return next(new BadRequestError("The drawing to be saved are not in the proper format!"));
+    return next(new BadRequestError("The drawing to be saved is not in the proper format!"));
   }
   else if (!id) {
+    // Not tested, it should only happens if there wasn't a middleware for auth
+    // Important to monitor if somehow it is reproduced and check which conditions
+    // If it is actualy reproducible, we should find a way to force it to happen to
+    // write unit tests for it
     return next(new UnauthorizedError("No user was found for this action!"));
   }
 

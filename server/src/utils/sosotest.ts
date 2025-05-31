@@ -9,7 +9,7 @@
           application. More details about this decision in the bottom of this file.
 */
 
-interface ApiResponse {
+export interface ApiResponse {
   body?: {
     [key: string]: unknown;
     error?: {
@@ -25,12 +25,12 @@ interface ApiResponse {
   status?: number;
 }
 
-interface ApiRequest {
+export interface ApiRequest {
   send: (body?: object) => Promise<ApiResponse>;
   set: (name: string, value: string[] | string) => ApiRequest;
 }
 
-interface Api {
+export interface Api {
   get: (path: string) => ApiRequest;
   post: (path: string) => ApiRequest;
   put: (path: string) => ApiRequest;

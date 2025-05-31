@@ -259,7 +259,7 @@ export const tabsDTOTestSample = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -276,7 +276,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": "32",
+            "lineWidth": 32,
             "lineColor": "#42ff68"
           },
           "type": "LINE"
@@ -293,7 +293,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": "32",
+            "lineWidth": 32,
             "lineColor": "#42ff68"
           },
           "type": "LINE"
@@ -310,7 +310,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": "32",
+            "lineWidth": 32,
             "lineColor": "#42ff68"
           },
           "type": "LINE"
@@ -327,7 +327,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": "32",
+            "lineWidth": 32,
             "lineColor": "#42ff68"
           },
           "type": "LINE"
@@ -344,7 +344,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": "32",
+            "lineWidth": 32,
             "lineColor": "#42ff68"
           },
           "type": "LINE"
@@ -361,7 +361,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": "32",
+            "lineWidth": 32,
             "lineColor": "#42ff68"
           },
           "type": "LINE"
@@ -378,7 +378,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": "32",
+            "lineWidth": 32,
             "lineColor": "#42ff68"
           },
           "type": "LINE"
@@ -391,11 +391,11 @@ export const tabsDTOTestSample = {
             "height": 112
           },
           "style": {
-            "rectThickness": 1,
+            "rectLineWidth": 1,
             "rectOutlineColor": "#000",
             "rectFillColor": "rgb(255, 255, 255)",
-            "filled": false,
-            "stroked": true
+            "rectFilled": false,
+            "rectStroked": true
           },
           "type": "RECT"
         },
@@ -407,11 +407,11 @@ export const tabsDTOTestSample = {
             "height": 243
           },
           "style": {
-            "rectThickness": 1,
+            "rectLineWidth": 1,
             "rectOutlineColor": "#48bbf4",
             "rectFillColor": "rgb(255, 255, 255)",
-            "filled": false,
-            "stroked": true
+            "rectFilled": false,
+            "rectStroked": true
           },
           "type": "RECT"
         },
@@ -423,11 +423,11 @@ export const tabsDTOTestSample = {
             "height": 126
           },
           "style": {
-            "rectThickness": 1,
+            "rectLineWidth": 1,
             "rectOutlineColor": "#48bbf4",
             "rectFillColor": "rgb(255, 255, 255)",
-            "filled": false,
-            "stroked": true
+            "rectFilled": false,
+            "rectStroked": true
           },
           "type": "RECT"
         },
@@ -439,11 +439,11 @@ export const tabsDTOTestSample = {
             "height": 91
           },
           "style": {
-            "rectThickness": "21",
+            "rectLineWidth": 21,
             "rectOutlineColor": "#48bbf4",
             "rectFillColor": "rgb(255, 255, 255)",
-            "filled": false,
-            "stroked": true
+            "rectFilled": false,
+            "rectStroked": true
           },
           "type": "RECT"
         },
@@ -455,11 +455,11 @@ export const tabsDTOTestSample = {
             "height": 97
           },
           "style": {
-            "rectThickness": "21",
+            "rectLineWidth": 21,
             "rectOutlineColor": "#48bbf4",
             "rectFillColor": "#d260b4",
-            "filled": true,
-            "stroked": false
+            "rectFilled": true,
+            "rectStroked": false
           },
           "type": "RECT"
         },
@@ -471,11 +471,11 @@ export const tabsDTOTestSample = {
             "height": 104
           },
           "style": {
-            "rectThickness": "21",
+            "rectLineWidth": 21,
             "rectOutlineColor": "#48bbf4",
             "rectFillColor": "#d260b4",
-            "filled": true,
-            "stroked": false
+            "rectFilled": true,
+            "rectStroked": false
           },
           "type": "RECT"
         },
@@ -487,11 +487,11 @@ export const tabsDTOTestSample = {
             "radiusHeight": 45
           },
           "style": {
-            "ellipseThickness": 1,
+            "ellipseLineWidth": 1,
             "ellipseOutlineColor": "#000",
             "ellipseFillColor": "rgb(255, 255, 255)",
-            "filled": false,
-            "stroked": true
+            "ellipseFilled": false,
+            "ellipseStroked": true
           },
           "type": "ELLIPSE"
         },
@@ -503,11 +503,11 @@ export const tabsDTOTestSample = {
             "height": 38
           },
           "style": {
-            "rectThickness": "21",
+            "rectLineWidth": 21,
             "rectOutlineColor": "#48bbf4",
             "rectFillColor": "#d260b4",
-            "filled": true,
-            "stroked": false
+            "rectFilled": true,
+            "rectStroked": false
           },
           "type": "RECT"
         },
@@ -519,11 +519,11 @@ export const tabsDTOTestSample = {
             "height": 0
           },
           "style": {
-            "rectThickness": "21",
+            "rectLineWidth": 21,
             "rectOutlineColor": "#48bbf4",
             "rectFillColor": "#d260b4",
-            "filled": true,
-            "stroked": false
+            "rectFilled": true,
+            "rectStroked": false
           },
           "type": "RECT"
         }
@@ -540,7 +540,7 @@ export const tabsDTOTestSample = {
               475
             ]
           ],
-          "eraserSize": "90",
+          "eraserSize": 90,
           "type": "ERASE"
         },
         {
@@ -554,7 +554,7 @@ export const tabsDTOTestSample = {
               311
             ]
           ],
-          "eraserSize": "90",
+          "eraserSize": 90,
           "type": "ERASE"
         },
         {
@@ -591,11 +591,11 @@ export const tabsDTOTestSample = {
             "height": 63
           },
           "style": {
-            "rectThickness": "21",
+            "rectLineWidth": 21,
             "rectOutlineColor": "#48bbf4",
             "rectFillColor": "#d260b4",
-            "filled": true,
-            "stroked": false
+            "rectFilled": true,
+            "rectStroked": false
           },
           "type": "RECT"
         },
@@ -621,11 +621,11 @@ export const tabsDTOTestSample = {
             "height": 18
           },
           "style": {
-            "rectThickness": "21",
+            "rectLineWidth": 21,
             "rectOutlineColor": "#48bbf4",
             "rectFillColor": "#d260b4",
-            "filled": true,
-            "stroked": false
+            "rectFilled": true,
+            "rectStroked": false
           },
           "type": "RECT"
         }
@@ -646,7 +646,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": 1,
+            "lineWidth": 1,
             "lineColor": "#000"
           },
           "type": "LINE"
@@ -663,7 +663,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": 1,
+            "lineWidth": 1,
             "lineColor": "#000"
           },
           "type": "LINE"
@@ -680,7 +680,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": 1,
+            "lineWidth": 1,
             "lineColor": "#000"
           },
           "type": "LINE"
@@ -693,11 +693,11 @@ export const tabsDTOTestSample = {
             "height": 484
           },
           "style": {
-            "rectThickness": 1,
+            "rectLineWidth": 1,
             "rectOutlineColor": "#000",
             "rectFillColor": "rgb(255, 255, 255)",
-            "filled": false,
-            "stroked": true
+            "rectFilled": false,
+            "rectStroked": true
           },
           "type": "RECT"
         },
@@ -1197,7 +1197,7 @@ export const tabsDTOTestSample = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -1214,7 +1214,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": 1,
+            "lineWidth": 1,
             "lineColor": "#000"
           },
           "type": "LINE"
@@ -1233,7 +1233,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": "28",
+            "lineWidth": 28,
             "lineColor": "#d01b1b"
           },
           "type": "LINE"
@@ -1250,7 +1250,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": 1,
+            "lineWidth": 1,
             "lineColor": "#d01b1b"
           },
           "type": "LINE"
@@ -1267,7 +1267,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": 1,
+            "lineWidth": 1,
             "lineColor": "#000"
           },
           "type": "LINE"
@@ -1289,7 +1289,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": "32",
+            "lineWidth": 32,
             "lineColor": "#42ff68"
           },
           "type": "LINE"
@@ -1306,7 +1306,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": "32",
+            "lineWidth": 32,
             "lineColor": "#42ff68"
           },
           "type": "LINE"
@@ -1319,11 +1319,11 @@ export const tabsDTOTestSample = {
             "radiusHeight": 100
           },
           "style": {
-            "ellipseThickness": 1,
+            "ellipseLineWidth": 1,
             "ellipseOutlineColor": "#000",
             "ellipseFillColor": "rgb(255, 255, 255)",
-            "filled": false,
-            "stroked": true
+            "ellipseFilled": false,
+            "ellipseStroked": true
           },
           "type": "ELLIPSE"
         },
@@ -1335,11 +1335,11 @@ export const tabsDTOTestSample = {
             "radiusHeight": 57
           },
           "style": {
-            "ellipseThickness": 1,
+            "ellipseLineWidth": 1,
             "ellipseOutlineColor": "#000",
             "ellipseFillColor": "rgb(255, 255, 255)",
-            "filled": false,
-            "stroked": true
+            "ellipseFilled": false,
+            "ellipseStroked": true
           },
           "type": "ELLIPSE"
         },
@@ -1351,11 +1351,11 @@ export const tabsDTOTestSample = {
             "height": 124
           },
           "style": {
-            "rectThickness": "21",
+            "rectLineWidth": 21,
             "rectOutlineColor": "#48bbf4",
             "rectFillColor": "#d260b4",
-            "filled": true,
-            "stroked": false
+            "rectFilled": true,
+            "rectStroked": false
           },
           "type": "RECT"
         },
@@ -1367,11 +1367,11 @@ export const tabsDTOTestSample = {
             "height": 114
           },
           "style": {
-            "rectThickness": "21",
+            "rectLineWidth": 21,
             "rectOutlineColor": "#48bbf4",
             "rectFillColor": "#d260b4",
-            "filled": false,
-            "stroked": true
+            "rectFilled": false,
+            "rectStroked": true
           },
           "type": "RECT"
         },
@@ -1383,11 +1383,11 @@ export const tabsDTOTestSample = {
             "radiusHeight": 96
           },
           "style": {
-            "ellipseThickness": 1,
+            "ellipseLineWidth": 1,
             "ellipseOutlineColor": "#000",
             "ellipseFillColor": "rgb(255, 255, 255)",
-            "filled": false,
-            "stroked": true
+            "ellipseFilled": false,
+            "ellipseStroked": true
           },
           "type": "ELLIPSE"
         },
@@ -1399,11 +1399,11 @@ export const tabsDTOTestSample = {
             "radiusHeight": 36
           },
           "style": {
-            "ellipseThickness": 1,
+            "ellipseLineWidth": 1,
             "ellipseOutlineColor": "#000",
             "ellipseFillColor": "#9b3131",
-            "filled": true,
-            "stroked": true
+            "ellipseFilled": true,
+            "ellipseStroked": true
           },
           "type": "ELLIPSE"
         },
@@ -1415,11 +1415,11 @@ export const tabsDTOTestSample = {
             "radiusHeight": 107
           },
           "style": {
-            "ellipseThickness": 1,
+            "ellipseLineWidth": 1,
             "ellipseOutlineColor": "#000",
             "ellipseFillColor": "#9b3131",
-            "filled": true,
-            "stroked": false
+            "ellipseFilled": false,
+            "ellipseStroked": true
           },
           "type": "ELLIPSE"
         },
@@ -1431,11 +1431,11 @@ export const tabsDTOTestSample = {
             "height": 62
           },
           "style": {
-            "rectThickness": "21",
+            "rectLineWidth": 21,
             "rectOutlineColor": "#48bbf4",
             "rectFillColor": "#d260b4",
-            "filled": false,
-            "stroked": true
+            "rectFilled": false,
+            "rectStroked": true
           },
           "type": "RECT"
         },
@@ -1447,11 +1447,11 @@ export const tabsDTOTestSample = {
             "height": 0
           },
           "style": {
-            "rectThickness": "21",
+            "rectLineWidth": 21,
             "rectOutlineColor": "#48bbf4",
             "rectFillColor": "#d260b4",
-            "filled": false,
-            "stroked": true
+            "rectFilled": false,
+            "rectStroked": true
           },
           "type": "RECT"
         },
@@ -1463,11 +1463,11 @@ export const tabsDTOTestSample = {
             "height": 167
           },
           "style": {
-            "rectThickness": 1,
+            "rectLineWidth": 1,
             "rectOutlineColor": "#000",
             "rectFillColor": "rgb(255, 255, 255)",
-            "filled": false,
-            "stroked": true
+            "rectFilled": false,
+            "rectStroked": true
           },
           "type": "RECT"
         },
@@ -1479,11 +1479,11 @@ export const tabsDTOTestSample = {
             "radiusHeight": 286
           },
           "style": {
-            "ellipseThickness": 1,
+            "ellipseLineWidth": 1,
             "ellipseOutlineColor": "#000",
             "ellipseFillColor": "rgb(255, 255, 255)",
-            "filled": false,
-            "stroked": true
+            "ellipseFilled": false,
+            "ellipseStroked": true
           },
           "type": "ELLIPSE"
         },
@@ -1495,12 +1495,11 @@ export const tabsDTOTestSample = {
             "radiusHeight": 82
           },
           "style": {
-            "ellipseThickness": 1,
+            "ellipseLineWidth": 1,
             "ellipseOutlineColor": "#000",
             "ellipseFillColor": "#0e185d",
-            "filled": false,
-            "stroked": true,
-            "ellipseFilled": true
+            "ellipseFilled": false,
+            "ellipseStroked": true,
           },
           "type": "ELLIPSE"
         },
@@ -1512,13 +1511,11 @@ export const tabsDTOTestSample = {
             "radiusHeight": 170
           },
           "style": {
-            "ellipseThickness": 1,
+            "ellipseLineWidth": 1,
             "ellipseOutlineColor": "#000",
             "ellipseFillColor": "#0e185d",
-            "filled": false,
-            "stroked": true,
-            "ellipseFilled": true,
-            "ellipseStroked": false
+            "ellipseFilled": false,
+            "ellipseStroked": true,
           },
           "type": "ELLIPSE"
         }
@@ -2011,7 +2008,7 @@ export const tabsDTOTestSample = {
               567
             ]
           ],
-          "eraserSize": "180",
+          "eraserSize": 180,
           "type": "ERASE"
         },
         {
@@ -2026,7 +2023,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": 1,
+            "lineWidth": 1,
             "lineColor": "#000"
           },
           "type": "LINE"
@@ -2043,7 +2040,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": 1,
+            "lineWidth": 1,
             "lineColor": "#000"
           },
           "type": "LINE"
@@ -2060,7 +2057,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": 1,
+            "lineWidth": 1,
             "lineColor": "#000"
           },
           "type": "LINE"
@@ -2077,7 +2074,7 @@ export const tabsDTOTestSample = {
             ]
           },
           "style": {
-            "lineThickness": 1,
+            "lineWidth": 1,
             "lineColor": "#000"
           },
           "type": "LINE"
@@ -2090,13 +2087,11 @@ export const tabsDTOTestSample = {
             "height": 125
           },
           "style": {
-            "rectThickness": 1,
+            "rectLineWidth": 1,
             "rectOutlineColor": "#000",
             "rectFillColor": "#25a727",
-            "filled": false,
-            "stroked": true,
-            "rectFilled": true,
-            "rectStroked": false
+            "rectFilled": false,
+            "rectStroked": true,
           },
           "type": "RECT"
         }
@@ -2119,7 +2114,7 @@ export const tabsDTOTestSampleUpdate = {
           ],
           "style": {
             "textColor": "#d11a1a",
-            "fontSize": "18",
+            "fontSize": 18,
             "fontFamily": "Ubuntu",
             "innerText": "Testando (:"
           },
@@ -2133,7 +2128,7 @@ export const tabsDTOTestSampleUpdate = {
             "height": 370
           },
           "style": {
-            "rectThickness": 1,
+            "rectLineWidth": 1,
             "rectOutlineColor": "#000",
             "rectFillColor": "rgb(255, 255, 255)",
             "rectFilled": false,
@@ -2237,7 +2232,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -2290,7 +2285,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -2395,7 +2390,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -2548,7 +2543,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -2593,7 +2588,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -2694,7 +2689,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -2755,7 +2750,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -2960,7 +2955,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -3081,7 +3076,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -3142,7 +3137,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -3191,7 +3186,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -3288,7 +3283,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -3341,7 +3336,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -3450,7 +3445,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -3671,7 +3666,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -3764,7 +3759,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -3937,7 +3932,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -4030,7 +4025,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -4183,7 +4178,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -4352,7 +4347,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -4441,7 +4436,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -4558,7 +4553,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -4663,7 +4658,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -4852,7 +4847,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -5065,7 +5060,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -5466,7 +5461,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -5519,7 +5514,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -5616,7 +5611,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -5757,7 +5752,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -5894,7 +5889,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -6063,7 +6058,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -6184,7 +6179,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -6237,7 +6232,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -6374,7 +6369,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -6467,7 +6462,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -6524,7 +6519,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -6581,7 +6576,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -6686,7 +6681,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -6819,7 +6814,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -6876,7 +6871,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -7081,7 +7076,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -7230,7 +7225,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -7267,7 +7262,7 @@ export const tabsDTOTestSampleUpdate = {
             ]
           ],
           "style": {
-            "drawThickness": 1,
+            "drawLineWidth": 1,
             "drawColor": "#000"
           },
           "type": "DRAW"
@@ -7280,7 +7275,7 @@ export const tabsDTOTestSampleUpdate = {
             "radiusHeight": 106
           },
           "style": {
-            "ellipseThickness": 1,
+            "ellipseLineWidth": 1,
             "ellipseOutlineColor": "#000",
             "ellipseFillColor": "rgb(255, 255, 255)",
             "ellipseFilled": false,

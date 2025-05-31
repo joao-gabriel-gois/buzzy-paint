@@ -5,22 +5,23 @@ import { usersRepository } from "@modules/accounts/repositories/in-memory/usersR
 import { usersTokensRepository } from "@modules/accounts/repositories/in-memory/usersTokensRepository.ts";
 import { expect } from "jsr:@std/expect/expect";
 import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
-import { createApi } from "@utils/sosotest.ts";
+import { createApi, Api } from "@utils/sosotest.ts";
 import { authenticateUserService } from "@modules/accounts/useCases/AuthenticateUser/authenticateUserService.ts";
 import { User } from "@modules/accounts/models/User.ts";
 import { sleep } from "@utils/sleep.ts";
 import { fail } from "@std/assert/fail";
 
 const JWT_IAT_REQUIRED_TIME_GAP_FOR_DIFF_TOKENS = 1;
+const PORT = 3456;
 let userRequestData: ICreateUserDTO;
 let server: Server;
+let api: Api;
 let validRefreshToken: string;
-const PORT = 3456;
-const api = createApi('127.0.0.1', PORT);
 
 describe('Refresh User Token Controller', () => {
   beforeAll(async () => {
     server = app.listen(PORT);
+    api = createApi("127.0.0.1", PORT);
 
     userRequestData = {
       email: "refresh-session@test.com",

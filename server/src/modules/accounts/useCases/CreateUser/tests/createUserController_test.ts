@@ -4,17 +4,18 @@ import { afterAll, beforeAll, describe, it } from "jsr:@std/testing/bdd";
 import { usersRepository } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
 import { expect } from "jsr:@std/expect/expect";
 import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
-import { createApi } from "@utils/sosotest.ts";
+import { Api, createApi } from "@utils/sosotest.ts";
 import { sleep } from "@utils/sleep.ts";
 
-let userRequestData: ICreateUserDTO & { confirmPassword: string };
-let server: Server;
 const PORT = 3456;
-const api = createApi("127.0.0.1", PORT);
+let server: Server;
+let api: Api;
+let userRequestData: ICreateUserDTO & { confirmPassword: string };
 
 describe("Authenticate User Controller", () => {
   beforeAll(async () => {
     server = app.listen(PORT);
+    api = createApi("127.0.0.1", PORT);
 
     userRequestData = {
       email: "anything@test.com",

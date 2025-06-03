@@ -11,7 +11,7 @@ export interface IDrawCommand {
   type: "DRAW";
   sequence: Point[];
   style: {
-    drawThickness: number;
+    drawLineWidth: number;
     drawColor: string;
   };
 }
@@ -23,7 +23,7 @@ export interface ILineCommand {
     end: Point;
   };
   style: {
-    lineThickness: number;
+    lineWidth: number;
     lineColor: string;
   };
 }
@@ -50,7 +50,7 @@ export interface IRectangleCommand {
   type: "RECT";
   rect: Rectangle;
   style: {
-    rectThickness: number;
+    rectLineWidth: number;
     rectOutlineColor: string;
     rectFillColor: string;
     rectFilled: boolean;
@@ -67,7 +67,7 @@ export interface IEllipseCommand {
     radiusHeight: number
   };
   style: {
-    ellipseThickness: number;
+    ellipseLineWidth: number;
     ellipseOutlineColor: string;
     ellipseFillColor: string;
     ellipseFilled: boolean;
@@ -96,7 +96,7 @@ export type UndoStack = EventQueue;
 export interface IDrawsDTO {
   tabName: string;
   eventQueue: EventQueue;
-  undoStack: UndoStack; // turn it in a tree later (/TODO on client side)
+  undoStack: UndoStack;
 }
 export interface ITabsDTO {
   activeIndex: number;

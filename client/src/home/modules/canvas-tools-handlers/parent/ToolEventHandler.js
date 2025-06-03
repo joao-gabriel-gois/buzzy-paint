@@ -25,11 +25,8 @@ export default class ToolEventHandler {
     this.handleOnMouseMove = this.handleOnMouseMove.bind(this);
     this.handleOnMouseUp = this.handleOnMouseUp.bind(this);
     this.handleStyleSwitch = this.handleStyleSwitch.bind(this);
-    this.handleGlobalMouseUpTracker = this.handleGlobalMouseUpTracker.bind(this);
-    this.renderCallEvent = new Event('render-call');
   }
   
-  // 1 - Utils
   createToolEvent(eventName, detail) {
     const toolEvent = new CustomEvent(eventName, {
       detail,
@@ -42,11 +39,11 @@ export default class ToolEventHandler {
     this.canvas.dispatchEvent(toolEvent);
   }
 
-  renderLatestState() {
-    this.canvas.dispatchEvent(this.renderCallEvent);
+  renderLatestState(options) {
+    const renderCallEvent = new CustomEvent('render-call', { detail: options});
+    this.canvas.dispatchEvent(renderCallEvent);
   }
 
-  // 2 - Event Handlers
   handleOnMouseDown(event) {
     event.preventDefault();
     this.canvas.addEventListener('mousemove', this.handleOnMouseMove);
@@ -65,12 +62,21 @@ export default class ToolEventHandler {
     this.canvas.style.cursor = this.cursorStyle;
   }
 
-  handleStyleSwitch(event) {
+  handleStyleSwitch(event, MIN_NUM_PARAM_SIZE = 1) {
     event.preventDefault();
     const el = event.target;
+    if (el.value === "") return;
+    let value = el.type === 'checkbox' ? el.checked : el.value;
+    if (el.type === "number") {
+      value = isNaN(Number(value)) || value < MIN_NUM_PARAM_SIZE
+        ? MIN_NUM_PARAM_SIZE
+        : Number(value);
+    }
+    el.value = value;
+    
     return this.updateCurrentStyle({
       ...this.currentStyle,
-      [`${el.getAttribute('id')}`]: el.type === 'checkbox' ? el.checked : el.value,
+      [`${el.getAttribute('id')}`]: value,
     });
   }
 
@@ -83,35 +89,18 @@ export default class ToolEventHandler {
     return this.currentStyle;
   }
 
-  // getCurrentStylePropsNamesArray() {
-  //   return [...this.styleSwitcher.children].map(input => {
-  //     return input.getAttribute('id');
-  //   });
-  // }
-
-  handleGlobalMouseUpTracker(e) {
-    if (e.target.tagName === "LI" || e.target.tagName === "IMG" || e.target.tagName === "BUTTON") return;
-    this.outsideCanvasMouseUp = e.target !== this.canvas;
-  };
-  // 3.a) - ToolbarListener Subject update handler
   setActiveState(state) {
     this.activeState = Boolean(state);
     if (Boolean(state)) {
       this.canvas.addEventListener('mousedown', this.handleOnMouseDown);
-      document.addEventListener('mouseup', this.handleGlobalMouseUpTracker);
     } else {
       this.canvas.removeEventListener('mousedown', this.handleOnMouseDown);
-      document.removeEventListener('mouseup', this.handleGlobalMouseUpTracker);
     }
   }
-  // 3.b) - ToolbarListener Subject public interface
+
   start() {
     if (!this.activeCounter) {
       this.styleSwitcher.onchange = this.handleStyleSwitch;
-      // this.styleSwitcher.onsubmit = (e) => {
-      //   e.preventDefault();
-      //   e.target.blur();
-      // }
     }
     this.setActiveState(true);
     this.activeCounter++;

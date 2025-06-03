@@ -1,5 +1,6 @@
 import {
   addCSSClass,
+  getStyle,
   removeCSSClass
 } from '../../utils/cssUtils.js'
 import { storage as strg } from '../../shared/global.js';
@@ -322,10 +323,7 @@ export class TabsManager {
 
     this.tabs[index]
       .canvasListener
-      .canvas
-      .dispatchEvent(
-        new Event('render-call')
-      );
+      .renderCurrentState();
   }
 
   async saveTabsData() {
@@ -405,13 +403,23 @@ export class TabsManager {
   }
 
   onDownloadCall(event) {
-    const currentCavansListener = this.tabs[this.activeIndex].canvasListener;
+    const currentCanvasListener = this.tabs[this.activeIndex].canvasListener;
     const { isPng, filename } = event.detail;
     const ext = `image/${isPng ? 'png' : 'jpeg'}`;
-    // not transparent case needs to apply the paintBg callback
-    currentCavansListener.renderCurrentState(!isPng && currentCavansListener.paintBackground);
-    const image = currentCavansListener
-      .canvas
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = currentCanvasListener.canvas.width;
+    tempCanvas.height = currentCanvasListener.canvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+
+    // Fill the temp canvas with the background color (for JPEG only)
+    if (!isPng) {
+      tempCtx.fillStyle = getStyle(currentCanvasListener.canvas).backgroundColor;
+      tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    }
+    tempCtx.drawImage(currentCanvasListener.canvas, 0, 0);
+
+    const image = tempCanvas
       .toDataURL(ext)
       .replace(ext, "image/octet-stream");
     const downloadHiddenAnchor = document.createElement('a');

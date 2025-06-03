@@ -8,7 +8,7 @@ export class Rectangler extends ToolEventHandler {
   constructor(elements, alert = createAndRenderAlert, confirm = createAndRenderConfirm) {
     super(elements);
     super.currentStyle = {
-      rectThickness: 1,
+      rectLineWidth: 1,
       rectOutlineColor: '#000',
       rectFillColor: getStyle(this.canvas).backgroundColor,
       rectFilled: false,
@@ -22,7 +22,6 @@ export class Rectangler extends ToolEventHandler {
 
     this.initOptionsInputHandler();
 
-    // array of positions of current draw
     this.currentRect = {};
     this.ctrlKeyCapturing = this.ctrlKeyCapturing.bind(this);
   }
@@ -142,16 +141,6 @@ export class Rectangler extends ToolEventHandler {
   }
 
   handleStyleSwitch(event) {
-    if (Number(event.target.value)) {
-      this.handleThicknessChange(event);
-    } else {   
-      super.handleStyleSwitch(event);
-      this.updateContextToCurrentStyle();
-    } 
-  }
-
-  // 2.a) - Private Class Utils:
-  handleThicknessChange(event) {
     super.handleStyleSwitch(event);
     this.updateContextToCurrentStyle();
   }
@@ -159,13 +148,13 @@ export class Rectangler extends ToolEventHandler {
   updateContextToCurrentStyle() {
     const {
       rectOutlineColor,
-      rectThickness,
+      rectLineWidth,
       rectFillColor,
     } = this.currentStyle;
 
     this.context.strokeStyle = rectOutlineColor;
     this.context.fillStyle = rectFillColor;
-    this.context.lineWidth = rectThickness;
+    this.context.lineWidth = rectLineWidth;
   }
 
   startCtrlKeyCapturing() {

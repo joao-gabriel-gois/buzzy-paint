@@ -22,19 +22,17 @@ export const createUserController = async (request: Request, response: Response,
       error: {
         name: 'Validation Error',
         message: 'Error confirming password',
-        issues: [
-          {
-            message: "Please confirm the password correctly. "
-              + "The input for password and confirm-password are not the same.",
-            path: "confirmPassword"
-          }
-        ]
+        issues: [{
+          message: "Please confirm the password correctly. "
+            + "The input for password and confirm-password are not the same.",
+          path: "confirmPassword"
+        }]
       }
     })
   }
 
   const usernameRule = new RegExp(
-    '^[a-zA-Z0-9._%+-]{4,12}$',
+    '^[a-zA-Z0-9._%+-]+',
   );
   const namesRule = new RegExp(
     '^[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ]+(?:\s+[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ]+)*$',
@@ -62,19 +60,19 @@ export const createUserController = async (request: Request, response: Response,
       }),
     lastName: zod.string()
       .regex(namesRule, {
-        message: "First Name only accepts Letters and spaces"
+        message: "Last Name only accepts Letters and spaces"
       }),
     password: zod.string()
-      .min(10, { message: 'The password must have at least 10 characters.'})
+      .min(10, { message: "The password must have at least 10 characters."})
       .regex(passwordRule, {
-        message: 'The password must have at least one uppercased character'
-        + ', one lowercased one, a number and a special character.'
+        message: "The password must have at least one uppercased character"
+        + ", one lowercased one, a number and a special character."
       }),
-      confirmPassword: zod.string()
-      .min(10, { message: 'The password must have at least 10 characters.'})
+    confirmPassword: zod.string()
+      .min(10, { message: "The password must have at least 10 characters."})
       .regex(passwordRule, {
-        message: 'The password must have at least one uppercased character'
-        + ', one lowercased one, a number and a special character.'
+        message: "The password must have at least one uppercased character"
+        + ", one lowercased one, a number and a special character."
       }),
   });
 
@@ -84,9 +82,8 @@ export const createUserController = async (request: Request, response: Response,
     return next(new ValidationError(message, 400, inputValidation.error));
   }
 
-  let newUser;
   try {
-    newUser = await createUserService.execute({
+    await createUserService({
       email,
       username,
       firstName,
@@ -101,5 +98,5 @@ export const createUserController = async (request: Request, response: Response,
     return next(new ApplicationError('Create User: Unknown error!', 500, error as Error));
   } 
 
-  return response.json(newUser);
+  return response.status(201).end();
 }

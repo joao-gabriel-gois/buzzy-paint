@@ -1,6 +1,7 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
 
+const MIN_FONT_SIZE = 4;
 
 // Tentar substituir todas as lógicas que lidam com o contexto ou com outra interface como no drawer
 // ou tentar o que lá deu problema de perfomance e ver se ocorre o mesmo
@@ -17,7 +18,6 @@ export class Writter extends ToolEventHandler {
     this.lastPosition = [];
   }
 
-  // 1) Private Event Handler - Event Related Functions
   createWriteEvent() {
     const writeEvent = super.createToolEvent('write', {
         position: this.lastPosition,
@@ -51,14 +51,11 @@ export class Writter extends ToolEventHandler {
     super.dispacthToolEvent(this.createWriteEvent());
   }
 
-  // 2.a) Private Class Utils
   updateLastPosition(event) {
     const position = getRelativeCursorPos(event, this.canvas);
     this.lastPosition = position;
   }
 
-  // tentar substituir todos os momentos em que se move o texto por render calls
-  // atualizando sempre a ultima posição lá também e de lá de fato usar o context
   writeText(innerText, position = this.lastPosition) {
     this.updateContextToCurrentStyle();
     this.context.fillText(innerText, ...position);
@@ -87,11 +84,11 @@ export class Writter extends ToolEventHandler {
     this.writeText(innerText);
   }
 
-  // 2.b) Specific Util for this implementation (same format but specific for each event handler)
+  handleStyleSwitch(event) {
+    super.handleStyleSwitch(event, MIN_FONT_SIZE);
+    this.updateContextToCurrentStyle();
+  }
 
-  // Bellow method is only necessary for Tools such as Writter and Drawer
-  // because both classes needs to render while updating CanvasListener
-  // Data structure
   updateContextToCurrentStyle() {
     const {
       textColor,

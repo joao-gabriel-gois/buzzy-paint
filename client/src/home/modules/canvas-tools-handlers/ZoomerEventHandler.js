@@ -21,7 +21,6 @@ export class Zoomer extends ToolEventHandler {
     return zoomEvent;
   }
 
-  // 1) Utils
   resetZoomState() {
     super.dispacthToolEvent(this.createZoomEvent(1))
     super.renderLatestState();
@@ -56,7 +55,6 @@ export class Zoomer extends ToolEventHandler {
     }
   }
 
-  // 2 - overrides from extended class
   handleOnMouseDown(event) {
     if (this.cursorStyle === 'help') {
       this.alert({

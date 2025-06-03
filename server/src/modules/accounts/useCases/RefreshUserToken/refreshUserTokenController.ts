@@ -21,7 +21,7 @@ export const refreshUserTokenController = async (request: Request, response: Res
   }
   let refreshedSessionInfo;
   try {
-    refreshedSessionInfo = await refreshUserTokenService.execute(refresh_token);
+    refreshedSessionInfo = await refreshUserTokenService(refresh_token);
   }
   catch(error) {
     if (error instanceof ApplicationError) {

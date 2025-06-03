@@ -3,7 +3,7 @@ import { ICreateUserTokensDTO } from "../../DTOs/CreateUserTokensDTO.ts";
 import { UserTokens } from "../../models/UserTokens.ts";
 import { DatabaseTransactionError } from "@shared/errors/ApplicationError.ts";
 
-export class UsersTokensRepositoryInMemory implements IUsersTokensRepository {
+class UsersTokensRepositoryInMemory implements IUsersTokensRepository {
   private usersTokens: UserTokens[] = [];
 
   async create(createUserTokenDTO: ICreateUserTokensDTO): Promise<UserTokens> {
@@ -76,7 +76,23 @@ export class UsersTokensRepositoryInMemory implements IUsersTokensRepository {
     }
   }
 
+  // async expireToken(refreshToken: string): Promise<void> {
+  //   return await new Promise<void>((resolve, _) => setTimeout(() => {
+  //     const tokenIndex = this.usersTokens.findIndex(token => token.refresh_token === refreshToken);
+  //     console.log('token before forcing expire:', this.usersTokens[tokenIndex]);
+  //     if (tokenIndex !== -1) {
+  //       // set its expiry date to 31 days ago
+  //       this.usersTokens[tokenIndex].expiration_date = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000).toISOString();
+  //       console.log('token after forcing expire:', this.usersTokens[tokenIndex]);
+  //     }
+  //     resolve();
+  //   }, 100));
+  // }
+
   clear(): void {
     this.usersTokens = [];
   }
 }
+
+
+export const usersTokensRepository = new UsersTokensRepositoryInMemory();

@@ -284,14 +284,14 @@ ___
 (1st milestone)
 - [x] <s>Add UpdateDraw Usecase Typying and Create Validation for them</s>
 - [x] <s>Add unit tests after changes (for services)</s>
-- [ ] <b>Implement CI/CD</b>
-- [ ] <s>Add unit tests for controllers</s>
+- [ ] <b>Add unit tests for controllers</b>
+- [ ] Implement CI/CD
 
 
 (2nd milestone)
+- [ ] Token management (review invalid tokens deletion after refreshing and frequent cleanup of the ones with expired refresh-token)
 - [ ] Prepare first deploy after finishing both backend and frontend 1st milestones
 - [ ] Password Recovery provider (for both dev/test and prod envs)
-- [ ] Token management (review invalid tokens deletion after refreshing and frequent cleanup of the ones with expired refresh-token)
 - [ ] OAuth (google/facebook/github)
 - [ ] Set proper routes, controllers and services for future User config screen
 - [ ] Totally remove MongoDB and change to Postgres JSONB
@@ -301,10 +301,12 @@ ___
 
 (1st milestone)
 - [x] <s>Ellipse drawing tool (becoming circle when keeping ctrl pressed, just like Rectangle/Square current feature)</s>
-- [x] <b>Crop/Move selected areas</b>
+- [x] <s>Crop to Move and/or rotate selected areas</s>
+- [x] <s>Optimize last state rendering</s>
 - [ ] Figure Out how to apply fill with collision / closed shapes detection (just like MS Classic Win98 Paint App)
 
 (2nd milestone)
+- [ ] Create text showing how to use each tool to be rendered alongside its options
 - [ ] Recover Password Screen
 - [ ] User config screen (update details), consuming from backend apis
 

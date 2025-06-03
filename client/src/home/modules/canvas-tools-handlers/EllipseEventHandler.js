@@ -8,7 +8,7 @@ export class Ellipser extends ToolEventHandler {
   constructor(elements, alert = createAndRenderAlert) {
     super(elements);
     super.currentStyle = {
-      ellipseThickness: 1,
+      ellipseLineWidth: 1,
       ellipseOutlineColor: '#000',
       ellipseFillColor: getStyle(this.canvas).backgroundColor,
       ellipseFilled: false,
@@ -142,16 +142,6 @@ export class Ellipser extends ToolEventHandler {
   }
 
   handleStyleSwitch(event) {
-    if (Number(event.target.value)) {
-      this.handleThicknessChange(event);
-    } else {   
-      super.handleStyleSwitch(event);
-      this.updateContextToCurrentStyle();
-    } 
-  }
-
-  // 2.a) - Private Class Utils:
-  handleThicknessChange(event) {
     super.handleStyleSwitch(event);
     this.updateContextToCurrentStyle();
   }
@@ -159,13 +149,13 @@ export class Ellipser extends ToolEventHandler {
   updateContextToCurrentStyle() {
     const {
       ellipseOutlineColor,
-      ellipseThickness,
+      ellipseLineWidth,
       ellipseFillColor,
     } = this.currentStyle;
 
     this.context.strokeStyle = ellipseOutlineColor;
     this.context.fillStyle = ellipseFillColor;
-    this.context.lineWidth = ellipseThickness;
+    this.context.lineWidth = ellipseLineWidth;
   }
 
   startCtrlKeyCapturing() {

@@ -1,10 +1,11 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
 import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
+
 export class Liner extends ToolEventHandler {
   constructor(elements) {
     super(elements);
     super.currentStyle = {
-      lineThickness: 1,
+      lineWidth: 1,
       lineColor: '#000',
     }
     // array of positions of current draw
@@ -64,12 +65,8 @@ export class Liner extends ToolEventHandler {
   }
 
   handleStyleSwitch(event) {
-    if (Number(event.target.value)) {
-      this.handleThicknessChange(event);
-    } else {   
-      super.handleStyleSwitch(event);
-      this.updateContextToCurrentStyle();
-    } 
+    super.handleStyleSwitch(event);
+    this.updateContextToCurrentStyle();
   }
 
   // 2.a) - Private Class Utils:
@@ -86,14 +83,14 @@ export class Liner extends ToolEventHandler {
   updateContextToCurrentStyle() {
     const {
       lineColor,
-      lineThickness
+      lineWidth
     } = this.currentStyle;
     
     // TODO - Create input for selecting line Cap on form
     // this.context.lineCap = "round";
     
     this.context.strokeStyle = lineColor;
-    this.context.lineWidth = lineThickness;
+    this.context.lineWidth = lineWidth;
   }
 
   // 3) Public interfaces

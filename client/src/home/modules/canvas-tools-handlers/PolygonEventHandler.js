@@ -1,10 +1,11 @@
 import ToolEventHandler from './parent/ToolEventHandler.js';
-import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js'
+import { getRelativeCursorPos } from '../../../utils/getRelativeCursorPos.js';
+
 export class Polygoner extends ToolEventHandler {
   constructor(elements) {
     super(elements);
     super.currentStyle = {
-      lineThickness: 1,
+      lineWidth: 1,
       lineColor: '#000',
     }
 
@@ -18,7 +19,6 @@ export class Polygoner extends ToolEventHandler {
     this.onKeyDown = this.onKeyDown.bind(this);
   }
 
-  // 1) Private Event Handler - Event Related Functions
   createLineEvent() {
     const lineEvent = super.createToolEvent('line', {
       line: this.currentLine,
@@ -83,7 +83,7 @@ export class Polygoner extends ToolEventHandler {
     if (event.ctrlKey && event.key === 'z') {
       this.undoStackedLastLines.push(this.currentLine);
       if (this.previousLines.length === 0) {
-        return this.resetCurrentState();
+        return this.clearState();
       }
       this.currentLine = this.previousLines.pop();
       this.canvas.dispatchEvent(new Event('render-call'));
@@ -99,7 +99,7 @@ export class Polygoner extends ToolEventHandler {
     }
   }
   
-  resetCurrentState() {
+  clearState() {
     this.firstLineDone = false;
     this.currentLine = {};
     this.previousLines = [];
@@ -107,28 +107,28 @@ export class Polygoner extends ToolEventHandler {
     this.canvas.style.cursor = 'default';
   }
 
-  handleStyleSwitch(event) {
-    if (Number(event.target.value)) {
-      this.handleThicknessChange(event);
-    } else {   
-      super.handleStyleSwitch(event);
-      this.updateContextToCurrentStyle();
-    } 
-  }
-
-  handleThicknessChange(event) {
+  handleStyleSwitch(event) {    
     super.handleStyleSwitch(event);
+    const { 
+      polygonLineWidth,
+      polygonLineColor
+    } = this.currentStyle;
+    if (polygonLineColor) this.currentStyle.lineColor = polygonLineColor;
+    delete this.currentStyle.polygonLineColor;
+    if (polygonLineWidth) this.currentStyle.lineWidth = polygonLineWidth;
+    delete this.currentStyle.polygonLineWidth;
+   
     this.updateContextToCurrentStyle();
   }
 
   updateContextToCurrentStyle() {
     const {
       lineColor,
-      lineThickness
+      lineWidth
     } = this.currentStyle;
       
     this.context.strokeStyle = lineColor;
-    this.context.lineWidth = lineThickness;
+    this.context.lineWidth = lineWidth;
   }
 
   setActiveState(state) {
@@ -137,7 +137,7 @@ export class Polygoner extends ToolEventHandler {
       document.addEventListener('keydown', this.onKeyDown);
     }
     else {
-      this.resetCurrentState();
+      this.clearState();
       document.removeEventListener('keydown', this.onKeyDown);
     }
     super.setActiveState(state);

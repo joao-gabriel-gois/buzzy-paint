@@ -3,3 +3,5 @@ node_modules/
 script.ts
 .test/
 .vscode/
+
+src/modules/accounts/useCases/UpdateUser/

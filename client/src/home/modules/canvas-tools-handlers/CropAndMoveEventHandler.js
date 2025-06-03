@@ -1,7 +1,7 @@
 import ToolEventHandler from "./parent/ToolEventHandler.js";
 import { getRelativeCursorPos } from "../../../utils/getRelativeCursorPos.js"
 import { createAndRenderAlert } from "../../../shared/alerts.js";
-
+import { hasCSSClass } from "../../../utils/cssUtils.js";
 const LINE_DASH = [3, 6];
 
 export class CropperAndMover extends ToolEventHandler {
@@ -30,6 +30,7 @@ export class CropperAndMover extends ToolEventHandler {
     // event handlers bindings
     this.ctrlKeyCapturing = this.ctrlKeyCapturing.bind(this);
     this.onMouseWheelAboveSelection = this.onMouseWheelAboveSelection.bind(this);
+    this.tabChangeOrExportImageTracker = this.tabChangeOrExportImageTracker.bind(this);
     // removing parent default event for inputs
     this.styleSwitcher.onchange = null;
   }
@@ -60,7 +61,9 @@ export class CropperAndMover extends ToolEventHandler {
         this.dispacthToolEvent(this.createCropAndMoveEvent());
       }
       this.clearState();
-      this.renderLatestState();
+      this.renderLatestState({
+        cleanImage: true,
+      });
     }
 
     if (!this.isSelectionDone) {
@@ -94,6 +97,11 @@ export class CropperAndMover extends ToolEventHandler {
           firstX, firstY,
           width, height
         );
+        if (!this.wholeCanvasImageData) {
+          this.renderLatestState({
+            cleanImage: true
+          });
+        }
         this.context.clearRect(firstX, firstY, width, height);
         // saving canvas state to later render behind image moving
         this.wholeCanvasImageData = this.context.getImageData(
@@ -102,12 +110,11 @@ export class CropperAndMover extends ToolEventHandler {
           this.canvas.width,
           this.canvas.height
         );
-        this.context.putImageData(this.wholeCanvasImageData, 0, 0);
+        // this.context.putImageData(this.wholeCanvasImageData, 0, 0);
       }
       else {
         // rendering previous saved canvas state before rendering
         // it behind image moving
-        this.renderLatestState();
         this.context.putImageData(this.wholeCanvasImageData, 0, 0);
       }
       
@@ -196,7 +203,9 @@ export class CropperAndMover extends ToolEventHandler {
         x, y,
         width, height
       );
-      super.renderLatestState();
+      super.renderLatestState({
+        cleanImage: true
+      });
       const canvasImageBeforeCrop = this.context.getImageData(
         0, 0,
         this.canvas.width,
@@ -281,6 +290,7 @@ export class CropperAndMover extends ToolEventHandler {
     this.currentStyle.rotationDegree = parseFloat(rotationDegree) * Math.PI / 180;
 
     if (this.isSelectionDone && this.selectionData) {
+      // check if this case needs cleanImage
       this.renderLatestState();
       this.updateContextToCurrentStyle();
     }
@@ -386,20 +396,43 @@ export class CropperAndMover extends ToolEventHandler {
       }
       this.handleStyleSwitch(fakeEvent);
       // this.wheelEndTimeoutControl = setTimeout(() => {
-      //   // possible callback once continuous sequentil wheel events
-      //   // stopped after 333 miliseconds
+      //   // possible callback once continuous wheel events
+      //   // stopped after `newScrollStopEventTimeGap` ms
+      //   // (333ms in the example below)
       //   console.log('wheel input update');
       // }, newScrollStopEventTimeGap);
     }
   }
 
+  tabChangeOrExportImageTracker(event) {
+    const el = event.target;
+    const isTabChanging = (
+      hasCSSClass(el, "tab")
+        || el.id === "add-tab"
+    );
+    const isImageBeingExported = (
+      el.tagName === "LI"
+        && el.innerText === "Export Image"
+    )
+    if (!(isTabChanging || isImageBeingExported)) return;
+    
+    if (this.imageStateHasChanged) {
+      this.dispacthToolEvent(this.createCropAndMoveEvent());
+    }
+    this.clearState();
+    this.renderLatestState({
+      cleanImage: true,
+    });
+    console.log('state cleared by tab change or image export')
+  };
 
   setActiveState(state) {
     const rotationInput = this.styleSwitcher.querySelector("#rotationDegree");
     if (Boolean(state)) {
       this.startCtrlKeyCapturing();
-      rotationInput.addEventListener('input', this.handleStyleSwitch);
-      this.canvas.addEventListener('wheel', this.onMouseWheelAboveSelection);
+      rotationInput.addEventListener("input", this.handleStyleSwitch);
+      this.canvas.addEventListener("wheel", this.onMouseWheelAboveSelection);
+      document.addEventListener("mousedown", this.tabChangeOrExportImageTracker);
       if (this.activeCounter === 0) {
         this.alert({
           type: "info",
@@ -411,13 +444,16 @@ export class CropperAndMover extends ToolEventHandler {
     }
     else {
       this.stopCtrlKeyCapturing();
-      rotationInput.removeEventListener('input', this.handleStyleSwitch);
-      this.canvas.removeEventListener('wheel', this.onMouseWheelAboveSelection);
+      rotationInput.removeEventListener("input", this.handleStyleSwitch);
+      this.canvas.removeEventListener("wheel", this.onMouseWheelAboveSelection);
+      document.removeEventListener("mousedown", this.tabChangeOrExportImageTracker);
       if (this.imageStateHasChanged) {
         this.dispacthToolEvent(this.createCropAndMoveEvent());
       }
       this.clearState();
-      this.renderLatestState();
+      this.renderLatestState({
+        cleanImage: true,
+      });
     }
     super.setActiveState(state);
   }

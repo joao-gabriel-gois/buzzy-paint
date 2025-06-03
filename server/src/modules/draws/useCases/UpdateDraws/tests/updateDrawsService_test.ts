@@ -1,34 +1,25 @@
 import { v4 as uuid } from "npm:uuid";
-import { beforeAll, describe, it } from "jsr:@std/testing/bdd";
+import { afterAll, beforeAll, describe, it } from "jsr:@std/testing/bdd";
 import { expect } from "jsr:@std/expect/expect";
 import { unreachable } from "@std/assert/unreachable";
 import { User } from "@modules/accounts/models/User.ts";
 import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
 import { IUpdateUserDTO } from "@modules/accounts/DTOs/UpdateUserDTO.ts";
 import { ITabsDTO } from "@modules/draws/DTOs/DrawsDTO.ts";
-import { IDrawsRepository } from "@modules/draws/repositories/IDrawsRepository.ts";
-import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts";
-import { DrawsRepositoryInMemory } from "@modules/draws/repositories/in-memory/drawsRepository.ts";
-import { UsersRepositoryInMemory } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
-import { CreateDrawsService } from "@modules/draws/useCases/CreateDraws/createDrawsService.ts";
-import { UpdateDrawsService } from "@modules/draws/useCases/UpdateDraws/updateDrawsService.ts";
-import { GetDrawsService } from "@modules/draws/useCases/GetDraws/getDrawsService.ts";
+import { drawsRepository } from "@modules/draws/repositories/in-memory/drawsRepository.ts";
+import { usersRepository } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
+import { createDrawsService } from "@modules/draws/useCases/CreateDraws/createDrawsService.ts";
+import { updateDrawsService } from "@modules/draws/useCases/UpdateDraws/updateDrawsService.ts";
+import { getDrawsService } from "@modules/draws/useCases/GetDraws/getDrawsService.ts";
 import { BusinessLogicError, NotFoundError } from "@shared/errors/ApplicationError.ts";
 import { tabsDTOTestSample, tabsDTOTestSampleUpdate } from "@modules/draws/useCases/tabsDTOTestSample.ts";
 
 let user: User;
 let userRequestData: ICreateUserDTO;
-let usersRepository: IUsersRepository;
 let createdDraws: ITabsDTO | null;
-let drawsRepository: IDrawsRepository;
-let createDrawsService: CreateDrawsService;
-let updateDrawsService: UpdateDrawsService;
-let getDrawsService: GetDrawsService;
 
 describe("Update Draws Service", () => {
   beforeAll(async () => {
-    usersRepository = new UsersRepositoryInMemory();
-    drawsRepository = new DrawsRepositoryInMemory();
     userRequestData = {
       email: "anything@test.com",
       username: "anyone",
@@ -38,26 +29,28 @@ describe("Update Draws Service", () => {
     };
     user = await usersRepository.create(userRequestData) as User;
     
-    createDrawsService = new CreateDrawsService(drawsRepository, usersRepository);
-    await createDrawsService.execute(user.id, tabsDTOTestSample);
+    await createDrawsService(user.id, tabsDTOTestSample);
    
-    getDrawsService = new GetDrawsService(drawsRepository, usersRepository);
-    createdDraws = await getDrawsService.execute(user.id);
+    createdDraws = await getDrawsService(user.id);
     if (!createdDraws) {
       throw new Error(
         'Test has failed. It was not possible to create the first draw for next tests.'
       );
     }
-    updateDrawsService = new UpdateDrawsService(drawsRepository, usersRepository);
+  });
+
+  afterAll(() => {
+    usersRepository.clear();
+    drawsRepository.clear();
   });
 
   it("should be able to update draws", async () => {
-    await updateDrawsService.execute(
+    await updateDrawsService(
       user.id,
       tabsDTOTestSampleUpdate
     );
 
-    const updatedDraws = await getDrawsService.execute(user.id);
+    const updatedDraws = await getDrawsService(user.id);
 
     expect(updatedDraws).not.toBe(null);
     expect(updatedDraws).not.toBe(createdDraws);
@@ -65,7 +58,7 @@ describe("Update Draws Service", () => {
 
   it("should not be able to update draws for a non-existent user", async () => {
     try {
-      await updateDrawsService.execute(uuid() as UUID, tabsDTOTestSample);
+      await updateDrawsService(uuid() as UUID, tabsDTOTestSample);
       unreachable("Expected NotFoundError was not thrown for not found user_id");
     }
     catch(error) {
@@ -90,7 +83,7 @@ describe("Update Draws Service", () => {
     await usersRepository.update(newUserWithInvalidDrawsId);
     
     try {
-      await updateDrawsService.execute(newUserWithInvalidDrawsId.id, tabsDTOTestSample);
+      await updateDrawsService(newUserWithInvalidDrawsId.id, tabsDTOTestSample);
       unreachable("Expected BusinessLogicError was not thrown for an existent draws document");
     }
     catch(error) {

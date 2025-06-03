@@ -1,30 +1,22 @@
 import { v4 as uuid } from "npm:uuid";
-import { beforeAll, describe, it } from "jsr:@std/testing/bdd";
+import { afterAll, beforeAll, describe, it } from "jsr:@std/testing/bdd";
 import { expect } from "jsr:@std/expect/expect";
 import { unreachable } from "@std/assert/unreachable";
 import { ICreateUserDTO } from "@modules/accounts/DTOs/CreateUserDTO.ts";
 import { IUpdateUserDTO } from "@modules/accounts/DTOs/UpdateUserDTO.ts";
 import { User } from "@modules/accounts/models/User.ts";
-import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts";
-import { IDrawsRepository } from "@modules/draws/repositories/IDrawsRepository.ts";
-import { DrawsRepositoryInMemory } from "@modules/draws/repositories/in-memory/drawsRepository.ts";
-import { UsersRepositoryInMemory } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
-import { CreateDrawsService } from "@modules/draws/useCases/CreateDraws/createDrawsService.ts";
-import { GetDrawsService } from "@modules/draws/useCases/GetDraws/getDrawsService.ts";
+import { usersRepository } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
+import { drawsRepository } from "@modules/draws/repositories/in-memory/drawsRepository.ts";
+import { createDrawsService } from "@modules/draws/useCases/CreateDraws/createDrawsService.ts";
+import { getDrawsService } from "@modules/draws/useCases/GetDraws/getDrawsService.ts";
 import { NotFoundError } from "@shared/errors/ApplicationError.ts";
 import { tabsDTOTestSample } from "@modules/draws/useCases/tabsDTOTestSample.ts";
 
 let userRequestData: ICreateUserDTO;
 let user: User;
-let usersRepository: IUsersRepository;
-let drawsRepository: IDrawsRepository;
-let createDrawsService: CreateDrawsService;
-let getDrawsService: GetDrawsService;
 
 describe("Get Draws Service", () => {
   beforeAll(async () => {
-    usersRepository = new UsersRepositoryInMemory();
-    drawsRepository = new DrawsRepositoryInMemory();
     userRequestData = {
       email: "anything@test.com",
       username: "anyone",
@@ -33,20 +25,23 @@ describe("Get Draws Service", () => {
       password: "TestPsswd!123_"
     };
     user = await usersRepository.create(userRequestData) as User;
-    createDrawsService = new CreateDrawsService(drawsRepository, usersRepository);
-    getDrawsService = new GetDrawsService(drawsRepository, usersRepository);
+  });
+
+  afterAll(() => {
+    usersRepository.clear();
+    drawsRepository.clear();
   });
 
   it("should be able to get draws", async () => {
-    await createDrawsService.execute(user.id, tabsDTOTestSample);
-    const draws = await getDrawsService.execute(user.id);
+    await createDrawsService(user.id, tabsDTOTestSample);
+    const draws = await getDrawsService(user.id);
     expect(draws).not.toBe(null);
     expect(draws).toBe(tabsDTOTestSample);
   });
 
   it("should not be able to get draws for a non-existent user", async () => {
     try {
-      await getDrawsService.execute(uuid() as UUID);
+      await getDrawsService(uuid() as UUID);
       unreachable("Expected NotFoundError was not thrown for not found user_id");
     }
     catch(error) {
@@ -71,7 +66,7 @@ describe("Get Draws Service", () => {
     await usersRepository.update(newUserWithInvalidDrawsId);
     
     try {
-      await getDrawsService.execute(newUserWithInvalidDrawsId.id);
+      await getDrawsService(newUserWithInvalidDrawsId.id);
       unreachable("Expected NotFoundError was not thrown for non-existent draws document");
     }
     catch(error) {

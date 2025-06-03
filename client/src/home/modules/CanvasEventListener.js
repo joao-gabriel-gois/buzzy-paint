@@ -1,7 +1,3 @@
-// import { createAndRenderAlert } from '../../shared/alerts.js';
-import { getStyle } from '../../utils/cssUtils.js';
-
-// const MAX_UNDO_STACK_SIZE = 120;
 
 export class CanvasEventListener {
   static #instancesCount = 0;
@@ -12,15 +8,14 @@ export class CanvasEventListener {
       eventQueue: [],
       undoStack: []
     },
-    // alert = createAndRenderAlert
   ) {
     CanvasEventListener.#instancesCount++;
     this.canvas = document.querySelector(canvasReference);
     this.context = this.canvas.getContext('2d', { willReadFrequently: true });
+    this.wholeCanvasImageData = null;
     
     this.eventQueue = data.eventQueue;
     this.undoStack = data.undoStack;
-    // this.alert = alert;
 
     this.offscreenCanvas = document.createElement('canvas');
     this.offscreenCanvasContext = null;
@@ -33,7 +28,6 @@ export class CanvasEventListener {
     this.onZoom = this.onZoom.bind(this);
     this.renderCurrentState = this.renderCurrentState.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
-    this.paintBackground = this.paintBackground.bind(this);
   }
 
   static getNumberOfInstances() {
@@ -42,9 +36,9 @@ export class CanvasEventListener {
 
   redrawSequence(event) {
     const { sequence, style } = event;
-    const drawThicknessRate = 1 + style.drawThickness / 8;
-    this.context.strokeStyle = style.drawColor;
-    this.context.lineWidth = drawThicknessRate;
+    const { drawLineWidth, drawColor } = style;
+    this.context.strokeStyle = drawColor;
+    this.context.lineWidth = drawLineWidth;
 
     sequence.forEach((point, index) => {
       if (!index) {
@@ -62,7 +56,7 @@ export class CanvasEventListener {
   redrawLine(event) {
     const { line, style } = event;
     this.context.strokeStyle = style.lineColor;
-    this.context.lineWidth = style.lineThickness;
+    this.context.lineWidth = style.lineWidth;
     this.context.beginPath();
     this.context.moveTo(...line.start);
     this.context.lineTo(...line.end);
@@ -99,7 +93,7 @@ export class CanvasEventListener {
     }
     if (style.rectStroked) {
       this.context.strokeStyle = style.rectOutlineColor;
-      this.context.lineWidth = style.rectThickness;
+      this.context.lineWidth = style.rectLineWidth;
       this.context.strokeRect(x, y, width, height);
     }
   }
@@ -119,7 +113,7 @@ export class CanvasEventListener {
     }
     if (style.ellipseStroked) {
       this.context.strokeStyle = style.ellipseOutlineColor;
-      this.context.lineWidth = style.ellipseThickness;
+      this.context.lineWidth = style.ellipseLineWidth;
       this.context.beginPath();
       this.context.ellipse(x, y, radiusWidth, radiusHeight, 0, 0, 2 * Math.PI);
       this.context.stroke();
@@ -133,19 +127,16 @@ export class CanvasEventListener {
       width,
       height
     } = event.firstSelection;
-
     const {
       dataPosition,
       firstEventOfTheChain,
-      style
+      style,
     } = event;
-    this.context.save();
-
+    
     if (firstEventOfTheChain) {
       const imageDataParameters = [firstX, firstY, width, height];
       this.cropSelectionData = this.context.getImageData(...imageDataParameters);
-      this.context.clearRect(...imageDataParameters, style.rotationDegree);
-      // saving canvas state to render it behind image moving later
+      this.context.clearRect(...imageDataParameters);
       this.wholeCanvasImageData = this.context.getImageData(
         0, 0,
         this.canvas.width,
@@ -155,24 +146,18 @@ export class CanvasEventListener {
     else {
       this.context.putImageData(this.wholeCanvasImageData, 0, 0);
     }
-
+    
     if (!this.cropSelectionData) {
       console.error("(CanvasEventListener) Strange scenario, can't find selection data!");
       return;
     }
-
+    
     let [x, y] = dataPosition;
     if (!(x && y)) {
       x = firstX;
       y = firstY;
     }
-    const centerX = x + width / 2;
-    const centerY = y + height / 2;
-    const angle = style.rotationDegree;
-
-    this.context.translate(centerX, centerY);
-    this.context.rotate(angle);
-
+    
     this.offscreenCanvas.width = width;
     this.offscreenCanvas.height = height;
     if (!this.offscreenCanvasContext) {
@@ -180,7 +165,15 @@ export class CanvasEventListener {
     }
     this.offscreenCanvasContext.clearRect(0, 0, width, height);
     this.offscreenCanvasContext.putImageData(this.cropSelectionData, 0, 0);
+    
+    this.context.save();
 
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+    const angle = style.rotationDegree;
+
+    this.context.translate(centerX, centerY);
+    this.context.rotate(angle);
     this.context.drawImage(
       this.offscreenCanvas, 
       -width / 2, -height / 2, // centered around rotation point
@@ -216,74 +209,66 @@ export class CanvasEventListener {
   applyErasing(event) {
     const size = event.eraserSize;
     this.context.beginPath();
-    if (event.isPng) {
-      event.sequence.forEach(point => {
-        this.context.clearRect(point[0] - size / 2, point[1] - size / 2, size, size);
-      });
-      this.context.closePath();
-      return;
-    }
-
     event.sequence.forEach(point => {
-        this.context.fillStyle = getStyle(this.canvas).backgroundColor;
-        this.context.fillRect(point[0] - size / 2, point[1] - size / 2, size, size);
+      this.context.clearRect(point[0] - size / 2, point[1] - size / 2, size, size);
     });
     this.context.closePath();
   }
 
-  renderCurrentState(cb) {
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    // JPG case for exporting images, cb shoud paintBackground before exporting
-    if (cb && !(cb instanceof Event)) cb();
+  renderCurrentState(event) {
+    let cleanImage;
+    if (event && event.detail) {
+      cleanImage = event.detail.cleanImage;
+    }
 
-    if (this.isZoomActive) 
-      this.applyZoom();
+    if (this.isZoomActive) this.applyZoom();
+    
+    if (!cleanImage && this.wholeCanvasImageData) {
+      this.context.putImageData(this.wholeCanvasImageData, 0, 0);
+      return;
+    }
+
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     
     for (let event of this.eventQueue) {
-      switch(event.type) {
-        case 'DRAW':
-          this.redrawSequence(event);
-          break;
-        case 'LINE':
-          this.redrawLine(event);
-          break;
-        case 'WRITE':
-          this.rewriteAtPoint(event);
-          break;
-        case 'RECT':
-          this.redrawRectangle(event);
-          break;
-        case 'ELLIPSE':
-          this.redrawEllipse(event);
-          break;
-        case 'CROP-AND-MOVE':
-          this.cropAndMove(event);
-          break;
-        case 'ERASE': 
-          event = {
-            ...event,
-            isPng: !cb
-          }
-          this.applyErasing(event);
-          break;  
-      }
+      this.renderEvent(event);
     };
+    this.wholeCanvasImageData = this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  renderEvent(event) {
+    switch(event.type) {
+      case 'DRAW':
+        this.redrawSequence(event);
+        break;
+      case 'LINE':
+        this.redrawLine(event);
+        break;
+      case 'WRITE':
+        this.rewriteAtPoint(event);
+        break;
+      case 'RECT':
+        this.redrawRectangle(event);
+        break;
+      case 'ELLIPSE':
+        this.redrawEllipse(event);
+        break;
+      case 'CROP-AND-MOVE':
+        this.cropAndMove(event);
+        break;
+      case 'ERASE':
+        this.applyErasing(event);
+        break;  
+    }
   }
 
   undo() {
-    // if (this.undoStack.length > MAX_UNDO_STACK_SIZE) {
-    //   this.alert({
-    //     type: "warning",
-    //     title: "Max UndoStack Size Reached",
-    //     message: "You've typed `ctrl + z` several times and reached the limit."
-    //       + " Cleaning all the previous commands (you can't revover it anymore!)." 
-    //   });
-    //   this.undoStack = [];
-    // } 
     const removedEvent = this.eventQueue.pop();
     if (removedEvent) {
       this.undoStack.push(removedEvent);
-      this.renderCurrentState();
+      this.renderCurrentState({
+        detail: { cleanImage: true }
+      });
     }
   }
 
@@ -291,7 +276,9 @@ export class CanvasEventListener {
     const reAddedEvent = this.undoStack.pop();
     if (reAddedEvent) {
       this.eventQueue.push(reAddedEvent);
-      this.renderCurrentState();
+      this.renderCurrentState({
+        detail: { cleanImage: true }
+      });
     }
   }
 
@@ -309,6 +296,11 @@ export class CanvasEventListener {
     type = type.toUpperCase();
     Object.assign(detail, { type });
     this.eventQueue.push(detail);
+    this.wholeCanvasImageData = this.context.getImageData(
+      0, 0,
+      this.canvas.width,
+      this.canvas.height
+    );
     this.undoStack = [];
   }
 
@@ -316,11 +308,6 @@ export class CanvasEventListener {
     const { zoom, state } = event.detail;
     this.isZoomActive = state;
     this.zoomCurrentRate = zoom;
-  }
-
-  paintBackground() {
-    this.context.fillStyle = getStyle(this.canvas).backgroundColor;
-    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   start() {

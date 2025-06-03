@@ -1,95 +1,70 @@
 import { checkHash } from "@utils/hash.ts";
 import { sign } from "npm:jsonwebtoken";
-import { InvalidParameterError, BadRequestError, BusinessLogicError } from "@shared/errors/ApplicationError.ts";
-import { usersRepository } from "@modules/accounts/repositories/postgres/usersRepository.ts";
 import auth from "@config/auth.ts";
-import { usersTokensRepository } from "@modules/accounts/repositories/postgres/usersTokensRepository.ts";
+import { IAuthRequest, IAuthResponse } from "@modules/accounts/useCases/interfaces.ts";
+import { usersTokensRepository as prodUsersTokensRepository } from "@modules/accounts/repositories/postgres/usersTokensRepository.ts";
+import { usersTokensRepository as testUsersTokensRepository  } from "@modules/accounts/repositories/in-memory/usersTokensRepository.ts";
+import { usersRepository as prodUsersRepository } from "@modules/accounts/repositories/postgres/usersRepository.ts";
+import { usersRepository as testUsersRepository } from "@modules/accounts/repositories/in-memory/usersRepository.ts";
+import { InvalidParameterError, UnauthorizedError } from "@shared/errors/ApplicationError.ts";
 import { expiryDateMapper, pgsqlDateAdapter } from "@utils/expiryDateMapper.ts";
-import { IUsersRepository } from "@modules/accounts/repositories/IUsersRepository.ts";
-import { IUsersTokensRepository } from "@modules/accounts/repositories/IUsersTokensRepository.ts";
 
-export interface IAuthRequest {
-  email: string;
-  password: string;
+const ENV = Deno.env.get('ENV');
+const  {
+  refresh_token_secret,
+  refresh_token_expires_in: prod_refresh_token_expires_in,
+  refresh_token_test_expires_in: test_refresh_token_expires_in,
+  token_secret,
+  token_expires_in 
+} = auth;
+
+const usersTokensRepository = ENV === 'test' ? testUsersTokensRepository : prodUsersTokensRepository;
+const usersRepository = ENV === 'test' ? testUsersRepository : prodUsersRepository;
+const refresh_token_expires_in = ENV === 'test' ? test_refresh_token_expires_in : prod_refresh_token_expires_in;
+
+if (!(token_secret || token_expires_in || refresh_token_secret || refresh_token_expires_in)) {
+  throw new InvalidParameterError("Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!");
 }
 
-export interface IAuthResponse {
-  user: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    username: string;
-  };
-  token: string;
-  refresh_token: string;
-}
-
-
-// class is exportable only for unit tests.
-// Do not import it anywhere else to keep all
-// services as singletons.
-export class AuthenticateUserService {
-  constructor(
-    private usersTokensRepository: IUsersTokensRepository,
-    private usersRepository: IUsersRepository,
-  ) {};
-
-  async execute({ email, password }: IAuthRequest): Promise<IAuthResponse> {
-    const user = await this.usersRepository.findByEmail(email);
-    if (!user || !user!.id) {
-      throw new BadRequestError("Incorrect Email or password!");
-    }
-
-    const  {
-      token_secret,
-      token_expires_in,
-      refresh_token_secret,
-      refresh_token_expires_in
-    } = auth;
-
-    if (!(token_secret || token_expires_in || refresh_token_secret || refresh_token_expires_in)) {
-      throw new InvalidParameterError("Server is not accessing .env variables used on authentication cofig file! Fatal Error. Contact admin!");
-    }
-
-    const passwordMatch = await checkHash(password, user.password!); // Password is manageable to get deleteable, but it will be surely returned
-    if (!passwordMatch) {
-      throw new BusinessLogicError("Incorrect Email or password!");
-    }
-
-    const token = sign({}, token_secret , {
-      subject: user.id,
-      expiresIn: token_expires_in,
-    });
-
-    const expiration_date = pgsqlDateAdapter(
-      new Date(Date.now() + expiryDateMapper(token_expires_in!))
-    );
-
-    const refresh_token = sign({ email }, refresh_token_secret, {
-      subject: user.id,
-      expiresIn: refresh_token_expires_in 
-    });
-
-    // usersTokensRepository
-    await this.usersTokensRepository.create({
-      user_id: user.id!,
-      expiration_date,
-      refresh_token
-    });
-    
-    return {
-      user: {
-        firstName: user.firstname,
-        lastName: user.lastname,
-        email: user.email,
-        username: user.username
-      }, 
-      token,
-      refresh_token,
-    };
-
+export async function authenticateUserService({ email, password }: IAuthRequest): Promise<IAuthResponse> {
+  const user = await usersRepository.findByEmail(email);
+  if (!user || !user!.id) {
+    throw new UnauthorizedError("Incorrect email or password!");
   }
 
-}
+  const passwordMatch = await checkHash(password, user.password!); // Password is manageable to get deleteable, but it will be surely returned
+  if (!passwordMatch) {
+    throw new UnauthorizedError("Incorrect email or password!");
+  }
 
-export const authenticateUserService = new AuthenticateUserService(usersTokensRepository, usersRepository);
+  const token = sign({}, token_secret , {
+    subject: user.id,
+    expiresIn: token_expires_in,
+  });
+
+  const expiration_date = pgsqlDateAdapter(
+    new Date(Date.now() + expiryDateMapper(token_expires_in!))
+  );
+
+  const refresh_token = sign({ email }, refresh_token_secret, {
+    subject: user.id,
+    expiresIn: refresh_token_expires_in 
+  });
+
+  await usersTokensRepository.create({
+    user_id: user.id!,
+    expiration_date,
+    refresh_token
+  });
+  
+  return {
+    user: {
+      firstName: user.firstname,
+      lastName: user.lastname,
+      email: user.email,
+      username: user.username
+    }, 
+    token,
+    refresh_token,
+  };
+}

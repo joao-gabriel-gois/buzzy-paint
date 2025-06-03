@@ -49,11 +49,11 @@ function isDrawCommand(value: unknown): value is IDrawCommand {
   if (!style || typeof style !== "object") return false;
 
   const {
-    drawThickness,
+    drawLineWidth,
     drawColor
   } = style as Partial<IDrawCommand["style"]>;
   
-  return typeof drawThickness === "number" && 
+  return typeof drawLineWidth === "number" && 
          typeof drawColor === "string";
 }
 
@@ -70,11 +70,11 @@ function isLineCommand(value: unknown): value is ILineCommand {
   if (!style || typeof style !== "object") return false;
 
   const {
-    lineThickness,
+    lineWidth,
     lineColor
   } = style as Partial<ILineCommand["style"]>;
 
-  return typeof lineThickness === "number" && 
+  return typeof lineWidth === "number" && 
          typeof lineColor === "string";
 }
 
@@ -121,7 +121,7 @@ function isRectangleCommand(value: unknown): value is IRectangleCommand {
   if (!isRectangle(rect)) return false;
   if (!style || typeof style !== "object") return false;
   
-  return typeof style.rectThickness === "number" && 
+  return typeof style.rectLineWidth === "number" && 
          typeof style.rectOutlineColor === "string" &&
          typeof style.rectFillColor === "string" &&  // This was rectFillColor in your interface
          typeof style.rectFilled === "boolean" &&
@@ -144,7 +144,7 @@ function isEllipseCommand(value: unknown): value is IEllipseCommand {
   }  
   if (!style || typeof style !== "object") return false;
   
-  return typeof style.ellipseThickness === "number" && 
+  return typeof style.ellipseLineWidth === "number" && 
          typeof style.ellipseOutlineColor === "string" &&
          typeof style.ellipseFillColor === "string" &&
          typeof style.ellipseFilled === "boolean" &&
